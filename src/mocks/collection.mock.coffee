@@ -5,5 +5,6 @@ angular.module('soil.collection.mock', [])
       constructor: (@_source_url) ->
         @members = undefined
 
-      loadAll: jasmine.createSpy()
+      loadAll: jasmine.createSpy().andCallFake =>
+        members = []
   ])
