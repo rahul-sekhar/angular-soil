@@ -8,6 +8,9 @@
         function soilCollection(_modelClass, _source_url) {
           this._modelClass = _modelClass;
           this._source_url = _source_url;
+          if (!_.isFunction(this._modelClass)) {
+            throw 'Expected a model class as the first argument when instantiating soilCollection';
+          }
           this.members = void 0;
         }
 

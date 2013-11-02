@@ -3,6 +3,9 @@ angular.module('soil.collection', [])
   .factory('soilCollection', ['$http', ($http) ->
     class soilCollection
       constructor: (@_modelClass, @_source_url) ->
+        unless _.isFunction(@_modelClass)
+          throw 'Expected a model class as the first argument when instantiating soilCollection'
+
         @members = undefined
 
       loadAll: ->
