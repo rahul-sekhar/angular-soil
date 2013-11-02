@@ -1,13 +1,12 @@
-angular.module('soil.collection.mock', [])
+angular.module('soil.collection.mock', ['soil.collection'])
+  .config(['$provide', ($provide) ->
+    $provide.decorator('soilCollection', ['$delegate', ($delegate) ->
+      class soilCollectionMock extends $delegate
+        constructor: ->
+          super
+          spyOn(this, 'loadAll').andCallFake =>
+            @members = []
 
-  .factory('soilCollection', ['$http', ($http) ->
-    class soilCollection
-      constructor: (@_source_url) ->
-        @members = undefined
-        spyOn(this, 'loadAll').andCallThrough()
-
-      loadAll: ->
-        @members = []
-
-      addItem: jasmine.createSpy()
+        addItem: jasmine.createSpy()
+    ])
   ])
