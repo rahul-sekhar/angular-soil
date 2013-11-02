@@ -1,4 +1,4 @@
-angular.module('soil-collection.mock', [])
+angular.module('soil.collection.mock', [])
 
   .factory('soilCollection', ['$http', ($http) ->
     class soilCollection

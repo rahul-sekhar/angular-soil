@@ -9,10 +9,10 @@ AngularJS 1.2.0rc3
 
 soilCollection
 --------------
-Include the module `soil-collection` like so:
+Include the module `soil.collection` like so:
 
 ```javascript
-angular.module('your-module', ['soil-collection'])
+angular.module('your-module', ['soil.collection'])
 ```
 
 The SoilCollection class can then be injected where required:

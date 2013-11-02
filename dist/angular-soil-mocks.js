@@ -1,7 +1,7 @@
 /* angular-soil v0.1.0 %> */
 
 (function() {
-  angular.module('soil-collection.mock', []).factory('soilCollection', [
+  angular.module('soil.collection.mock', []).factory('soilCollection', [
     '$http', function($http) {
       var soilCollection;
       return soilCollection = (function() {

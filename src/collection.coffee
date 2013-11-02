@@ -1,4 +1,4 @@
-angular.module('soil-collection', [])
+angular.module('soil.collection', [])
 
   .factory('soilCollection', ['$http', ($http) ->
     class soilCollection

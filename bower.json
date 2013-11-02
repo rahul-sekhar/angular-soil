@@ -18,6 +18,7 @@
     "node_modules",
     "bower_components",
     "tests"
+    "karma.conf.json"
   ],
   "dependencies": {
     "angular": "1.2.0-rc.3",
