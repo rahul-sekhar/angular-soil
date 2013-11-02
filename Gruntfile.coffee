@@ -4,7 +4,8 @@ module.exports = (grunt) ->
     coffee:
       compile:
         files: {
-          'dist/angular-soil.js': 'src/*.coffee'
+          'dist/angular-soil.js': 'src/*.coffee',
+          'dist/angular-soil-mocks.js': 'src/mocks/*.coffee'
         }
     uglify:
       build:
@@ -14,7 +15,7 @@ module.exports = (grunt) ->
       options:
         banner: '/* <%= pkg.name %> v<%= pkg.version %> %> */\n'
       files:
-        src: ['dist/angular-soil.js', 'dist/angular-soil.min.js']
+        src: ['dist/angular-soil.js', 'dist/angular-soil.min.js', 'dist/angular-soil-mocks.js']
 
 
   grunt.loadNpmTasks('grunt-contrib-coffee');

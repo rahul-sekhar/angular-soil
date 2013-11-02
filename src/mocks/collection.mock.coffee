@@ -1,11 +1,9 @@
-angular.module('soil-collection', [])
+angular.module('soil-collection.mock', [])
 
   .factory('soilCollection', ['$http', ($http) ->
     class soilCollection
       constructor: (@_source_url) ->
         @members = undefined
 
-      loadAll: ->
-        $http.get(@_source_url).success (data) =>
-          @members = data
+      loadAll: jasmine.createSpy()
   ])

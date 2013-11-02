@@ -1,7 +1,7 @@
 /* angular-soil v0.1.0 %> */
 
 (function() {
-  angular.module('soil-collection', []).factory('soilCollection', [
+  angular.module('soil-collection.mock', []).factory('soilCollection', [
     '$http', function($http) {
       var soilCollection;
       return soilCollection = (function() {
@@ -10,12 +10,7 @@
           this.members = void 0;
         }
 
-        soilCollection.prototype.loadAll = function() {
-          var _this = this;
-          return $http.get(this._source_url).success(function(data) {
-            return _this.members = data;
-          });
-        };
+        soilCollection.prototype.loadAll = jasmine.createSpy();
 
         return soilCollection;
 
