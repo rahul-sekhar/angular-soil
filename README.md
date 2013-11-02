@@ -18,7 +18,8 @@ angular.module('your-module', ['soil-collection'])
 The SoilCollection class can then be injected where required:
 
 ```javascript
-angular.module('your-module').factory('yourFactory', ['soilCollection', function (soilCollection)
-  // ...
+angular.module('your-module')
+  .factory('yourFactory', ['soilCollection', function (soilCollection)
+    // ...
 ])
 ```

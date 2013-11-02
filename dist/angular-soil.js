@@ -11,7 +11,10 @@
         }
 
         Collection.prototype.loadAll = function() {
-          return $http.get(this._source_url);
+          var _this = this;
+          return $http.get(this._source_url).success(function(data) {
+            return _this.members = data;
+          });
         };
 
         return Collection;

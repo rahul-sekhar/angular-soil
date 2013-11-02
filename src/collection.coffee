@@ -6,5 +6,6 @@ angular.module('soil-collection', [])
         @members = undefined
 
       loadAll: ->
-        $http.get(@_source_url)
+        $http.get(@_source_url).success (data) =>
+          @members = data
   ])
