@@ -1,6 +1,6 @@
 {
   "name": "angular-soil",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://github.com/rahul-sekhar/angular-soil",
   "authors": [
     "Rahul Sekhar <sekhar.rahul@gmail.com>"
@@ -18,7 +18,10 @@
     "node_modules",
     "bower_components",
     "tests",
-    "karma.conf.json"
+    "karma.conf.json",
+    "src",
+    "Gruntfile.coffee",
+    "package.json"
   ],
   "dependencies": {
     "angular": "1.2.0-rc.3",

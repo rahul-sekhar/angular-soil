@@ -1,6 +1,6 @@
 module.exports = (grunt) ->
   grunt.initConfig
-    pkg: grunt.file.readJSON('package.json')
+    pkg: grunt.file.readJSON('bower.json')
     coffee:
       compile:
         files: {
