@@ -1,0 +1,26 @@
+{
+  "name": "angular-soil",
+  "version": "0.1.0",
+  "homepage": "https://github.com/rahul-sekhar/angular-soil",
+  "authors": [
+    "Rahul Sekhar <sekhar.rahul@gmail.com>"
+  ],
+  "description": "AngularJS modules with a model and collection base",
+  "main": "dist/angular-soil.js",
+  "keywords": [
+    "angularjs",
+    "model",
+    "collection"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "1.2.0-rc.3",
+    "angular-mocks": "1.2.0-rc.3"
+  }
+}
