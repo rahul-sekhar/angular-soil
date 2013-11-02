@@ -1,14 +1,16 @@
-describe 'soil-collection module', ->
-  beforeEach module 'soil-collection'
+describe 'soil.collection module', ->
+  beforeEach module 'soil.collection'
+  beforeEach module 'soil.model.mock'
 
   describe 'soilCollection', ->
-    soilCollection = instance = httpBackend = rootScope = null
+    soilModel = soilCollection = instance = httpBackend = rootScope = null
 
-    beforeEach inject (_soilCollection_, $httpBackend, $rootScope) ->
+    beforeEach inject (_soilCollection_, $httpBackend, $rootScope, _soilModel_) ->
       httpBackend = $httpBackend
       rootScope = $rootScope
+      soilModel = _soilModel_
       soilCollection = _soilCollection_
-      instance = new soilCollection('/source_url')
+      instance = new soilCollection(soilModel, '/source_url')
 
     it 'sets members to undefined', ->
       expect(instance.members).toBeUndefined()
@@ -50,3 +52,52 @@ describe 'soil-collection module', ->
 
         it 'leaves members as is', ->
           expect(instance.members).toBeUndefined
+
+    describe '#addItem', ->
+      request = null
+
+      describe 'when not loaded', ->
+        beforeEach ->
+          instance.members = undefined
+          instance.addItem { data: 'val' }
+
+        it 'does not send a POST request', ->
+          httpBackend.verifyNoOutstandingExpectation()
+
+      describe 'when loaded', ->
+        beforeEach ->
+          request = httpBackend.expectPOST('/source_url', { data: 'val' })
+          request.respond null
+          instance.members = ['data1', 'data2']
+          instance.addItem { data: 'val' }
+
+        it 'sends a POST request', ->
+          httpBackend.verifyNoOutstandingExpectation()
+
+        describe 'on success', ->
+          beforeEach ->
+            request.respond { response_data: 'formatted val' }
+            httpBackend.flush()
+            rootScope.$apply()
+
+          newModel = ->
+            _.last instance.members
+
+          it 'adds a model to the collection', ->
+            expect(instance.members.length).toEqual(3)
+
+          it 'adds a model of the collections class', ->
+            expect(newModel() instanceof soilModel).toBe(true)
+
+          it 'loads response data into the added model', ->
+            expect(Object.getOwnPropertyNames(newModel())).toEqual ['response_data']
+            expect(newModel().response_data).toEqual('formatted val')
+
+        describe 'on failure', ->
+          beforeEach ->
+            request.respond 500
+            httpBackend.flush()
+            rootScope.$apply()
+
+          it 'does not add a model to the collection', ->
+            expect(instance.members.length).toEqual(2)

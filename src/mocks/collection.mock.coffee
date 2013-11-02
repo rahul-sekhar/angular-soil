@@ -4,7 +4,10 @@ angular.module('soil.collection.mock', [])
     class soilCollection
       constructor: (@_source_url) ->
         @members = undefined
+        spyOn(this, 'loadAll').andCallThrough()
 
-      loadAll: jasmine.createSpy().andCallFake =>
-        members = []
+      loadAll: ->
+        @members = []
+
+      addItem: jasmine.createSpy()
   ])

@@ -5,11 +5,12 @@ AngularJS modules with a model and collection base. Tailored specifically to dev
 
 Dependencies
 ------------
-AngularJS 1.2.0rc3
+- [AngularJS 1.2.0rc3](http://angularjs.org)
+- [Lo-Dash](http://lodash.com/)
 
 soilCollection
 --------------
-Include the module `soil.collection` like so:
+Include the module `soil.collection` like this:
 
 ```javascript
 angular.module('your-module', ['soil.collection'])
