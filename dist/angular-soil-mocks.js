@@ -1,4 +1,4 @@
-/* angular-soil 0.1.3 %> */
+/* angular-soil 0.1.4 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -40,14 +40,15 @@
     '$provide', function($provide) {
       return $provide.decorator('soilModel', [
         '$delegate', function($delegate) {
-          var soilModelMock, _ref;
+          var soilModelMock;
           return soilModelMock = (function(_super) {
             __extends(soilModelMock, _super);
 
             function soilModelMock() {
-              _ref = soilModelMock.__super__.constructor.apply(this, arguments);
-              return _ref;
+              soilModelMock.__super__.constructor.apply(this, arguments);
             }
+
+            soilModelMock.prototype.refresh = jasmine.createSpy();
 
             return soilModelMock;
 

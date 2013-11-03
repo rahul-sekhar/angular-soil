@@ -21,6 +21,13 @@ angular.module('soil.model', [])
         else
           @_base_url
 
+      refresh: ->
+        if @id
+          $http.get(@url()).success (data) =>
+            @load(data)
+        else
+          throw 'Cannot refresh model without an ID'
+
       _with_slash: (url) ->
         url.replace /\/?$/, '/'
   ])

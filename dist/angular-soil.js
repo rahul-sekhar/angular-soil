@@ -1,4 +1,4 @@
-/* angular-soil 0.1.3 %> */
+/* angular-soil 0.1.4 %> */
 
 (function() {
   angular.module('soil.collection', []).factory('soilCollection', [
@@ -65,10 +65,25 @@
 
         soilModel.prototype.url = function() {
           if (this.id) {
-            return this._base_url + '/' + this.id;
+            return this._with_slash(this._base_url) + this.id;
           } else {
             return this._base_url;
           }
+        };
+
+        soilModel.prototype.refresh = function() {
+          var _this = this;
+          if (this.id) {
+            return $http.get(this.url()).success(function(data) {
+              return _this.load(data);
+            });
+          } else {
+            throw 'Cannot refresh model without an ID';
+          }
+        };
+
+        soilModel.prototype._with_slash = function(url) {
+          return url.replace(/\/?$/, '/');
         };
 
         return soilModel;

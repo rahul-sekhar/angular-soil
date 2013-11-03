@@ -62,3 +62,36 @@ describe 'soil.model module', ->
         it 'returns the base url with the id', ->
           expect(instance.url()).toBe('/model_path/56')
 
+    describe '#refresh', ->
+      describe 'without an id', ->
+        it 'throws an error', ->
+          expect(instance.refresh).toThrow('Cannot refresh model without an ID')
+
+      describe 'with an id', ->
+        request = null
+
+        beforeEach ->
+          instance.id = 5
+          request = httpBackend.expectGET('/5')
+          request.respond null
+          spyOn(instance, 'load')
+          instance.refresh()
+
+        it 'sends a get request', ->
+          httpBackend.verifyNoOutstandingExpectation()
+
+        describe 'on success', ->
+          beforeEach ->
+            request.respond 'some data'
+            httpBackend.flush()
+
+          it 'loads the response data', ->
+            expect(instance.load).toHaveBeenCalledWith 'some data'
+
+        describe 'on error', ->
+          beforeEach ->
+            request.respond 500
+            httpBackend.flush()
+
+          it 'does not load data', ->
+            expect(instance.load).not.toHaveBeenCalled()

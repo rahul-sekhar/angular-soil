@@ -3,11 +3,10 @@ describe 'soil.collection module', ->
   beforeEach module 'soil.model.mock'
 
   describe 'soilCollection', ->
-    soilModel = soilCollection = instance = httpBackend = rootScope = null
+    soilModel = soilCollection = instance = httpBackend = null
 
-    beforeEach inject (_soilCollection_, $httpBackend, $rootScope, _soilModel_) ->
+    beforeEach inject (_soilCollection_, $httpBackend, _soilModel_) ->
       httpBackend = $httpBackend
-      rootScope = $rootScope
       soilModel = _soilModel_
       soilCollection = _soilCollection_
       instance = new soilCollection(soilModel, '/source_url')
@@ -30,7 +29,6 @@ describe 'soil.collection module', ->
         beforeEach ->
           request.respond []
           httpBackend.flush()
-          rootScope.$apply()
 
         it 'sets members to an empty array', ->
           expect(instance.members).toEqual []
@@ -39,7 +37,6 @@ describe 'soil.collection module', ->
         beforeEach ->
           request.respond [{id: 1, name: 'first'}, {id: 4, name: 'second'}]
           httpBackend.flush()
-          rootScope.$apply()
 
         it 'creates a model for each member', ->
           _.each instance.members, (member) ->
@@ -52,7 +49,6 @@ describe 'soil.collection module', ->
         beforeEach ->
           request.respond 500
           httpBackend.flush()
-          rootScope.$apply()
 
         it 'leaves members as is', ->
           expect(instance.members).toBeUndefined
@@ -82,7 +78,6 @@ describe 'soil.collection module', ->
           beforeEach ->
             request.respond { response_data: 'formatted val' }
             httpBackend.flush()
-            rootScope.$apply()
 
           newModel = ->
             _.last instance.members
@@ -101,7 +96,6 @@ describe 'soil.collection module', ->
           beforeEach ->
             request.respond 500
             httpBackend.flush()
-            rootScope.$apply()
 
           it 'does not add a model to the collection', ->
             expect(instance.members.length).toEqual(2)
