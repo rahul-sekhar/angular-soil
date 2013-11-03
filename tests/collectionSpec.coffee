@@ -41,8 +41,12 @@ describe 'soil.collection module', ->
           httpBackend.flush()
           rootScope.$apply()
 
+        it 'creates a model for each member', ->
+          _.each instance.members, (member) ->
+            expect(member instanceof soilModel).toBeTruthy()
+
         it 'sets members to the response', ->
-          expect(instance.members).toEqual [{id: 1, name: 'first'}, {id: 4, name: 'second'}]
+          expect(_.map(instance.members, (member) -> member.id)).toEqual [1, 4]
 
       describe 'on failure', ->
         beforeEach ->
@@ -87,7 +91,7 @@ describe 'soil.collection module', ->
             expect(instance.members.length).toEqual(3)
 
           it 'adds a model of the collections class', ->
-            expect(newModel() instanceof soilModel).toBe(true)
+            expect(newModel() instanceof soilModel).toBeTruthy()
 
           it 'loads response data into the added model', ->
             expect(Object.getOwnPropertyNames(newModel())).toEqual ['response_data']

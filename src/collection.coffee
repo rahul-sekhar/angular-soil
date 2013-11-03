@@ -9,8 +9,8 @@ angular.module('soil.collection', [])
         @members = undefined
 
       loadAll: ->
-        $http.get(@_source_url).success (data) =>
-          @members = data
+        $http.get(@_source_url).success (items) =>
+          @members = _.map(items, (item) => new @_modelClass(item))
 
       addItem: (data) ->
         return if @members == undefined

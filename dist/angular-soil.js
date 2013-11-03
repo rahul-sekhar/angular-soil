@@ -1,4 +1,4 @@
-/* angular-soil v0.1.2 %> */
+/* angular-soil 0.1.3 %> */
 
 (function() {
   angular.module('soil.collection', []).factory('soilCollection', [
@@ -16,8 +16,10 @@
 
         soilCollection.prototype.loadAll = function() {
           var _this = this;
-          return $http.get(this._source_url).success(function(data) {
-            return _this.members = data;
+          return $http.get(this._source_url).success(function(items) {
+            return _this.members = _.map(items, function(item) {
+              return new _this._modelClass(item);
+            });
           });
         };
 

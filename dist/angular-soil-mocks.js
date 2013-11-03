@@ -1,4 +1,4 @@
-/* angular-soil v0.1.2 %> */
+/* angular-soil 0.1.3 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
