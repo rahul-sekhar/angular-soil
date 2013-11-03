@@ -6,5 +6,7 @@ angular.module('soil.model.mock', ['soil.model'])
           super
 
         refresh: jasmine.createSpy()
+
+        updateField: jasmine.createSpy()
     ])
   ])

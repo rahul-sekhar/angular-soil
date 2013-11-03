@@ -33,13 +33,21 @@ describe 'soil.model module', ->
         it 'does not clear private fields', ->
           expect(instance._private).toEqual('private val')
 
+        it 'sets saved data', ->
+          expect(instance._saved_data).toEqual { field: 'new val', field5: 'another val' }
+
       describe 'with no data', ->
         beforeEach ->
           instance._private = 'private val'
           instance.load()
 
         it 'is cleared, except for private fields', ->
-          expect(Object.getOwnPropertyNames(instance)).toEqual ['_private']
+          expect(instance.field).toBeUndefined()
+          expect(instance.field2).toBeUndefined()
+          expect(instance._private).toEqual('private val')
+
+        it 'clears saved data', ->
+          expect(instance._saved_data).toEqual {}
 
     describe '#url', ->
       beforeEach -> instance._base_url = '/model_path'
@@ -77,7 +85,7 @@ describe 'soil.model module', ->
           spyOn(instance, 'load')
           instance.refresh()
 
-        it 'sends a get request', ->
+        it 'sends a GET request', ->
           httpBackend.verifyNoOutstandingExpectation()
 
         describe 'on success', ->
@@ -95,3 +103,43 @@ describe 'soil.model module', ->
 
           it 'does not load data', ->
             expect(instance.load).not.toHaveBeenCalled()
+
+    describe '#updateField', ->
+      describe 'without an id', ->
+        it 'throws an error', ->
+          expect(instance.updateField).toThrow('Cannot update model without an ID')
+
+      describe 'with an id', ->
+        request = null
+
+        beforeEach ->
+          instance.id = 5
+          instance.field = 'updated val'
+          request = httpBackend.expectPUT('/5', { field: 'updated val' })
+          request.respond null
+          instance.updateField('field')
+
+        it 'sends a PUT request', ->
+          httpBackend.verifyNoOutstandingExpectation()
+
+        describe 'on success', ->
+          beforeEach ->
+            request.respond { field: 'formatted updated val', other_field: 'other val' }
+            httpBackend.flush()
+
+          it 'sets the field to the response', ->
+            expect(instance.field).toEqual('formatted updated val')
+
+          it 'does not set other fields from the response', ->
+            expect(instance.other_field).toBeUndefined()
+
+          it 'replaces saved data with the response', ->
+            expect(instance._saved_data).toEqual { field: 'formatted updated val', other_field: 'other val' }
+
+        describe 'on error', ->
+          beforeEach ->
+            request.respond 500
+            httpBackend.flush()
+
+          it 'restores the field to the old saved data', ->
+            expect(instance.field).toEqual('val')

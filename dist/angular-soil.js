@@ -1,4 +1,4 @@
-/* angular-soil 0.1.4 %> */
+/* angular-soil 0.2.4 %> */
 
 (function() {
   angular.module('soil.collection', []).factory('soilCollection', [
@@ -60,7 +60,8 @@
               return delete obj[key];
             }
           });
-          return _.assign(this, data);
+          _.assign(this, data);
+          return this._saved_data = data || {};
         };
 
         soilModel.prototype.url = function() {
@@ -79,6 +80,23 @@
             });
           } else {
             throw 'Cannot refresh model without an ID';
+          }
+        };
+
+        soilModel.prototype.updateField = function(field) {
+          var data,
+            _this = this;
+          if (this.id) {
+            data = {};
+            data[field] = this[field];
+            return $http.put(this.url(), data).success(function(response_data) {
+              _this[field] = response_data[field];
+              return _this._saved_data = response_data;
+            }).error(function() {
+              return _this[field] = _this._saved_data[field];
+            });
+          } else {
+            throw 'Cannot update model without an ID';
           }
         };
 

@@ -1,4 +1,4 @@
-/* angular-soil 0.1.4 %> */
+/* angular-soil 0.2.4 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -49,6 +49,8 @@
             }
 
             soilModelMock.prototype.refresh = jasmine.createSpy();
+
+            soilModelMock.prototype.updateField = jasmine.createSpy();
 
             return soilModelMock;
 

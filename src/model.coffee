@@ -15,6 +15,9 @@ angular.module('soil.model', [])
         # Assign new fields
         _.assign this, data
 
+        # Set saved data
+        @_saved_data = data || {}
+
       url: ->
         if @id
           @_with_slash(@_base_url) + @id
@@ -27,6 +30,21 @@ angular.module('soil.model', [])
             @load(data)
         else
           throw 'Cannot refresh model without an ID'
+
+      updateField: (field) ->
+        if @id
+          data = {}
+          data[field] = @[field]
+
+          $http.put(@url(), data)
+            .success (response_data) =>
+              @[field] = response_data[field]
+              @_saved_data = response_data
+
+            .error =>
+              @[field] = @_saved_data[field]
+        else
+          throw 'Cannot update model without an ID'
 
       _with_slash: (url) ->
         url.replace /\/?$/, '/'

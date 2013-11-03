@@ -89,8 +89,8 @@ describe 'soil.collection module', ->
             expect(newModel() instanceof soilModel).toBeTruthy()
 
           it 'loads response data into the added model', ->
-            expect(Object.getOwnPropertyNames(newModel())).toEqual ['response_data']
             expect(newModel().response_data).toEqual('formatted val')
+            expect(newModel()._saved_data).toEqual { response_data: 'formatted val' }
 
         describe 'on failure', ->
           beforeEach ->
