@@ -1,4 +1,4 @@
-/* angular-soil v0.1.1 %> */
+/* angular-soil v0.1.2 %> */
 
 (function() {
   angular.module('soil.collection', []).factory('soilCollection', [
@@ -50,6 +50,8 @@
           this.load(data);
         }
 
+        soilModel.prototype._base_url = '/';
+
         soilModel.prototype.load = function(data) {
           _.forOwn(this, function(value, key, obj) {
             if (_.first(key) !== '_') {
@@ -59,7 +61,13 @@
           return _.assign(this, data);
         };
 
-        soilModel.prototype._url = '/';
+        soilModel.prototype.url = function() {
+          if (this.id) {
+            return this._base_url + '/' + this.id;
+          } else {
+            return this._base_url;
+          }
+        };
 
         return soilModel;
 

@@ -5,6 +5,8 @@ angular.module('soil.model', [])
       constructor: (data) ->
         @load(data)
 
+      _base_url: '/'
+
       load: (data) ->
         # Clear old fields
         _.forOwn this, (value, key, obj) ->
@@ -13,6 +15,9 @@ angular.module('soil.model', [])
         # Assign new fields
         _.assign this, data
 
-      _url: '/'
-
+      url: ->
+        if @id
+          @_base_url + '/' + @id
+        else
+          @_base_url
   ])

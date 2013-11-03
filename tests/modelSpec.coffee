@@ -13,13 +13,9 @@ describe 'soil.model module', ->
       expect(instance.field).toBe('val')
       expect(instance.field2).toBe('other val')
 
-    describe '_url', ->
+    describe '_base_url', ->
       it 'is the root by default', ->
-        expect(instance._url).toBe('/')
-
-      it 'can be overridden', ->
-        instance._url = '/test'
-        expect(instance._url).toBe('/test')
+        expect(instance._base_url).toBe('/')
 
     describe '#load', ->
       describe 'with data', ->
@@ -44,3 +40,16 @@ describe 'soil.model module', ->
 
         it 'is cleared, except for private fields', ->
           expect(Object.getOwnPropertyNames(instance)).toEqual ['_private']
+
+    describe '#url', ->
+      beforeEach -> instance._base_url = '/model_path'
+
+      describe 'without an id', ->
+        it 'returns the base url', ->
+          expect(instance.url()).toBe('/model_path')
+
+      describe 'with an id', ->
+        beforeEach -> instance.id = 56
+
+        it 'returns the base url with the id', ->
+          expect(instance.url()).toBe('/model_path/56')
