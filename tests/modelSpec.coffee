@@ -53,3 +53,12 @@ describe 'soil.model module', ->
 
         it 'returns the base url with the id', ->
           expect(instance.url()).toBe('/model_path/56')
+
+      describe 'with a trailing slash and an id', ->
+        beforeEach ->
+          instance._base_url = '/model_path/'
+          instance.id = 56
+
+        it 'returns the base url with the id', ->
+          expect(instance.url()).toBe('/model_path/56')
+

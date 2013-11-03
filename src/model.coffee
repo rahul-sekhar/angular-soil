@@ -17,7 +17,10 @@ angular.module('soil.model', [])
 
       url: ->
         if @id
-          @_base_url + '/' + @id
+          @_with_slash(@_base_url) + @id
         else
           @_base_url
+
+      _with_slash: (url) ->
+        url.replace /\/?$/, '/'
   ])
