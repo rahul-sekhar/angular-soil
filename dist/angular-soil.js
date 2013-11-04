@@ -1,4 +1,4 @@
-/* angular-soil 0.3.4 %> */
+/* angular-soil 0.3.5 %> */
 
 (function() {
   angular.module('soil.collection', []).factory('soilCollection', [
@@ -49,10 +49,10 @@
       var soilModel;
       return soilModel = (function() {
         function soilModel(dataOrId) {
-          if (angular.isNumber(dataOrId)) {
+          if (angular.isObject(dataOrId)) {
+            this._load(dataOrId);
+          } else if (dataOrId) {
             this._getById(dataOrId);
-          } else if (angular.isObject(dataOrId)) {
-            this.load(dataOrId);
           }
         }
 
@@ -60,16 +60,6 @@
 
         soilModel.prototype.isLoaded = function() {
           return !!this.id;
-        };
-
-        soilModel.prototype.load = function(data) {
-          _.forOwn(this, function(value, key, obj) {
-            if (_.first(key) !== '_') {
-              return delete obj[key];
-            }
-          });
-          _.assign(this, data);
-          return this._saved_data = data || {};
         };
 
         soilModel.prototype.url = function(id) {
@@ -100,10 +90,20 @@
           }
         };
 
+        soilModel.prototype._load = function(data) {
+          _.forOwn(this, function(value, key, obj) {
+            if (_.first(key) !== '_') {
+              return delete obj[key];
+            }
+          });
+          _.assign(this, data);
+          return this._saved_data = data || {};
+        };
+
         soilModel.prototype._getById = function(id) {
           var _this = this;
           return $http.get(this.url(id)).success(function(response_data) {
-            return _this.load(response_data);
+            return _this._load(response_data);
           });
         };
 

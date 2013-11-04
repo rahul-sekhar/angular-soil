@@ -5,8 +5,8 @@ angular.module('soil.model.mock', ['soil.model'])
         constructor: ->
           super
 
-        _getById: jasmine.createSpy()
+        _getById: jasmine.createSpy('_getById')
 
-        updateField: jasmine.createSpy()
+        updateField: jasmine.createSpy('updateField')
     ])
   ])

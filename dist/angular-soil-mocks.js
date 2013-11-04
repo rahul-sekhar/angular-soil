@@ -1,4 +1,4 @@
-/* angular-soil 0.3.4 %> */
+/* angular-soil 0.3.5 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -20,7 +20,7 @@
               });
             }
 
-            soilCollectionMock.prototype.addItem = jasmine.createSpy();
+            soilCollectionMock.prototype.addItem = jasmine.createSpy('addItem');
 
             return soilCollectionMock;
 
@@ -48,9 +48,9 @@
               soilModelMock.__super__.constructor.apply(this, arguments);
             }
 
-            soilModelMock.prototype._getById = jasmine.createSpy();
+            soilModelMock.prototype._getById = jasmine.createSpy('_getById');
 
-            soilModelMock.prototype.updateField = jasmine.createSpy();
+            soilModelMock.prototype.updateField = jasmine.createSpy('updateField');
 
             return soilModelMock;
 

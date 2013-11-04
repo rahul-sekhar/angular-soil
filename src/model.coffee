@@ -3,26 +3,14 @@ angular.module('soil.model', [])
   .factory('soilModel', ['$http', ($http) ->
     class soilModel
       constructor: (dataOrId) ->
-        if angular.isNumber(dataOrId)
+        if angular.isObject(dataOrId)
+          @_load(dataOrId)
+        else if dataOrId
           @_getById(dataOrId)
-
-        else if angular.isObject(dataOrId)
-          @load(dataOrId)
 
       _base_url: '/'
 
       isLoaded: -> !!@id
-
-      load: (data) ->
-        # Clear old fields
-        _.forOwn this, (value, key, obj) ->
-          delete obj[key] unless _.first(key) == '_'
-
-        # Assign new fields
-        _.assign this, data
-
-        # Set saved data
-        @_saved_data = data || {}
 
       url: (id = @id) ->
         if id
@@ -45,9 +33,20 @@ angular.module('soil.model', [])
         else
           throw 'Cannot update model without an ID'
 
+      _load: (data) ->
+        # Clear old fields
+        _.forOwn this, (value, key, obj) ->
+          delete obj[key] unless _.first(key) == '_'
+
+        # Assign new fields
+        _.assign this, data
+
+        # Set saved data
+        @_saved_data = data || {}
+
       _getById: (id) ->
         $http.get(@url(id)).success (response_data) =>
-          @load(response_data)
+          @_load(response_data)
 
       _with_slash: (url) ->
         url.replace /\/?$/, '/'

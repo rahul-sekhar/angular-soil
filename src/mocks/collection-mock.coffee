@@ -7,6 +7,6 @@ angular.module('soil.collection.mock', ['soil.collection'])
           spyOn(this, 'loadAll').andCallFake =>
             @members = []
 
-        addItem: jasmine.createSpy()
+        addItem: jasmine.createSpy('addItem')
     ])
   ])

@@ -10,23 +10,53 @@ describe 'soil.model module', ->
       instance = new soilModel { field: 'val', field2: 'other val' }
 
     # Construction
+    describe 'construction', ->
+      mockSoilModel = null
 
-    describe 'when constructed with an object', ->
-      it 'contains the data passed to the constructor', ->
-        expect(instance.field).toBe('val')
-        expect(instance.field2).toBe('other val')
+      beforeEach ->
+        class mockSoilModel extends soilModel
+          _getById: jasmine.createSpy('_getById')
+          _load: jasmine.createSpy('_load')
 
-      it 'sets its saved data to the passed object', ->
-        expect(instance._saved_data).toEqual({ field: 'val', field2: 'other val' })
+      describe 'when constructed with an object', ->
+        beforeEach -> instance = new mockSoilModel( { field: 'data' })
 
-    describe 'when constructed with an integer', ->
+        it 'loads the data', ->
+          expect(instance._load).toHaveBeenCalledWith({ field: 'data' })
+
+      describe 'when constructed with an integer', ->
+        beforeEach -> instance = new mockSoilModel(12)
+
+        it 'gets data by ID', ->
+          expect(instance._getById).toHaveBeenCalledWith(12)
+
+      describe 'when constructed with a string', ->
+        beforeEach -> instance = new mockSoilModel('12')
+
+        it 'gets data by ID', ->
+          expect(instance._getById).toHaveBeenCalledWith('12')
+
+      describe 'when constructed with no arguments', ->
+        beforeEach -> instance = new mockSoilModel
+
+        it 'does nothing', ->
+          expect(instance._load).not.toHaveBeenCalled()
+          expect(instance._getById).not.toHaveBeenCalled()
+
+    describe '_base_url', ->
+      it 'is the root by default', ->
+        expect(instance._base_url).toBe('/')
+
+
+    # Load from ID
+    describe '#_getById', ->
       response = null
 
       beforeEach ->
         response = httpBackend.expectGET('/6')
         response.respond null
-        instance = new soilModel(6)
-        spyOn(instance, 'load')
+        instance._getById(6)
+        spyOn(instance, '_load')
 
       it 'sends a GET request', ->
         httpBackend.verifyNoOutstandingExpectation()
@@ -37,7 +67,7 @@ describe 'soil.model module', ->
           httpBackend.flush()
 
         it 'loads the data', ->
-          expect(instance.load).toHaveBeenCalledWith('some data')
+          expect(instance._load).toHaveBeenCalledWith('some data')
 
       describe 'on error', ->
         beforeEach ->
@@ -45,11 +75,7 @@ describe 'soil.model module', ->
           httpBackend.flush()
 
         it 'does not load anything', ->
-          expect(instance.load).not.toHaveBeenCalled()
-
-    describe '_base_url', ->
-      it 'is the root by default', ->
-        expect(instance._base_url).toBe('/')
+          expect(instance._load).not.toHaveBeenCalled()
 
 
     # Check if model is loaded
@@ -68,11 +94,11 @@ describe 'soil.model module', ->
 
     # Load data into model
 
-    describe '#load', ->
+    describe '#_load', ->
       describe 'with data', ->
         beforeEach ->
           instance._private = 'private val'
-          instance.load { field: 'new val', field5: 'another val' }
+          instance._load { field: 'new val', field5: 'another val' }
 
         it 'contains the passed data', ->
           expect(instance.field).toBe('new val')
@@ -90,7 +116,7 @@ describe 'soil.model module', ->
       describe 'with no data', ->
         beforeEach ->
           instance._private = 'private val'
-          instance.load()
+          instance._load()
 
         it 'is cleared, except for private fields', ->
           expect(instance.field).toBeUndefined()
@@ -124,10 +150,9 @@ describe 'soil.model module', ->
         it 'returns the base url with the id', ->
           expect(instance.url()).toBe('/model_path/56')
 
-      describe 'when passed an id', ->
+      describe 'when passed an id as an integer', ->
         it 'returns the model url for that id', ->
           expect(instance.url(12)).toBe('/model_path/12')
-
 
     # Update a single field
 
