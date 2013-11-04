@@ -48,7 +48,7 @@
               soilModelMock.__super__.constructor.apply(this, arguments);
             }
 
-            soilModelMock.prototype._getFromId = jasmine.createSpy();
+            soilModelMock.prototype._getById = jasmine.createSpy();
 
             soilModelMock.prototype.updateField = jasmine.createSpy();
 

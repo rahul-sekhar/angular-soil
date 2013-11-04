@@ -50,7 +50,7 @@
       return soilModel = (function() {
         function soilModel(dataOrId) {
           if (angular.isNumber(dataOrId)) {
-            this._getFromId(dataOrId);
+            this._getById(dataOrId);
           } else if (angular.isObject(dataOrId)) {
             this.load(dataOrId);
           }
@@ -100,7 +100,7 @@
           }
         };
 
-        soilModel.prototype._getFromId = function(id) {
+        soilModel.prototype._getById = function(id) {
           var _this = this;
           return $http.get(this.url(id)).success(function(response_data) {
             return _this.load(response_data);
