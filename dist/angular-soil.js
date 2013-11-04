@@ -1,4 +1,4 @@
-/* angular-soil 0.2.4 %> */
+/* angular-soil 0.3.4 %> */
 
 (function() {
   angular.module('soil.collection', []).factory('soilCollection', [
@@ -48,11 +48,22 @@
     '$http', function($http) {
       var soilModel;
       return soilModel = (function() {
-        function soilModel(data) {
-          this.load(data);
+        function soilModel(dataOrId) {
+          var _this = this;
+          if (angular.isNumber(dataOrId)) {
+            $http.get(this.url(dataOrId)).success(function(response_data) {
+              return _this.load(response_data);
+            });
+          } else if (angular.isObject(dataOrId)) {
+            this.load(dataOrId);
+          }
         }
 
         soilModel.prototype._base_url = '/';
+
+        soilModel.prototype.isLoaded = function() {
+          return !!this.id;
+        };
 
         soilModel.prototype.load = function(data) {
           _.forOwn(this, function(value, key, obj) {
@@ -64,22 +75,14 @@
           return this._saved_data = data || {};
         };
 
-        soilModel.prototype.url = function() {
-          if (this.id) {
-            return this._with_slash(this._base_url) + this.id;
+        soilModel.prototype.url = function(id) {
+          if (id == null) {
+            id = this.id;
+          }
+          if (id) {
+            return this._with_slash(this._base_url) + id;
           } else {
             return this._base_url;
-          }
-        };
-
-        soilModel.prototype.refresh = function() {
-          var _this = this;
-          if (this.id) {
-            return $http.get(this.url()).success(function(data) {
-              return _this.load(data);
-            });
-          } else {
-            throw 'Cannot refresh model without an ID';
           }
         };
 

@@ -2,10 +2,17 @@ angular.module('soil.model', [])
 
   .factory('soilModel', ['$http', ($http) ->
     class soilModel
-      constructor: (data) ->
-        @load(data)
+      constructor: (dataOrId) ->
+        if angular.isNumber(dataOrId)
+          $http.get(@url(dataOrId)).success (response_data) =>
+            @load(response_data)
+
+        else if angular.isObject(dataOrId)
+          @load(dataOrId)
 
       _base_url: '/'
+
+      isLoaded: -> !!@id
 
       load: (data) ->
         # Clear old fields
@@ -18,18 +25,11 @@ angular.module('soil.model', [])
         # Set saved data
         @_saved_data = data || {}
 
-      url: ->
-        if @id
-          @_with_slash(@_base_url) + @id
+      url: (id = @id) ->
+        if id
+          @_with_slash(@_base_url) + id
         else
           @_base_url
-
-      refresh: ->
-        if @id
-          $http.get(@url()).success (data) =>
-            @load(data)
-        else
-          throw 'Cannot refresh model without an ID'
 
       updateField: (field) ->
         if @id

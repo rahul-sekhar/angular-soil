@@ -9,13 +9,64 @@ describe 'soil.model module', ->
       soilModel = _soilModel_
       instance = new soilModel { field: 'val', field2: 'other val' }
 
-    it 'contains the data passed to the constructor', ->
-      expect(instance.field).toBe('val')
-      expect(instance.field2).toBe('other val')
+    # Construction
+
+    describe 'when constructed with an object', ->
+      it 'contains the data passed to the constructor', ->
+        expect(instance.field).toBe('val')
+        expect(instance.field2).toBe('other val')
+
+      it 'sets its saved data to the passed object', ->
+        expect(instance._saved_data).toEqual({ field: 'val', field2: 'other val' })
+
+    describe 'when constructed with an integer', ->
+      response = null
+
+      beforeEach ->
+        response = httpBackend.expectGET('/6')
+        response.respond null
+        instance = new soilModel(6)
+        spyOn(instance, 'load')
+
+      it 'sends a GET request', ->
+        httpBackend.verifyNoOutstandingExpectation()
+
+      describe 'on success', ->
+        beforeEach ->
+          response.respond 'some data'
+          httpBackend.flush()
+
+        it 'loads the data', ->
+          expect(instance.load).toHaveBeenCalledWith('some data')
+
+      describe 'on error', ->
+        beforeEach ->
+          response.respond 500
+          httpBackend.flush()
+
+        it 'does not load anything', ->
+          expect(instance.load).not.toHaveBeenCalled()
 
     describe '_base_url', ->
       it 'is the root by default', ->
         expect(instance._base_url).toBe('/')
+
+
+    # Check if model is loaded
+
+    describe '#isLoaded', ->
+      describe 'without id set', ->
+        it 'is false', ->
+          expect(instance.isLoaded()).toBeFalsy()
+
+      describe 'with an id set', ->
+        beforeEach -> instance.id = 7
+
+        it 'is true', ->
+          expect(instance.isLoaded()).toBeTruthy()
+
+
+    # Load data into model
 
     describe '#load', ->
       describe 'with data', ->
@@ -49,14 +100,17 @@ describe 'soil.model module', ->
         it 'clears saved data', ->
           expect(instance._saved_data).toEqual {}
 
+
+    # Get model URL
+
     describe '#url', ->
       beforeEach -> instance._base_url = '/model_path'
 
-      describe 'without an id', ->
+      describe 'when not loaded', ->
         it 'returns the base url', ->
           expect(instance.url()).toBe('/model_path')
 
-      describe 'with an id', ->
+      describe 'when loaded', ->
         beforeEach -> instance.id = 56
 
         it 'returns the base url with the id', ->
@@ -70,46 +124,15 @@ describe 'soil.model module', ->
         it 'returns the base url with the id', ->
           expect(instance.url()).toBe('/model_path/56')
 
-    describe '#refresh', ->
-      describe 'without an id', ->
-        it 'throws an error', ->
-          expect(instance.refresh).toThrow('Cannot refresh model without an ID')
 
-      describe 'with an id', ->
-        request = null
-
-        beforeEach ->
-          instance.id = 5
-          request = httpBackend.expectGET('/5')
-          request.respond null
-          spyOn(instance, 'load')
-          instance.refresh()
-
-        it 'sends a GET request', ->
-          httpBackend.verifyNoOutstandingExpectation()
-
-        describe 'on success', ->
-          beforeEach ->
-            request.respond 'some data'
-            httpBackend.flush()
-
-          it 'loads the response data', ->
-            expect(instance.load).toHaveBeenCalledWith 'some data'
-
-        describe 'on error', ->
-          beforeEach ->
-            request.respond 500
-            httpBackend.flush()
-
-          it 'does not load data', ->
-            expect(instance.load).not.toHaveBeenCalled()
+    # Update a single field
 
     describe '#updateField', ->
-      describe 'without an id', ->
+      describe 'when not loaded', ->
         it 'throws an error', ->
           expect(instance.updateField).toThrow('Cannot update model without an ID')
 
-      describe 'with an id', ->
+      describe 'when loaded', ->
         request = null
 
         beforeEach ->
