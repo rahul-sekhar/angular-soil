@@ -4,8 +4,7 @@ angular.module('soil.model', [])
     class soilModel
       constructor: (dataOrId) ->
         if angular.isNumber(dataOrId)
-          $http.get(@url(dataOrId)).success (response_data) =>
-            @load(response_data)
+          @_getFromId(dataOrId)
 
         else if angular.isObject(dataOrId)
           @load(dataOrId)
@@ -45,6 +44,10 @@ angular.module('soil.model', [])
               @[field] = @_saved_data[field]
         else
           throw 'Cannot update model without an ID'
+
+      _getFromId: (id) ->
+        $http.get(@url(id)).success (response_data) =>
+          @load(response_data)
 
       _with_slash: (url) ->
         url.replace /\/?$/, '/'

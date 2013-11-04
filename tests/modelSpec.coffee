@@ -124,6 +124,10 @@ describe 'soil.model module', ->
         it 'returns the base url with the id', ->
           expect(instance.url()).toBe('/model_path/56')
 
+      describe 'when passed an id', ->
+        it 'returns the model url for that id', ->
+          expect(instance.url(12)).toBe('/model_path/12')
+
 
     # Update a single field
 
