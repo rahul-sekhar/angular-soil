@@ -49,11 +49,8 @@
       var soilModel;
       return soilModel = (function() {
         function soilModel(dataOrId) {
-          var _this = this;
           if (angular.isNumber(dataOrId)) {
-            $http.get(this.url(dataOrId)).success(function(response_data) {
-              return _this.load(response_data);
-            });
+            this._getFromId(dataOrId);
           } else if (angular.isObject(dataOrId)) {
             this.load(dataOrId);
           }
@@ -101,6 +98,13 @@
           } else {
             throw 'Cannot update model without an ID';
           }
+        };
+
+        soilModel.prototype._getFromId = function(id) {
+          var _this = this;
+          return $http.get(this.url(id)).success(function(response_data) {
+            return _this.load(response_data);
+          });
         };
 
         soilModel.prototype._with_slash = function(url) {
