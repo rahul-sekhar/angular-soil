@@ -63,7 +63,7 @@
           });
         };
 
-        soilModel.prototype.isLoaded = function() {
+        soilModel.prototype.isInitialized = function() {
           return !!this.id;
         };
 
@@ -81,7 +81,7 @@
         soilModel.prototype.updateField = function(field) {
           var data,
             _this = this;
-          if (this.isLoaded()) {
+          if (this.isInitialized()) {
             data = {};
             data[field] = this[field];
             return $http.put(this.url(), data).success(function(responseData) {
@@ -97,7 +97,7 @@
 
         soilModel.prototype.save = function(field) {
           var _this = this;
-          if (this.isLoaded()) {
+          if (this.isInitialized()) {
             return $http.put(this.url(), this._dataToSave()).success(function(responseData) {
               return _this._load(responseData);
             });

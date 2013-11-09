@@ -12,9 +12,7 @@ angular.module('soil.model', [])
         return $http.get(@url(id)).success (responseData) =>
           @_load(responseData)
 
-      isLoaded: -> 
-        # dump(@id)
-        !!@id
+      isInitialized: -> !!@id
 
       url: (id = @id) ->
         if id
@@ -23,7 +21,7 @@ angular.module('soil.model', [])
           @_base_url
 
       updateField: (field) ->
-        if @isLoaded()
+        if @isInitialized()
           data = {}
           data[field] = @[field]
 
@@ -38,7 +36,7 @@ angular.module('soil.model', [])
           throw 'Cannot update model without an ID'
 
       save: (field) ->
-        if @isLoaded()
+        if @isInitialized()
           
           return $http.put(@url(), @_dataToSave())
             .success (responseData) =>

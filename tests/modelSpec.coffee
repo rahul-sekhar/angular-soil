@@ -85,16 +85,16 @@ describe 'soil.model module', ->
 
     # Check if model is loaded
 
-    describe '#isLoaded', ->
+    describe '#isInitialized', ->
       describe 'without id set', ->
         it 'is false', ->
-          expect(instance.isLoaded()).toBeFalsy()
+          expect(instance.isInitialized()).toBeFalsy()
 
       describe 'with an id set', ->
         beforeEach -> instance.id = 7
 
         it 'is true', ->
-          expect(instance.isLoaded()).toBeTruthy()
+          expect(instance.isInitialized()).toBeTruthy()
 
 
     # Load data into model
