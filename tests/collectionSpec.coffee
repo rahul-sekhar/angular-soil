@@ -100,7 +100,7 @@ describe 'soil.collection module', ->
 
           it 'loads response data into the added model', ->
             expect(newModel().response_data).toEqual('formatted val')
-            expect(newModel()._savedData).toEqual { response_data: 'formatted val' }
+            expect(newModel().savedData).toEqual { response_data: 'formatted val' }
 
           it 'resolves the promise', ->
             promise.expectToBeResolved()

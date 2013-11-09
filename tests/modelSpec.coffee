@@ -116,7 +116,7 @@ describe 'soil.model module', ->
           expect(instance._private).toEqual('private val')
 
         it 'sets saved data', ->
-          expect(instance._savedData).toEqual { field: 'new val', field5: 'another val' }
+          expect(instance.savedData).toEqual { field: 'new val', field5: 'another val' }
 
       describe 'with no data', ->
         beforeEach ->
@@ -129,7 +129,7 @@ describe 'soil.model module', ->
           expect(instance._private).toEqual('private val')
 
         it 'clears saved data', ->
-          expect(instance._savedData).toEqual {}
+          expect(instance.savedData).toEqual {}
 
 
     # Get model URL
@@ -191,7 +191,7 @@ describe 'soil.model module', ->
             expect(instance.other_field).toBeUndefined()
 
           it 'replaces saved data with the response', ->
-            expect(instance._savedData).toEqual { field: 'formatted updated val', other_field: 'other val' }
+            expect(instance.savedData).toEqual { field: 'formatted updated val', other_field: 'other val' }
 
           it 'resolves the promise', ->
             promise.expectToBeResolved()

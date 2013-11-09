@@ -86,9 +86,9 @@
             data[field] = this[field];
             return $http.put(this.url(), data).success(function(responseData) {
               _this[field] = responseData[field];
-              return _this._savedData = responseData;
+              return _this.savedData = responseData;
             }).error(function() {
-              return _this[field] = _this._savedData[field];
+              return _this[field] = _this.savedData[field];
             });
           } else {
             throw 'Cannot update model without an ID';
@@ -113,7 +113,7 @@
             }
           });
           _.assign(this, data);
-          return this._savedData = data || {};
+          return this.savedData = data || {};
         };
 
         soilModel.prototype._withSlash = function(url) {

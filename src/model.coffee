@@ -28,16 +28,16 @@ angular.module('soil.model', [])
           return $http.put(@url(), data)
             .success (responseData) =>
               @[field] = responseData[field]
-              @_savedData = responseData
+              @savedData = responseData
 
             .error =>
-              @[field] = @_savedData[field]
+              @[field] = @savedData[field]
         else
           throw 'Cannot update model without an ID'
 
       save: (field) ->
         if @isInitialized()
-          
+
           return $http.put(@url(), @_dataToSave())
             .success (responseData) =>
               @_load(responseData)
@@ -53,7 +53,7 @@ angular.module('soil.model', [])
         _.assign this, data
 
         # Set saved data
-        @_savedData = data || {}
+        @savedData = data || {}
 
       _withSlash: (url) ->
         url.replace /\/?$/, '/'
