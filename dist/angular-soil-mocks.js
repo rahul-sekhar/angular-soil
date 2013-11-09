@@ -1,13 +1,13 @@
-/* angular-soil 0.3.5 %> */
+/* angular-soil 0.4.0 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  angular.module('soil.collection.mock', ['soil.collection']).config([
+  angular.module('soil.collection.mock', ['soil.collection', 'angular-mock-promise']).config([
     '$provide', function($provide) {
       return $provide.decorator('soilCollection', [
-        '$delegate', function($delegate) {
+        '$delegate', 'createMockPromise', function($delegate, createMockPromise) {
           var soilCollectionMock;
           return soilCollectionMock = (function(_super) {
             __extends(soilCollectionMock, _super);
@@ -20,7 +20,7 @@
               });
             }
 
-            soilCollectionMock.prototype.addItem = jasmine.createSpy('addItem');
+            soilCollectionMock.prototype.addItem = jasmine.createSpy('addItem').andReturn(createMockPromise());
 
             return soilCollectionMock;
 
@@ -36,10 +36,10 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  angular.module('soil.model.mock', ['soil.model']).config([
+  angular.module('soil.model.mock', ['soil.model', 'angular-mock-promise']).config([
     '$provide', function($provide) {
       return $provide.decorator('soilModel', [
-        '$delegate', function($delegate) {
+        '$delegate', 'createMockPromise', function($delegate, createMockPromise) {
           var soilModelMock;
           return soilModelMock = (function(_super) {
             __extends(soilModelMock, _super);
@@ -48,9 +48,11 @@
               soilModelMock.__super__.constructor.apply(this, arguments);
             }
 
-            soilModelMock.prototype._getById = jasmine.createSpy('_getById');
+            soilModelMock.prototype.getById = jasmine.createSpy('getById').andReturn(createMockPromise());
 
-            soilModelMock.prototype.updateField = jasmine.createSpy('updateField');
+            soilModelMock.prototype.updateField = jasmine.createSpy('updateField').andReturn(createMockPromise());
+
+            soilModelMock.prototype.save = jasmine.createSpy('save').andReturn(createMockPromise());
 
             return soilModelMock;
 

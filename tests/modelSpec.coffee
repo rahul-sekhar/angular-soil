@@ -1,6 +1,6 @@
 describe 'soil.model module', ->
   beforeEach module 'soil.model'
-  beforeEach module 'testPromise'
+  beforeEach module 'angular-mock-promise'
 
   describe 'soilModel', ->
     soilModel = httpBackend = instance = null
@@ -51,11 +51,11 @@ describe 'soil.model module', ->
     describe '#getById', ->
       response = promise = null
 
-      beforeEach inject (testPromise) ->
+      beforeEach inject (promiseExpectation) ->
         response = httpBackend.expectGET('/6')
         response.respond null
         spyOn(instance, '_load')
-        promise = testPromise(instance.getById(6))
+        promise = promiseExpectation(instance.getById(6))
 
       it 'sends a GET request', ->
         httpBackend.verifyNoOutstandingExpectation()
@@ -69,7 +69,7 @@ describe 'soil.model module', ->
           expect(instance._load).toHaveBeenCalledWith('some data')
 
         it 'resolves the promise', ->
-          promise.expectSuccess()
+          promise.expectToBeResolved()
 
       describe 'on error', ->
         beforeEach ->
@@ -80,7 +80,7 @@ describe 'soil.model module', ->
           expect(instance._load).not.toHaveBeenCalled()
 
         it 'rejects the promise', ->
-          promise.expectError()
+          promise.expectToBeRejected()
 
 
     # Check if model is loaded
@@ -169,12 +169,12 @@ describe 'soil.model module', ->
       describe 'when loaded', ->
         request = promise = null
 
-        beforeEach inject (testPromise) ->
+        beforeEach inject (promiseExpectation) ->
           instance.id = 5
           instance.field = 'updated val'
           request = httpBackend.expectPUT('/5', { field: 'updated val' })
           request.respond null
-          promise = testPromise(instance.updateField('field'))
+          promise = promiseExpectation(instance.updateField('field'))
 
         it 'sends a PUT request', ->
           httpBackend.verifyNoOutstandingExpectation()
@@ -194,7 +194,7 @@ describe 'soil.model module', ->
             expect(instance._savedData).toEqual { field: 'formatted updated val', other_field: 'other val' }
 
           it 'resolves the promise', ->
-            promise.expectSuccess()
+            promise.expectToBeResolved()
 
         describe 'on error', ->
           beforeEach ->
@@ -205,7 +205,7 @@ describe 'soil.model module', ->
             expect(instance.field).toEqual('val')
 
           it 'rejects the promise', ->
-            promise.expectError()
+            promise.expectToBeRejected()
 
     # Save the model
 
@@ -220,7 +220,7 @@ describe 'soil.model module', ->
       describe 'when loaded', ->
         request = promise = null
 
-        beforeEach inject (testPromise) ->
+        beforeEach inject (promiseExpectation) ->
           instance.id = 5
           instance.field = 'new val'
           instance.field2 = 'other new val'
@@ -230,7 +230,7 @@ describe 'soil.model module', ->
           request.respond null
 
           spyOn(instance, '_load')
-          promise = testPromise(instance.save())
+          promise = promiseExpectation(instance.save())
 
         it 'sends a PUT request', ->
           httpBackend.verifyNoOutstandingExpectation()
@@ -244,7 +244,7 @@ describe 'soil.model module', ->
             expect(instance._load).toHaveBeenCalledWith { field: 'formatted new val', field4: 'side effect' }
 
           it 'resolves the promise', ->
-            promise.expectSuccess()
+            promise.expectToBeResolved()
 
         describe 'on error', ->
           beforeEach ->
@@ -255,4 +255,4 @@ describe 'soil.model module', ->
             expect(instance._load).not.toHaveBeenCalled()
 
           it 'rejects the promise', ->
-            promise.expectError()
+            promise.expectToBeRejected()

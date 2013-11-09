@@ -5,7 +5,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks('grunt-json-replace');
 
   grunt.initConfig
-    version: grunt.file.read('version.txt')
+    version: grunt.file.read('version.txt').trim()
 
     pkg: grunt.file.readJSON('bower.json')
 

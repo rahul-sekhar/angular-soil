@@ -1,7 +1,7 @@
 describe 'soil.collection module', ->
   beforeEach module 'soil.collection'
   beforeEach module 'soil.model.mock'
-  beforeEach module 'testPromise'
+  beforeEach module 'angular-mock-promise'
 
   describe 'soilCollection', ->
     soilModel = soilCollection = instance = httpBackend = null
@@ -18,10 +18,10 @@ describe 'soil.collection module', ->
     describe '#loadAll', ->
       request = promise = null
 
-      beforeEach inject (testPromise) ->
+      beforeEach inject (promiseExpectation) ->
         request = httpBackend.expectGET('/source_url')
         request.respond null
-        promise = testPromise(instance.loadAll())
+        promise = promiseExpectation(instance.loadAll())
 
       it 'sends a request to the source_url', ->
         httpBackend.verifyNoOutstandingExpectation()
@@ -35,7 +35,7 @@ describe 'soil.collection module', ->
           expect(instance.members).toEqual []
 
         it 'resolves the promise', ->
-          promise.expectSuccess()
+          promise.expectToBeResolved()
 
       describe 'with a response', ->
         beforeEach ->
@@ -50,7 +50,7 @@ describe 'soil.collection module', ->
           expect(_.map(instance.members, (member) -> member.id)).toEqual [1, 4]
 
         it 'resolves the promise', ->
-          promise.expectSuccess()
+          promise.expectToBeResolved()
 
       describe 'on failure', ->
         beforeEach ->
@@ -61,7 +61,7 @@ describe 'soil.collection module', ->
           expect(instance.members).toBeUndefined
 
         it 'rejects the promise', ->
-          promise.expectError()
+          promise.expectToBeRejected()
 
     describe '#addItem', ->
       request = promise = null
@@ -75,11 +75,11 @@ describe 'soil.collection module', ->
           httpBackend.verifyNoOutstandingExpectation()
 
       describe 'when loaded', ->
-        beforeEach inject (testPromise) ->
+        beforeEach inject (promiseExpectation) ->
           request = httpBackend.expectPOST('/source_url', { data: 'val' })
           request.respond null
           instance.members = ['data1', 'data2']
-          promise = testPromise(instance.addItem { data: 'val' })
+          promise = promiseExpectation(instance.addItem { data: 'val' })
 
         it 'sends a POST request', ->
           httpBackend.verifyNoOutstandingExpectation()
@@ -103,7 +103,7 @@ describe 'soil.collection module', ->
             expect(newModel()._savedData).toEqual { response_data: 'formatted val' }
 
           it 'resolves the promise', ->
-            promise.expectSuccess()
+            promise.expectToBeResolved()
 
         describe 'on failure', ->
           beforeEach ->
@@ -114,4 +114,4 @@ describe 'soil.collection module', ->
             expect(instance.members.length).toEqual(2)
 
           it 'rejects the promise', ->
-            promise.expectError()
+            promise.expectToBeRejected()
