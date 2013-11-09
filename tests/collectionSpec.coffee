@@ -1,6 +1,7 @@
 describe 'soil.collection module', ->
   beforeEach module 'soil.collection'
   beforeEach module 'soil.model.mock'
+  beforeEach module 'testPromise'
 
   describe 'soilCollection', ->
     soilModel = soilCollection = instance = httpBackend = null
@@ -15,12 +16,12 @@ describe 'soil.collection module', ->
       expect(instance.members).toBeUndefined()
 
     describe '#loadAll', ->
-      request = null
+      request = promise = null
 
-      beforeEach ->
+      beforeEach inject (testPromise) ->
         request = httpBackend.expectGET('/source_url')
         request.respond null
-        instance.loadAll()
+        promise = testPromise(instance.loadAll())
 
       it 'sends a request to the source_url', ->
         httpBackend.verifyNoOutstandingExpectation()
@@ -32,6 +33,9 @@ describe 'soil.collection module', ->
 
         it 'sets members to an empty array', ->
           expect(instance.members).toEqual []
+
+        it 'resolves the promise', ->
+          promise.expectSuccess()
 
       describe 'with a response', ->
         beforeEach ->
@@ -45,6 +49,9 @@ describe 'soil.collection module', ->
         it 'sets members to the response', ->
           expect(_.map(instance.members, (member) -> member.id)).toEqual [1, 4]
 
+        it 'resolves the promise', ->
+          promise.expectSuccess()
+
       describe 'on failure', ->
         beforeEach ->
           request.respond 500
@@ -53,8 +60,11 @@ describe 'soil.collection module', ->
         it 'leaves members as is', ->
           expect(instance.members).toBeUndefined
 
+        it 'rejects the promise', ->
+          promise.expectError()
+
     describe '#addItem', ->
-      request = null
+      request = promise = null
 
       describe 'when not loaded', ->
         beforeEach ->
@@ -65,11 +75,11 @@ describe 'soil.collection module', ->
           httpBackend.verifyNoOutstandingExpectation()
 
       describe 'when loaded', ->
-        beforeEach ->
+        beforeEach inject (testPromise) ->
           request = httpBackend.expectPOST('/source_url', { data: 'val' })
           request.respond null
           instance.members = ['data1', 'data2']
-          instance.addItem { data: 'val' }
+          promise = testPromise(instance.addItem { data: 'val' })
 
         it 'sends a POST request', ->
           httpBackend.verifyNoOutstandingExpectation()
@@ -90,7 +100,10 @@ describe 'soil.collection module', ->
 
           it 'loads response data into the added model', ->
             expect(newModel().response_data).toEqual('formatted val')
-            expect(newModel()._saved_data).toEqual { response_data: 'formatted val' }
+            expect(newModel()._savedData).toEqual { response_data: 'formatted val' }
+
+          it 'resolves the promise', ->
+            promise.expectSuccess()
 
         describe 'on failure', ->
           beforeEach ->
@@ -99,3 +112,6 @@ describe 'soil.collection module', ->
 
           it 'does not add a model to the collection', ->
             expect(instance.members.length).toEqual(2)
+
+          it 'rejects the promise', ->
+            promise.expectError()

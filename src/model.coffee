@@ -5,33 +5,46 @@ angular.module('soil.model', [])
       constructor: (dataOrId) ->
         if angular.isObject(dataOrId)
           @_load(dataOrId)
-        else if dataOrId
-          @_getById(dataOrId)
 
       _base_url: '/'
 
-      isLoaded: -> !!@id
+      getById: (id) ->
+        return $http.get(@url(id)).success (responseData) =>
+          @_load(responseData)
+
+      isLoaded: -> 
+        # dump(@id)
+        !!@id
 
       url: (id = @id) ->
         if id
-          @_with_slash(@_base_url) + id
+          @_withSlash(@_base_url) + id
         else
           @_base_url
 
       updateField: (field) ->
-        if @id
+        if @isLoaded()
           data = {}
           data[field] = @[field]
 
-          $http.put(@url(), data)
-            .success (response_data) =>
-              @[field] = response_data[field]
-              @_saved_data = response_data
+          return $http.put(@url(), data)
+            .success (responseData) =>
+              @[field] = responseData[field]
+              @_savedData = responseData
 
             .error =>
-              @[field] = @_saved_data[field]
+              @[field] = @_savedData[field]
         else
           throw 'Cannot update model without an ID'
+
+      save: (field) ->
+        if @isLoaded()
+          
+          return $http.put(@url(), @_dataToSave())
+            .success (responseData) =>
+              @_load(responseData)
+        else
+          throw 'Cannot save model without an ID'
 
       _load: (data) ->
         # Clear old fields
@@ -42,12 +55,16 @@ angular.module('soil.model', [])
         _.assign this, data
 
         # Set saved data
-        @_saved_data = data || {}
+        @_savedData = data || {}
 
-      _getById: (id) ->
-        $http.get(@url(id)).success (response_data) =>
-          @_load(response_data)
-
-      _with_slash: (url) ->
+      _withSlash: (url) ->
         url.replace /\/?$/, '/'
+
+      _fieldsToSave: []
+
+      _dataToSave: ->
+        data = {}
+        _.each @_fieldsToSave, (field) =>
+          data[field] = if @[field] == undefined then null else @[field]
+        return data
   ])

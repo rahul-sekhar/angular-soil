@@ -1,5 +1,6 @@
 describe 'soil.model module', ->
   beforeEach module 'soil.model'
+  beforeEach module 'testPromise'
 
   describe 'soilModel', ->
     soilModel = httpBackend = instance = null
@@ -15,7 +16,6 @@ describe 'soil.model module', ->
 
       beforeEach ->
         class mockSoilModel extends soilModel
-          _getById: jasmine.createSpy('_getById')
           _load: jasmine.createSpy('_load')
 
       describe 'when constructed with an object', ->
@@ -27,21 +27,20 @@ describe 'soil.model module', ->
       describe 'when constructed with an integer', ->
         beforeEach -> instance = new mockSoilModel(12)
 
-        it 'gets data by ID', ->
-          expect(instance._getById).toHaveBeenCalledWith(12)
+        it 'does nothing', ->
+          expect(instance._load).not.toHaveBeenCalled()
 
       describe 'when constructed with a string', ->
         beforeEach -> instance = new mockSoilModel('12')
 
-        it 'gets data by ID', ->
-          expect(instance._getById).toHaveBeenCalledWith('12')
+        it 'does nothing', ->
+          expect(instance._load).not.toHaveBeenCalled()
 
       describe 'when constructed with no arguments', ->
         beforeEach -> instance = new mockSoilModel
 
         it 'does nothing', ->
           expect(instance._load).not.toHaveBeenCalled()
-          expect(instance._getById).not.toHaveBeenCalled()
 
     describe '_base_url', ->
       it 'is the root by default', ->
@@ -49,14 +48,14 @@ describe 'soil.model module', ->
 
 
     # Load from ID
-    describe '#_getById', ->
-      response = null
+    describe '#getById', ->
+      response = promise = null
 
-      beforeEach ->
+      beforeEach inject (testPromise) ->
         response = httpBackend.expectGET('/6')
         response.respond null
-        instance._getById(6)
         spyOn(instance, '_load')
+        promise = testPromise(instance.getById(6))
 
       it 'sends a GET request', ->
         httpBackend.verifyNoOutstandingExpectation()
@@ -69,6 +68,9 @@ describe 'soil.model module', ->
         it 'loads the data', ->
           expect(instance._load).toHaveBeenCalledWith('some data')
 
+        it 'resolves the promise', ->
+          promise.expectSuccess()
+
       describe 'on error', ->
         beforeEach ->
           response.respond 500
@@ -76,6 +78,9 @@ describe 'soil.model module', ->
 
         it 'does not load anything', ->
           expect(instance._load).not.toHaveBeenCalled()
+
+        it 'rejects the promise', ->
+          promise.expectError()
 
 
     # Check if model is loaded
@@ -111,7 +116,7 @@ describe 'soil.model module', ->
           expect(instance._private).toEqual('private val')
 
         it 'sets saved data', ->
-          expect(instance._saved_data).toEqual { field: 'new val', field5: 'another val' }
+          expect(instance._savedData).toEqual { field: 'new val', field5: 'another val' }
 
       describe 'with no data', ->
         beforeEach ->
@@ -124,7 +129,7 @@ describe 'soil.model module', ->
           expect(instance._private).toEqual('private val')
 
         it 'clears saved data', ->
-          expect(instance._saved_data).toEqual {}
+          expect(instance._savedData).toEqual {}
 
 
     # Get model URL
@@ -159,17 +164,17 @@ describe 'soil.model module', ->
     describe '#updateField', ->
       describe 'when not loaded', ->
         it 'throws an error', ->
-          expect(instance.updateField).toThrow('Cannot update model without an ID')
+          expect(-> instance.updateField()).toThrow('Cannot update model without an ID')
 
       describe 'when loaded', ->
-        request = null
+        request = promise = null
 
-        beforeEach ->
+        beforeEach inject (testPromise) ->
           instance.id = 5
           instance.field = 'updated val'
           request = httpBackend.expectPUT('/5', { field: 'updated val' })
           request.respond null
-          instance.updateField('field')
+          promise = testPromise(instance.updateField('field'))
 
         it 'sends a PUT request', ->
           httpBackend.verifyNoOutstandingExpectation()
@@ -186,7 +191,10 @@ describe 'soil.model module', ->
             expect(instance.other_field).toBeUndefined()
 
           it 'replaces saved data with the response', ->
-            expect(instance._saved_data).toEqual { field: 'formatted updated val', other_field: 'other val' }
+            expect(instance._savedData).toEqual { field: 'formatted updated val', other_field: 'other val' }
+
+          it 'resolves the promise', ->
+            promise.expectSuccess()
 
         describe 'on error', ->
           beforeEach ->
@@ -195,3 +203,56 @@ describe 'soil.model module', ->
 
           it 'restores the field to the old saved data', ->
             expect(instance.field).toEqual('val')
+
+          it 'rejects the promise', ->
+            promise.expectError()
+
+    # Save the model
+
+    describe '#save', ->
+      beforeEach ->
+        instance._fieldsToSave = ['field', 'field3', 'field4']
+
+      describe 'when not loaded', ->
+        it 'throws an error', ->
+          expect(-> instance.save()).toThrow('Cannot save model without an ID')
+
+      describe 'when loaded', ->
+        request = promise = null
+
+        beforeEach inject (testPromise) ->
+          instance.id = 5
+          instance.field = 'new val'
+          instance.field2 = 'other new val'
+          instance.field3 = 'third new val'
+
+          request = httpBackend.expectPUT('/5', { field: 'new val', field3: 'third new val', field4: null })
+          request.respond null
+
+          spyOn(instance, '_load')
+          promise = testPromise(instance.save())
+
+        it 'sends a PUT request', ->
+          httpBackend.verifyNoOutstandingExpectation()
+
+        describe 'on success', ->
+          beforeEach ->
+            request.respond { field: 'formatted new val', field4: 'side effect' }
+            httpBackend.flush()
+
+          it 'loads the response data', ->
+            expect(instance._load).toHaveBeenCalledWith { field: 'formatted new val', field4: 'side effect' }
+
+          it 'resolves the promise', ->
+            promise.expectSuccess()
+
+        describe 'on error', ->
+          beforeEach ->
+            request.respond 500
+            httpBackend.flush()
+
+          it 'does not load the response data', ->
+            expect(instance._load).not.toHaveBeenCalled()
+
+          it 'rejects the promise', ->
+            promise.expectError()
