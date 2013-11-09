@@ -42,9 +42,9 @@ describe 'soil.model module', ->
         it 'does nothing', ->
           expect(instance._load).not.toHaveBeenCalled()
 
-    describe '_base_url', ->
+    describe '_baseUrl', ->
       it 'is the root by default', ->
-        expect(instance._base_url).toBe('/')
+        expect(instance._baseUrl).toBe('/')
 
 
     # Load from ID
@@ -135,7 +135,7 @@ describe 'soil.model module', ->
     # Get model URL
 
     describe '#url', ->
-      beforeEach -> instance._base_url = '/model_path'
+      beforeEach -> instance._baseUrl = '/model_path'
 
       describe 'when not loaded', ->
         it 'returns the base url', ->
@@ -149,7 +149,7 @@ describe 'soil.model module', ->
 
       describe 'with a trailing slash and an id', ->
         beforeEach ->
-          instance._base_url = '/model_path/'
+          instance._baseUrl = '/model_path/'
           instance.id = 56
 
         it 'returns the base url with the id', ->

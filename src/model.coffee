@@ -6,7 +6,7 @@ angular.module('soil.model', [])
         if angular.isObject(dataOrId)
           @_load(dataOrId)
 
-      _base_url: '/'
+      _baseUrl: '/'
 
       getById: (id) ->
         return $http.get(@url(id)).success (responseData) =>
@@ -16,9 +16,9 @@ angular.module('soil.model', [])
 
       url: (id = @id) ->
         if id
-          @_withSlash(@_base_url) + id
+          @_withSlash(@_baseUrl) + id
         else
-          @_base_url
+          @_baseUrl
 
       updateField: (field) ->
         if @isInitialized()
