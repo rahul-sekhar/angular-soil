@@ -1,4 +1,4 @@
-/* angular-soil 0.4.0 %> */
+/* angular-soil 0.4.1 %> */
 
 (function() {
   angular.module('soil.collection', []).factory('soilCollection', [

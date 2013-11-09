@@ -1,6 +1,6 @@
 {
 	"name": "angular-soil",
-	"version": "0.4.0",
+	"version": "0.4.1",
 	"homepage": "https://github.com/rahul-sekhar/angular-soil",
 	"authors": [
 		"Rahul Sekhar <sekhar.rahul@gmail.com>"
@@ -24,8 +24,8 @@
 		"package.json"
 	],
 	"dependencies": {
-		"angular": "1.2.0-rc.3",
-		"angular-mocks": "1.2.0-rc.3",
+		"angular": "1.2",
+		"angular-mocks": "1.2",
 		"lodash": "latest",
 		"angular-mock-promise": "git@github.com:rahul-sekhar/angular-mock-promise.git"
 	}
