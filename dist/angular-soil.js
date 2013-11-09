@@ -56,6 +56,8 @@
 
         soilModel.prototype._baseUrl = '/';
 
+        soilModel.prototype._urlSuffix = '';
+
         soilModel.prototype.getById = function(id) {
           var _this = this;
           return $http.get(this.url(id)).success(function(responseData) {
@@ -72,9 +74,9 @@
             id = this.id;
           }
           if (id) {
-            return this._withSlash(this._baseUrl) + id;
+            return this._withSlash(this._baseUrl) + id + this._urlSuffix;
           } else {
-            return this._baseUrl;
+            return this._baseUrl + this._urlSuffix;
           }
         };
 

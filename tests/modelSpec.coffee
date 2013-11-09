@@ -46,6 +46,10 @@ describe 'soil.model module', ->
       it 'is the root by default', ->
         expect(instance._baseUrl).toBe('/')
 
+    describe '_urlSuffix', ->
+      it 'is null by default', ->
+        expect(instance._urlSuffix).toBe('')
+
 
     # Load from ID
     describe '#getById', ->
@@ -158,6 +162,15 @@ describe 'soil.model module', ->
       describe 'when passed an id as an integer', ->
         it 'returns the model url for that id', ->
           expect(instance.url(12)).toBe('/model_path/12')
+
+      describe 'with a url suffix', ->
+        beforeEach ->
+          instance._urlSuffix = '/something'
+          instance._baseUrl = '/model_path/'
+          instance.id = 56
+
+        it 'returns the base url with an id and suffix', ->
+          expect(instance.url()).toBe('/model_path/56/something')
 
     # Update a single field
 
