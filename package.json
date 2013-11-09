@@ -6,6 +6,8 @@
 		"url": "https://github.com/rahul-sekhar/angular-soil"
 	},
 	"devDependencies": {
+		"phantomjs": "1.9.1-0",
+		"karma": "latest",
 		"grunt": "~0.4.1",
 		"grunt-contrib-uglify": "latest",
 		"grunt-contrib-coffee": "latest",
