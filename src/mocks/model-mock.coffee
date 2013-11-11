@@ -10,5 +10,7 @@ angular.module('soil.model.mock', ['soil.model', 'angular-mock-promise'])
         updateField: jasmine.createSpy('updateField').andReturn(createMockPromise())
 
         save: jasmine.createSpy('save').andReturn(createMockPromise())
+
+        delete: jasmine.createSpy('delete').andReturn(createMockPromise())
     ])
   ])

@@ -1,4 +1,4 @@
-/* angular-soil 0.1.3 %> */
+/* angular-soil 0.4.1 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -53,6 +53,8 @@
             soilModelMock.prototype.updateField = jasmine.createSpy('updateField').andReturn(createMockPromise());
 
             soilModelMock.prototype.save = jasmine.createSpy('save').andReturn(createMockPromise());
+
+            soilModelMock.prototype["delete"] = jasmine.createSpy('delete').andReturn(createMockPromise());
 
             return soilModelMock;
 

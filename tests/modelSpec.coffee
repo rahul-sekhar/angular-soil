@@ -4,7 +4,6 @@ describe 'soil.model module', ->
 
   describe 'soilModel', ->
     soilModel = httpBackend = instance = null
-
     beforeEach inject (_soilModel_, $httpBackend) ->
       httpBackend = $httpBackend
       soilModel = _soilModel_
@@ -13,7 +12,6 @@ describe 'soil.model module', ->
     # Construction
     describe 'construction', ->
       mockSoilModel = null
-
       beforeEach ->
         class mockSoilModel extends soilModel
           _load: jasmine.createSpy('_load')
@@ -54,7 +52,6 @@ describe 'soil.model module', ->
     # Load from ID
     describe '#getById', ->
       response = promise = null
-
       beforeEach inject (promiseExpectation) ->
         response = httpBackend.expectGET('/6')
         response.respond null
@@ -181,7 +178,6 @@ describe 'soil.model module', ->
 
       describe 'when loaded', ->
         request = promise = null
-
         beforeEach inject (promiseExpectation) ->
           instance.id = 5
           instance.field = 'updated val'
@@ -232,7 +228,6 @@ describe 'soil.model module', ->
 
       describe 'when loaded', ->
         request = promise = null
-
         beforeEach inject (promiseExpectation) ->
           instance.id = 5
           instance.field = 'new val'
@@ -266,6 +261,54 @@ describe 'soil.model module', ->
 
           it 'does not load the response data', ->
             expect(instance._load).not.toHaveBeenCalled()
+
+          it 'rejects the promise', ->
+            promise.expectToBeRejected()
+
+
+    # Delete the model
+
+    describe '#delete', ->
+      describe 'when not loaded', ->
+        it 'throws an error', ->
+          expect(-> instance.delete()).toThrow('Cannot delete model without an ID')
+
+      describe 'when loaded', ->
+        request = promise = null
+        beforeEach inject (promiseExpectation) ->
+          instance.id = 5
+          request = httpBackend.expectDELETE('/5')
+          request.respond null
+
+          promise = promiseExpectation(instance.delete())
+
+        it 'sends a DELETE request', ->
+          httpBackend.verifyNoOutstandingExpectation()
+
+        describe 'on success', ->
+          beforeEach ->
+            request.respond 'OK'
+            httpBackend.flush()
+
+          it 'clears all model data', ->
+            expect(instance.id).toBeUndefined()
+            expect(instance.field).toBeUndefined()
+            expect(instance.field2).toBeUndefined()
+            expect(instance.savedData).toEqual({})
+
+          it 'resolves the promise', ->
+            promise.expectToBeResolved()
+
+        describe 'on error', ->
+          beforeEach ->
+            request.respond 500
+            httpBackend.flush()
+
+          it 'does not clear model data', ->
+            expect(instance.id).not.toBeUndefined()
+            expect(instance.field).not.toBeUndefined()
+            expect(instance.field2).not.toBeUndefined()
+            expect(instance.savedData).toEqual({ field: 'val', field2: 'other val' })
 
           it 'rejects the promise', ->
             promise.expectToBeRejected()

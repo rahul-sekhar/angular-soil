@@ -37,25 +37,30 @@ angular.module('soil.model', [])
         else
           throw 'Cannot update model without an ID'
 
-      save: (field) ->
+      save: ->
         if @isInitialized()
-
           return $http.put(@url(), @_dataToSave())
             .success (responseData) =>
               @_load(responseData)
         else
           throw 'Cannot save model without an ID'
 
+      delete: ->
+        if @isInitialized()
+          return $http.delete(@url())
+            .success => @_load(null)
+
+        else
+          throw 'Cannot delete model without an ID'
+
       _load: (data) ->
-        # Clear old fields
+        @_clearFields()
+        _.assign this, data
+        @savedData = data || {}
+
+      _clearFields: () ->
         _.forOwn this, (value, key, obj) ->
           delete obj[key] unless _.first(key) == '_'
-
-        # Assign new fields
-        _.assign this, data
-
-        # Set saved data
-        @savedData = data || {}
 
       _withSlash: (url) ->
         url.replace /\/?$/, '/'

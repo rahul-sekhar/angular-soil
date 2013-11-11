@@ -1,4 +1,4 @@
-/* angular-soil 0.1.3 %> */
+/* angular-soil 0.4.1 %> */
 
 (function() {
   angular.module('soil.collection', []).factory('soilCollection', [
@@ -97,7 +97,7 @@
           }
         };
 
-        soilModel.prototype.save = function(field) {
+        soilModel.prototype.save = function() {
           var _this = this;
           if (this.isInitialized()) {
             return $http.put(this.url(), this._dataToSave()).success(function(responseData) {
@@ -108,14 +108,29 @@
           }
         };
 
+        soilModel.prototype["delete"] = function() {
+          var _this = this;
+          if (this.isInitialized()) {
+            return $http["delete"](this.url()).success(function() {
+              return _this._load(null);
+            });
+          } else {
+            throw 'Cannot delete model without an ID';
+          }
+        };
+
         soilModel.prototype._load = function(data) {
-          _.forOwn(this, function(value, key, obj) {
+          this._clearFields();
+          _.assign(this, data);
+          return this.savedData = data || {};
+        };
+
+        soilModel.prototype._clearFields = function() {
+          return _.forOwn(this, function(value, key, obj) {
             if (_.first(key) !== '_') {
               return delete obj[key];
             }
           });
-          _.assign(this, data);
-          return this.savedData = data || {};
         };
 
         soilModel.prototype._withSlash = function(url) {
