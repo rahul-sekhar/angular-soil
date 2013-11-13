@@ -112,6 +112,45 @@ describe 'soil.collection module', ->
       it 'adds the new item to the front of the member array', ->
         expect(instance.members).toEqual(['new member', 'member1', 'member2', 'member3'])
 
+
+    # Create an item and add it to the collection
+    describe '#create', ->
+      soilModelMock = promise = null
+      beforeEach inject (createMockPromise) ->
+        promise = createMockPromise()
+
+      describe 'when a model is successfully created', ->
+        beforeEach inject (soilCollection) ->
+          class soilModelMock extends soilModel
+            constructor: ->
+              super
+              @save = jasmine.createSpy().andReturn(promise)
+          instance = new soilCollection(soilModelMock)
+          instance.members = ['member1', 'member2']
+
+        describe 'with default options', ->
+          beforeEach ->
+            instance.create({ data: 'val' })
+
+          it 'does nothing until the promise is resolved', ->
+            expect(instance.members).toEqual(['member1', 'member2'])
+
+          it 'adds the created model when the promise is resolved', ->
+            promise.resolve()
+            expect(instance.members).toEqual(['member1', 'member2', jasmine.any(soilModelMock)])
+
+          it 'loads the added model with the passed data', ->
+            promise.resolve()
+            expect(instance.members[2].load).toHaveBeenCalledWith({ data: 'val' })
+
+        describe 'with addToFront set', ->
+          beforeEach ->
+            instance.create({ data: 'val' }, { addToFront: true })
+
+          it 'adds the created model to the front when the promise is resolved', ->
+            promise.resolve()
+            expect(instance.members).toEqual([jasmine.any(soilModelMock), 'member1', 'member2'])
+
     # Remove an item from the collection by ID
     describe '#removeById', ->
       beforeEach ->

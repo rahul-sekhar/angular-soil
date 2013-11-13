@@ -21,6 +21,16 @@ angular.module('soil.collection', [])
       addToFront: (item) ->
         @members.unshift(item)
 
+      create: (data, options = {}) ->
+        options = _.defaults(options, { addToFront: false })
+
+        newModel = new @modelClass(data)
+        newModel.save().then =>
+          if options.addToFront
+            @addToFront(newModel)
+          else
+            @add(newModel)
+
       removeById: (id) ->
         _.remove @members, (item) ->
           item.id == id

@@ -1,4 +1,4 @@
-/* angular-soil 0.6.1 %> */
+/* angular-soil 0.6.2 %> */
 
 (function() {
   angular.module('soil.association', ['soil.collection']).factory('hasOneAssociation', [
@@ -120,6 +120,25 @@
 
         soilCollection.prototype.addToFront = function(item) {
           return this.members.unshift(item);
+        };
+
+        soilCollection.prototype.create = function(data, options) {
+          var newModel,
+            _this = this;
+          if (options == null) {
+            options = {};
+          }
+          options = _.defaults(options, {
+            addToFront: false
+          });
+          newModel = new this.modelClass(data);
+          return newModel.save().then(function() {
+            if (options.addToFront) {
+              return _this.addToFront(newModel);
+            } else {
+              return _this.add(newModel);
+            }
+          });
         };
 
         soilCollection.prototype.removeById = function(id) {
