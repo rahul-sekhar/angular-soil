@@ -11,6 +11,16 @@ describe 'soil.collection module', ->
       soilModel = _soilModel_
       instance = new soilCollection(soilModel, '/source_url')
 
+    # Construction
+    describe 'if constructed with the getData option set', ->
+      beforeEach inject (soilCollection) ->
+        class soilCollectionMock extends soilCollection
+          get: jasmine.createSpy()
+        instance = new soilCollectionMock(soilModel, '/source_url', { getData: true })
+
+      it 'gets data on construction', ->
+        expect(instance.get).toHaveBeenCalled()
+
     it 'sets members to undefined', ->
       expect(instance.members).toBeUndefined()
 

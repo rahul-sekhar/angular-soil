@@ -2,8 +2,13 @@ angular.module('soil.collection', [])
 
   .factory('soilCollection', ['$http', ($http) ->
     class soilCollection
-      constructor: (@modelClass, @_sourceUrl) ->
+      constructor: (@modelClass, @_sourceUrl, options = {}) ->
+        @_options = _.defaults(options, {
+          getData: false
+        })
         @members = undefined
+        if @_options.getData
+          @get()
 
       load: (data) ->
         data ||= []
