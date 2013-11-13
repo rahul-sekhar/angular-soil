@@ -1,4 +1,4 @@
-/* angular-soil 0.6.6 %> */
+/* angular-soil 0.6.7 %> */
 
 (function() {
   angular.module('soil.association', ['soil.collection']).factory('hasOneAssociation', [
@@ -300,7 +300,7 @@
 
         soilModel.prototype._modifyDataBeforeLoad = function(loadData) {
           var data;
-          data = _.cloneDeep(loadData);
+          data = _.clone(loadData);
           _.each(this._associations, function(association) {
             return association.beforeLoad(data);
           });
@@ -309,7 +309,7 @@
 
         soilModel.prototype._modifyDataBeforeSave = function(saveData) {
           var data;
-          data = _.cloneDeep(saveData);
+          data = _.clone(saveData);
           _.each(this._associations, function(association) {
             return association.beforeSave(data);
           });

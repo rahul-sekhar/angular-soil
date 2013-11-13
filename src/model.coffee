@@ -83,12 +83,12 @@ angular.module('soil.model', [])
       _fieldsToSave: []
 
       _modifyDataBeforeLoad: (loadData) ->
-        data = _.cloneDeep(loadData)
+        data = _.clone(loadData)
         _.each @_associations, (association) -> association.beforeLoad(data)
         return data
 
       _modifyDataBeforeSave: (saveData) ->
-        data = _.cloneDeep(saveData)
+        data = _.clone(saveData)
         _.each @_associations, (association) -> association.beforeSave(data)
         return data
 
