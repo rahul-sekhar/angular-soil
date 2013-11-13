@@ -7,10 +7,10 @@ angular.module('soil.model', [])
       _associations: []
 
       constructor: (arg) ->
-        if angular.isNumber(arg)
-          @get(arg)
-        else if angular.isObject(arg)
+        if angular.isObject(arg)
           @load(arg)
+        else if arg
+          @get(arg)
 
       setBaseUrl: (newUrl) ->
         @_baseUrl = newUrl

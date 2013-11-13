@@ -31,6 +31,13 @@ describe 'soil.model module', ->
           expect(instance.get).toHaveBeenCalledWith(15)
           expect(instance.load).not.toHaveBeenCalled()
 
+      describe 'when passed a string', ->
+        beforeEach -> instance = new mockSoilModel('15')
+
+        it 'gets data from the server', ->
+          expect(instance.get).toHaveBeenCalledWith('15')
+          expect(instance.load).not.toHaveBeenCalled()
+
       describe 'when passed an object', ->
         beforeEach -> instance = new mockSoilModel({ data: 'val' })
 
