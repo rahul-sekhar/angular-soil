@@ -115,11 +115,53 @@ describe 'soil.collection module', ->
 
     # Create an item and add it to the collection
     describe '#create', ->
-      soilModelMock = promise = null
-      beforeEach inject (createMockPromise) ->
+      soilModelMock = promise = returnedPromise = null
+      beforeEach inject (createMockPromise, soilCollection) ->
         promise = createMockPromise()
+        class soilModelMock extends soilModel
+          constructor: ->
+            super
+            @save = jasmine.createSpy().andReturn(promise)
+        instance = new soilCollection(soilModelMock)
+        instance.members = ['member1', 'member2']
 
-      describe 'when a model is successfully created', ->
+      describe 'with default options', ->
+        beforeEach inject (promiseExpectation) ->
+          returnedPromise = promiseExpectation(instance.create({ data: 'val' }))
+
+        it 'does nothing until the promise is resolved', ->
+          expect(instance.members).toEqual(['member1', 'member2'])
+
+        describe 'when the promise is resolved', ->
+          beforeEach -> promise.resolve()
+
+          it 'adds the created model when the promise is resolved', ->
+            expect(instance.members).toEqual(['member1', 'member2', jasmine.any(soilModelMock)])
+
+          it 'loads the added model with the passed data', ->
+            expect(instance.members[2].load).toHaveBeenCalledWith({ data: 'val' })
+
+          it 'resolves the returned promise', ->
+            returnedPromise.expectToBeResolved()
+
+        describe 'when the promise is rejected', ->
+          beforeEach -> promise.reject()
+
+          it 'does not add a member', ->
+            expect(instance.members).toEqual(['member1', 'member2'])
+
+          it 'rejects the returned promise', ->
+            returnedPromise.expectToBeRejected()
+
+      describe 'with addToFront set', ->
+        beforeEach ->
+          instance.create({ data: 'val' }, { addToFront: true })
+
+        it 'adds the created model to the front when the promise is resolved', ->
+          promise.resolve()
+          expect(instance.members).toEqual([jasmine.any(soilModelMock), 'member1', 'member2'])
+
+      describe 'when a model is not created successfully', ->
         beforeEach inject (soilCollection) ->
           class soilModelMock extends soilModel
             constructor: ->
@@ -129,27 +171,23 @@ describe 'soil.collection module', ->
           instance.members = ['member1', 'member2']
 
         describe 'with default options', ->
-          beforeEach ->
-            instance.create({ data: 'val' })
+          beforeEach inject (promiseExpectation) ->
+            returnedPromise = promiseExpectation(instance.create({ data: 'val' }))
 
           it 'does nothing until the promise is resolved', ->
             expect(instance.members).toEqual(['member1', 'member2'])
 
-          it 'adds the created model when the promise is resolved', ->
-            promise.resolve()
-            expect(instance.members).toEqual(['member1', 'member2', jasmine.any(soilModelMock)])
+          describe 'when the promise is resolved', ->
+            beforeEach -> promise.resolve()
 
-          it 'loads the added model with the passed data', ->
-            promise.resolve()
-            expect(instance.members[2].load).toHaveBeenCalledWith({ data: 'val' })
+            it 'adds the created model when the promise is resolved', ->
+              expect(instance.members).toEqual(['member1', 'member2', jasmine.any(soilModelMock)])
 
-        describe 'with addToFront set', ->
-          beforeEach ->
-            instance.create({ data: 'val' }, { addToFront: true })
+            it 'loads the added model with the passed data', ->
+              expect(instance.members[2].load).toHaveBeenCalledWith({ data: 'val' })
 
-          it 'adds the created model to the front when the promise is resolved', ->
-            promise.resolve()
-            expect(instance.members).toEqual([jasmine.any(soilModelMock), 'member1', 'member2'])
+            it 'resolves the returned promise', ->
+              returnedPromise.expectToBeResolved()
 
     # Remove an item from the collection by ID
     describe '#removeById', ->

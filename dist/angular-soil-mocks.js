@@ -1,4 +1,4 @@
-/* angular-soil 0.6.2 %> */
+/* angular-soil 0.6.3 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -15,6 +15,7 @@
             function soilCollectionMock() {
               this.load = jasmine.createSpy('load').andReturn(this);
               this.get = jasmine.createSpy('get').andReturn(createMockPromise());
+              this.create = jasmine.createSpy('create').andReturn(createMockPromise());
               soilCollectionMock.__super__.constructor.apply(this, arguments);
             }
 

@@ -25,7 +25,7 @@ angular.module('soil.collection', [])
         options = _.defaults(options, { addToFront: false })
 
         newModel = new @modelClass(data)
-        newModel.save().then =>
+        return newModel.save().then =>
           if options.addToFront
             @addToFront(newModel)
           else

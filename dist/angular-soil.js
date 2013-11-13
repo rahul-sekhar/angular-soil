@@ -1,4 +1,4 @@
-/* angular-soil 0.6.2 %> */
+/* angular-soil 0.6.3 %> */
 
 (function() {
   angular.module('soil.association', ['soil.collection']).factory('hasOneAssociation', [

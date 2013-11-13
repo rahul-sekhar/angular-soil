@@ -5,6 +5,7 @@ angular.module('soil.collection.mock', ['soil.collection', 'angular-mock-promise
         constructor: ->
           @load = jasmine.createSpy('load').andReturn(this)
           @get = jasmine.createSpy('get').andReturn(createMockPromise())
+          @create = jasmine.createSpy('create').andReturn(createMockPromise())
           super
 
     ])
