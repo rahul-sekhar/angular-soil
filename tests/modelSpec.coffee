@@ -43,6 +43,14 @@ describe 'soil.model module', ->
       it 'is the root by default', ->
         expect(instance._baseUrl).toBe('/')
 
+    describe '_fieldsToSave', ->
+      it 'is set to an empty array', ->
+        expect(instance._fieldsToSave).toEqual([])
+
+    describe '_associations', ->
+      it 'is set to an empty array', ->
+        expect(instance._associations).toEqual([])
+
     # Set the base url
     describe '#setBaseUrl', ->
       it 'can be used to set _baseUrl', ->
@@ -52,14 +60,16 @@ describe 'soil.model module', ->
 
     # Load data into the model
     describe '#load', ->
+      result = null
       describe 'with data', ->
         beforeEach ->
+          instance._associations = [{ beforeLoad: (data) -> data.field5 += ' changed by association' }]
           instance._private = 'private val'
-          instance.load { field: 'new val', field5: 'another val' }
+          result = instance.load { field: 'new val', field5: 'another val' }
 
-        it 'contains the passed data', ->
+        it 'contains the passed data, modified by associations', ->
           expect(instance.field).toBe('new val')
-          expect(instance.field5).toBe('another val')
+          expect(instance.field5).toBe('another val changed by association')
 
         it 'clears old fields', ->
           expect(instance.field2).toBeUndefined()
@@ -67,13 +77,16 @@ describe 'soil.model module', ->
         it 'does not clear private fields', ->
           expect(instance._private).toEqual('private val')
 
-        it 'sets saved data', ->
+        it 'sets saved data, unmodified by associations', ->
           expect(instance.savedData).toEqual { field: 'new val', field5: 'another val' }
+
+        it 'returns the instance', ->
+          expect(result).toBe(instance)
 
       describe 'with null passed', ->
         beforeEach ->
           instance._private = 'private val'
-          instance.load(null)
+          result = instance.load(null)
 
         it 'is cleared, except for private fields', ->
           expect(instance.field).toBeUndefined()
@@ -82,6 +95,9 @@ describe 'soil.model module', ->
 
         it 'clears saved data', ->
           expect(instance.savedData).toEqual {}
+
+        it 'returns the instance', ->
+          expect(result).toBe(instance)
 
     # Get, by passing an ID
     describe '#get', ->
@@ -158,21 +174,32 @@ describe 'soil.model module', ->
           expect(instance.loaded()).toBeTruthy()
 
 
+    # Get data to be saved
+    describe '#dataToSave', ->
+      beforeEach ->
+        instance._associations = [{ beforeSave: (data) ->
+          data.field3 = data.field3 += ' association'
+        }]
+        instance._fieldsToSave = ['field', 'field3', 'field4']
+        instance.field = 'new val'
+        instance.field2 = 'other new val'
+        instance.field3 = 'third new val'
+
+      it 'selects fields to save and applies associations', ->
+        expect(instance.dataToSave()).toEqual({ field: 'new val', field3: 'third new val association', field4: null })
+
     # Save the model
     describe '#save', ->
       request = promise = null
       beforeEach ->
         instance.setBaseUrl('/model_path')
-        instance._fieldsToSave = ['field', 'field3', 'field4']
-        instance.field = 'new val'
-        instance.field2 = 'other new val'
-        instance.field3 = 'third new val'
+        spyOn(instance, 'dataToSave').andReturn('save data')
         spyOn(instance, 'load')
 
       describe 'without an id', ->
         request = promise = null
         beforeEach inject (promiseExpectation) ->
-          request = httpBackend.expectPOST('/model_path', { field: 'new val', field3: 'third new val', field4: null })
+          request = httpBackend.expectPOST('/model_path', 'save data')
           request.respond null
           promise = promiseExpectation(instance.save())
 
@@ -204,7 +231,7 @@ describe 'soil.model module', ->
       describe 'with an id', ->
         beforeEach inject (promiseExpectation) ->
           instance.id = 5
-          request = httpBackend.expectPUT('/model_path/5', { field: 'new val', field3: 'third new val', field4: null })
+          request = httpBackend.expectPUT('/model_path/5', 'save data')
           request.respond null
           promise = promiseExpectation(instance.save())
 
@@ -236,7 +263,7 @@ describe 'soil.model module', ->
 
     # Delete the model
     describe '#delete', ->
-      describe 'wwithout an id', ->
+      describe 'without an id', ->
         it 'throws an error', ->
           expect(-> instance.delete()).toThrow()
 
@@ -285,8 +312,12 @@ describe 'soil.model module', ->
         request = promise = null
         beforeEach inject (promiseExpectation) ->
           instance.load { id: 5, field: 'val', field2: 'other val' }
+          instance._associations = [{
+            beforeSave: (data) -> data.field += ' association',
+            beforeLoad: (data) -> data.field += ' association load'
+          }]
           instance.field = 'updated val'
-          request = httpBackend.expectPUT('/5', { field: 'updated val' })
+          request = httpBackend.expectPUT('/5', { field: 'updated val association' })
           request.respond null
           promise = promiseExpectation(instance.updateField('field'))
 
@@ -298,13 +329,13 @@ describe 'soil.model module', ->
             request.respond { field: 'formatted updated val', other_field: 'other val' }
             httpBackend.flush()
 
-          it 'sets the field to the response', ->
-            expect(instance.field).toEqual('formatted updated val')
+          it 'sets the field to the response, modified by the association', ->
+            expect(instance.field).toEqual('formatted updated val association load')
 
           it 'does not set other fields from the response', ->
             expect(instance.other_field).toBeUndefined()
 
-          it 'replaces saved data with the response', ->
+          it 'replaces saved data with the response, unmodified by the association', ->
             expect(instance.savedData).toEqual { field: 'formatted updated val', other_field: 'other val' }
 
           it 'resolves the promise', ->
@@ -315,8 +346,8 @@ describe 'soil.model module', ->
             request.respond 500
             httpBackend.flush()
 
-          it 'restores the field to the old saved data', ->
-            expect(instance.field).toEqual('val')
+          it 'restores the field to the old saved data, modified by the association', ->
+            expect(instance.field).toEqual('val association load')
 
           it 'rejects the promise', ->
             promise.expectToBeRejected()

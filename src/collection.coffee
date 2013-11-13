@@ -9,6 +9,7 @@ angular.module('soil.collection', [])
         data ||= []
         @members = _.map data, (modelData) =>
           new @_modelClass(modelData)
+        return this
 
       get: (url) ->
         return $http.get(url)

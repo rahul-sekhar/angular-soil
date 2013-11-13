@@ -3,6 +3,8 @@ angular.module('soil.model', [])
   .factory('soilModel', ['$http', ($http) ->
     class soilModel
       _baseUrl: '/'
+      _fieldsToSave: []
+      _associations: []
 
       constructor: (arg) ->
         if angular.isNumber(arg)
@@ -21,8 +23,9 @@ angular.module('soil.model', [])
 
       load: (data) ->
         @_clearFields()
-        _.assign this, data
-        @savedData = data || {}
+        @_setSavedData(data)
+        _.assign this, @_modifyDataBeforeLoad(data)
+        return this
 
       get: (id) ->
         return $http.get(@url(id)).success (responseData) =>
@@ -32,10 +35,10 @@ angular.module('soil.model', [])
 
       save: ->
         if @id
-          return $http.put(@url(), @_dataToSave())
+          return $http.put(@url(), @dataToSave())
             .success (responseData) => @load(responseData)
         else
-          return $http.post(@url(), @_dataToSave())
+          return $http.post(@url(), @dataToSave())
             .success (responseData) => @load(responseData)
 
       delete: ->
@@ -47,14 +50,24 @@ angular.module('soil.model', [])
         @_checkIfLoaded()
         data = {}
         data[field] = @[field]
+        data = @_modifyDataBeforeSave(data)
 
         return $http.put(@url(), data)
           .success (responseData) =>
-            @[field] = responseData[field]
-            @savedData = responseData
-          .error =>
-            @[field] = @savedData[field]
+            @savedData = _.cloneDeep(responseData)
+            fieldData = _.pick(responseData, field)
+            fieldData = @_modifyDataBeforeLoad(fieldData)
+            @[field] = fieldData[field]
 
+          .error =>
+            restoreData = @_modifyDataBeforeLoad(@savedData)
+            @[field] = restoreData[field]
+
+      dataToSave: ->
+        data = {}
+        _.each @_fieldsToSave, (field) =>
+          data[field] = if @[field] == undefined then null else @[field]
+        return @_modifyDataBeforeSave(data)
 
       _checkIfLoaded: ->
         throw 'Operation not permitted on an unloaded model' unless @loaded()
@@ -69,9 +82,16 @@ angular.module('soil.model', [])
 
       _fieldsToSave: []
 
-      _dataToSave: ->
-        data = {}
-        _.each @_fieldsToSave, (field) =>
-          data[field] = if @[field] == undefined then null else @[field]
+      _modifyDataBeforeLoad: (loadData) ->
+        data = _.cloneDeep(loadData)
+        _.each @_associations, (association) -> association.beforeLoad(data)
         return data
+
+      _modifyDataBeforeSave: (saveData) ->
+        data = _.cloneDeep(saveData)
+        _.each @_associations, (association) -> association.beforeSave(data)
+        return data
+
+      _setSavedData: (data) ->
+        @savedData = if data then _.cloneDeep(data) else {}
   ])

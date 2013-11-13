@@ -1,4 +1,4 @@
-/* angular-soil 0.5.0 %> */
+/* angular-soil 0.6.0 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -8,16 +8,15 @@
     '$provide', function($provide) {
       return $provide.decorator('soilCollection', [
         '$delegate', 'createMockPromise', function($delegate, createMockPromise) {
-          var soilCollectionMock, _ref;
+          var soilCollectionMock;
           return soilCollectionMock = (function(_super) {
             __extends(soilCollectionMock, _super);
 
             function soilCollectionMock() {
-              _ref = soilCollectionMock.__super__.constructor.apply(this, arguments);
-              return _ref;
+              this.load = jasmine.createSpy('load').andReturn(this);
+              this.get = jasmine.createSpy('get').andReturn(createMockPromise());
+              soilCollectionMock.__super__.constructor.apply(this, arguments);
             }
-
-            soilCollectionMock.prototype.get = jasmine.createSpy('get').andReturn(createMockPromise());
 
             return soilCollectionMock;
 
@@ -37,22 +36,18 @@
     '$provide', function($provide) {
       return $provide.decorator('soilModel', [
         '$delegate', 'createMockPromise', function($delegate, createMockPromise) {
-          var soilModelMock, _ref;
+          var soilModelMock;
           return soilModelMock = (function(_super) {
             __extends(soilModelMock, _super);
 
             function soilModelMock() {
-              _ref = soilModelMock.__super__.constructor.apply(this, arguments);
-              return _ref;
+              this.load = jasmine.createSpy('load').andReturn(this);
+              this.get = jasmine.createSpy('get').andReturn(createMockPromise());
+              this.save = jasmine.createSpy('save').andReturn(createMockPromise());
+              this["delete"] = jasmine.createSpy('delete').andReturn(createMockPromise());
+              this.updateField = jasmine.createSpy('updateField').andReturn(createMockPromise());
+              soilModelMock.__super__.constructor.apply(this, arguments);
             }
-
-            soilModelMock.prototype.get = jasmine.createSpy('get').andReturn(createMockPromise());
-
-            soilModelMock.prototype.save = jasmine.createSpy('save').andReturn(createMockPromise());
-
-            soilModelMock.prototype["delete"] = jasmine.createSpy('delete').andReturn(createMockPromise());
-
-            soilModelMock.prototype.updateField = jasmine.createSpy('updateField').andReturn(createMockPromise());
 
             return soilModelMock;
 

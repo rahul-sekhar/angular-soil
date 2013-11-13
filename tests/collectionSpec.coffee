@@ -16,29 +16,32 @@ describe 'soil.collection module', ->
 
     # Load data into the collection
     describe '#load', ->
+      result = null
       beforeEach ->
         instance.members = ['member1', 'member2', 'member3']
 
       describe 'with data passed', ->
         beforeEach ->
-          instance.load([{ id: 1, name: 'first' }, { id: 4, name: 'second' }])
+          result = instance.load([{ id: 1, name: 'first' }, { id: 4, name: 'second' }])
 
-        it 'replaces old members', ->
-          expect(instance.members.length).toEqual(2)
+        it 'replaces members with a model for each member', ->
+          expect(instance.members).toEqual([jasmine.any(soilModel), jasmine.any(soilModel)])
 
-        it 'creates a model for each member', ->
-          _.each instance.members, (member) ->
-            expect(member instanceof soilModel).toBeTruthy()
+        it 'loads each models data', ->
+          expect(instance.members[0].load).toHaveBeenCalledWith({ id: 1, name: 'first' })
+          expect(instance.members[1].load).toHaveBeenCalledWith({ id: 4, name: 'second' })
 
-        it 'sets members to the response', ->
-          expect(_.map(instance.members, (member) -> member.id)).toEqual [1, 4]
-          expect(_.map(instance.members, (member) -> member.name)).toEqual ['first', 'second']
+        it 'returns the instance', ->
+          expect(result).toBe(instance)
 
       describe 'with null passed', ->
-        beforeEach -> instance.load(null)
+        beforeEach -> result = instance.load(null)
 
         it 'clears members', ->
           expect(instance.members).toEqual([])
+
+        it 'returns the instance', ->
+          expect(result).toBe(instance)
 
     # Get data from a source
     describe '#get', ->
