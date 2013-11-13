@@ -20,20 +20,19 @@ angular.module('soil.collection', [])
         return $http.get(@_sourceUrl)
           .success (data) => @load(data)
 
-      add: (item) ->
-        @members.push(item)
+      add: (data) ->
+        @members.push(new @modelClass(data))
 
-      addToFront: (item) ->
-        @members.unshift(item)
+      addToFront: (data) ->
+        @members.unshift(new @modelClass(data))
 
       create: (data, options = {}) ->
         options = _.defaults(options, { addToFront: false })
         return $http.post(@_sourceUrl, data).success (responseData) =>
-          newModel = new @modelClass(responseData)
           if options.addToFront
-            @addToFront(newModel)
+            @addToFront(responseData)
           else
-            @add(newModel)
+            @add(responseData)
 
       removeById: (id) ->
         _.remove @members, (item) ->

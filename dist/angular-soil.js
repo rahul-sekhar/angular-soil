@@ -1,4 +1,4 @@
-/* angular-soil 0.6.7 %> */
+/* angular-soil 0.6.8 %> */
 
 (function() {
   angular.module('soil.association', ['soil.collection']).factory('hasOneAssociation', [
@@ -124,12 +124,12 @@
           });
         };
 
-        soilCollection.prototype.add = function(item) {
-          return this.members.push(item);
+        soilCollection.prototype.add = function(data) {
+          return this.members.push(new this.modelClass(data));
         };
 
-        soilCollection.prototype.addToFront = function(item) {
-          return this.members.unshift(item);
+        soilCollection.prototype.addToFront = function(data) {
+          return this.members.unshift(new this.modelClass(data));
         };
 
         soilCollection.prototype.create = function(data, options) {
@@ -141,12 +141,10 @@
             addToFront: false
           });
           return $http.post(this._sourceUrl, data).success(function(responseData) {
-            var newModel;
-            newModel = new _this.modelClass(responseData);
             if (options.addToFront) {
-              return _this.addToFront(newModel);
+              return _this.addToFront(responseData);
             } else {
-              return _this.add(newModel);
+              return _this.add(responseData);
             }
           });
         };

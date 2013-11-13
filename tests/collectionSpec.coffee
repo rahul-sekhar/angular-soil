@@ -107,21 +107,27 @@ describe 'soil.collection module', ->
 
     # Add an item to the collection
     describe '#add', ->
-      beforeEach ->
-        instance.members = ['member1', 'member2', 'member3']
-        instance.add('new member')
+      describe 'when passed data', ->
+        beforeEach ->
+          instance.members = ['member1', 'member2', 'member3']
+          instance.add({ data: 'val' })
 
-      it 'adds the new item to the end of the member array', ->
-        expect(instance.members).toEqual(['member1', 'member2', 'member3', 'new member'])
+        it 'adds the new item to the end of the member array', ->
+          expect(instance.members).toEqual(['member1', 'member2', 'member3', jasmine.any(soilModel)])
+
+        it 'loads data into the new member', ->
+          expect(instance.members[3].load).toHaveBeenCalledWith({ data: 'val' })
 
     describe '#addToFront', ->
       beforeEach ->
         instance.members = ['member1', 'member2', 'member3']
-        instance.addToFront('new member')
+        instance.addToFront({ data: 'val' })
 
       it 'adds the new item to the front of the member array', ->
-        expect(instance.members).toEqual(['new member', 'member1', 'member2', 'member3'])
+        expect(instance.members).toEqual([jasmine.any(soilModel), 'member1', 'member2', 'member3'])
 
+      it 'loads data into the new member', ->
+          expect(instance.members[0].load).toHaveBeenCalledWith({ data: 'val' })
 
     # Create an item and add it to the collection
     describe '#create', ->
@@ -133,6 +139,7 @@ describe 'soil.collection module', ->
 
       describe 'with default options', ->
         beforeEach inject (promiseExpectation) ->
+          spyOn(instance, 'add')
           promise = promiseExpectation(instance.create({ data: 'val' }))
 
         it 'sends a POST request', ->
@@ -147,10 +154,7 @@ describe 'soil.collection module', ->
             httpBackend.flush()
 
           it 'adds the created model', ->
-            expect(instance.members).toEqual(['member1', 'member2', jasmine.any(soilModel)])
-
-          it 'loads the added model with the passed data', ->
-            expect(instance.members[2].load).toHaveBeenCalledWith({ data: 'response val' })
+            expect(instance.add).toHaveBeenCalledWith({ data: 'response val' })
 
           it 'resolves the returned promise', ->
             promise.expectToBeResolved()
@@ -168,12 +172,13 @@ describe 'soil.collection module', ->
 
       describe 'with addToFront set', ->
         beforeEach ->
+          spyOn(instance, 'addToFront')
           instance.create({ data: 'val' }, { addToFront: true })
 
         it 'adds the created model to the front', ->
           response.respond { data: 'response val' }
           httpBackend.flush()
-          expect(instance.members).toEqual([jasmine.any(soilModel), 'member1', 'member2'])
+          expect(instance.addToFront).toHaveBeenCalledWith({ data: 'response val' })
 
     # Remove an item from the collection by ID
     describe '#removeById', ->
