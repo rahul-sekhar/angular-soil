@@ -43,6 +43,24 @@ describe 'soil.collection module', ->
         it 'returns the instance', ->
           expect(result).toBe(instance)
 
+    # Check whether data has been loaded
+    describe '#loaded', ->
+      describe 'with no data', ->
+        it 'returns false', ->
+          expect(instance.loaded()).toBe(false)
+
+      describe 'with an empty array of members', ->
+        beforeEach -> instance.members = []
+
+        it 'returns true', ->
+          expect(instance.loaded()).toBe(true)
+
+      describe 'with an array of members', ->
+        beforeEach -> instance.members = ['member1', 'member2']
+
+        it 'returns true', ->
+          expect(instance.loaded()).toBe(true)
+
     # Get data from a source
     describe '#get', ->
       request = promise = null

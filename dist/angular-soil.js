@@ -1,4 +1,4 @@
-/* angular-soil 0.6.0 %> */
+/* angular-soil 0.6.1 %> */
 
 (function() {
   angular.module('soil.association', ['soil.collection']).factory('hasOneAssociation', [
@@ -93,8 +93,8 @@
     '$http', function($http) {
       var soilCollection;
       return soilCollection = (function() {
-        function soilCollection(_modelClass) {
-          this._modelClass = _modelClass;
+        function soilCollection(modelClass) {
+          this.modelClass = modelClass;
           this.members = void 0;
         }
 
@@ -102,7 +102,7 @@
           var _this = this;
           data || (data = []);
           this.members = _.map(data, function(modelData) {
-            return new _this._modelClass(modelData);
+            return new _this.modelClass(modelData);
           });
           return this;
         };
@@ -132,6 +132,10 @@
           return _.remove(this.members, function(item) {
             return itemToRemove === item;
           });
+        };
+
+        soilCollection.prototype.loaded = function() {
+          return !(this.members === void 0);
         };
 
         return soilCollection;

@@ -2,13 +2,13 @@ angular.module('soil.collection', [])
 
   .factory('soilCollection', ['$http', ($http) ->
     class soilCollection
-      constructor: (@_modelClass) ->
+      constructor: (@modelClass) ->
         @members = undefined
 
       load: (data) ->
         data ||= []
         @members = _.map data, (modelData) =>
-          new @_modelClass(modelData)
+          new @modelClass(modelData)
         return this
 
       get: (url) ->
@@ -28,4 +28,7 @@ angular.module('soil.collection', [])
       remove: (itemToRemove) ->
         _.remove @members, (item) ->
           itemToRemove == item
+
+      loaded: ->
+        return !(@members == undefined)
   ])
