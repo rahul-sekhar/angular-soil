@@ -1,4 +1,4 @@
-/* angular-soil 0.6.3 %> */
+/* angular-soil 0.6.4 %> */
 
 (function() {
   angular.module('soil.association', ['soil.collection']).factory('hasOneAssociation', [
@@ -93,8 +93,9 @@
     '$http', function($http) {
       var soilCollection;
       return soilCollection = (function() {
-        function soilCollection(modelClass) {
+        function soilCollection(modelClass, _sourceUrl) {
           this.modelClass = modelClass;
+          this._sourceUrl = _sourceUrl;
           this.members = void 0;
         }
 
@@ -107,9 +108,9 @@
           return this;
         };
 
-        soilCollection.prototype.get = function(url) {
+        soilCollection.prototype.get = function() {
           var _this = this;
-          return $http.get(url).success(function(data) {
+          return $http.get(this._sourceUrl).success(function(data) {
             return _this.load(data);
           });
         };
@@ -123,16 +124,16 @@
         };
 
         soilCollection.prototype.create = function(data, options) {
-          var newModel,
-            _this = this;
+          var _this = this;
           if (options == null) {
             options = {};
           }
           options = _.defaults(options, {
             addToFront: false
           });
-          newModel = new this.modelClass(data);
-          return newModel.save().then(function() {
+          return $http.post(this._sourceUrl, data).success(function(responseData) {
+            var newModel;
+            newModel = new _this.modelClass(responseData);
             if (options.addToFront) {
               return _this.addToFront(newModel);
             } else {

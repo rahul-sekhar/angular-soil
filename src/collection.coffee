@@ -2,7 +2,7 @@ angular.module('soil.collection', [])
 
   .factory('soilCollection', ['$http', ($http) ->
     class soilCollection
-      constructor: (@modelClass) ->
+      constructor: (@modelClass, @_sourceUrl) ->
         @members = undefined
 
       load: (data) ->
@@ -11,8 +11,8 @@ angular.module('soil.collection', [])
           new @modelClass(modelData)
         return this
 
-      get: (url) ->
-        return $http.get(url)
+      get: ->
+        return $http.get(@_sourceUrl)
           .success (data) => @load(data)
 
       add: (item) ->
@@ -23,9 +23,8 @@ angular.module('soil.collection', [])
 
       create: (data, options = {}) ->
         options = _.defaults(options, { addToFront: false })
-
-        newModel = new @modelClass(data)
-        return newModel.save().then =>
+        return $http.post(@_sourceUrl, data).success (responseData) =>
+          newModel = new @modelClass(responseData)
           if options.addToFront
             @addToFront(newModel)
           else

@@ -9,7 +9,7 @@ describe 'soil.collection module', ->
     beforeEach inject (soilCollection, $httpBackend, _soilModel_) ->
       httpBackend = $httpBackend
       soilModel = _soilModel_
-      instance = new soilCollection(soilModel)
+      instance = new soilCollection(soilModel, '/source_url')
 
     it 'sets members to undefined', ->
       expect(instance.members).toBeUndefined()
@@ -68,7 +68,7 @@ describe 'soil.collection module', ->
         spyOn(instance, 'load')
         request = httpBackend.expectGET('/source_url')
         request.respond null
-        promise = promiseExpectation(instance.get('/source_url'))
+        promise = promiseExpectation(instance.get())
 
       it 'sends a request to the source_url', ->
         httpBackend.verifyNoOutstandingExpectation()
@@ -115,79 +115,55 @@ describe 'soil.collection module', ->
 
     # Create an item and add it to the collection
     describe '#create', ->
-      soilModelMock = promise = returnedPromise = null
-      beforeEach inject (createMockPromise, soilCollection) ->
-        promise = createMockPromise()
-        class soilModelMock extends soilModel
-          constructor: ->
-            super
-            @save = jasmine.createSpy().andReturn(promise)
-        instance = new soilCollection(soilModelMock)
+      promise = response = null
+      beforeEach  ->
         instance.members = ['member1', 'member2']
+        response = httpBackend.expectPOST('/source_url', { data: 'val' })
+        response.respond null
 
       describe 'with default options', ->
         beforeEach inject (promiseExpectation) ->
-          returnedPromise = promiseExpectation(instance.create({ data: 'val' }))
+          promise = promiseExpectation(instance.create({ data: 'val' }))
 
-        it 'does nothing until the promise is resolved', ->
+        it 'sends a POST request', ->
+          httpBackend.verifyNoOutstandingExpectation()
+
+        it 'does nothing until the backend responds', ->
           expect(instance.members).toEqual(['member1', 'member2'])
 
-        describe 'when the promise is resolved', ->
-          beforeEach -> promise.resolve()
+        describe 'on success', ->
+          beforeEach ->
+            response.respond { data: 'response val' }
+            httpBackend.flush()
 
-          it 'adds the created model when the promise is resolved', ->
-            expect(instance.members).toEqual(['member1', 'member2', jasmine.any(soilModelMock)])
+          it 'adds the created model', ->
+            expect(instance.members).toEqual(['member1', 'member2', jasmine.any(soilModel)])
 
           it 'loads the added model with the passed data', ->
-            expect(instance.members[2].load).toHaveBeenCalledWith({ data: 'val' })
+            expect(instance.members[2].load).toHaveBeenCalledWith({ data: 'response val' })
 
           it 'resolves the returned promise', ->
-            returnedPromise.expectToBeResolved()
+            promise.expectToBeResolved()
 
-        describe 'when the promise is rejected', ->
-          beforeEach -> promise.reject()
+        describe 'on failure', ->
+          beforeEach ->
+            response.respond 500
+            httpBackend.flush()
 
           it 'does not add a member', ->
             expect(instance.members).toEqual(['member1', 'member2'])
 
           it 'rejects the returned promise', ->
-            returnedPromise.expectToBeRejected()
+            promise.expectToBeRejected()
 
       describe 'with addToFront set', ->
         beforeEach ->
           instance.create({ data: 'val' }, { addToFront: true })
 
-        it 'adds the created model to the front when the promise is resolved', ->
-          promise.resolve()
-          expect(instance.members).toEqual([jasmine.any(soilModelMock), 'member1', 'member2'])
-
-      describe 'when a model is not created successfully', ->
-        beforeEach inject (soilCollection) ->
-          class soilModelMock extends soilModel
-            constructor: ->
-              super
-              @save = jasmine.createSpy().andReturn(promise)
-          instance = new soilCollection(soilModelMock)
-          instance.members = ['member1', 'member2']
-
-        describe 'with default options', ->
-          beforeEach inject (promiseExpectation) ->
-            returnedPromise = promiseExpectation(instance.create({ data: 'val' }))
-
-          it 'does nothing until the promise is resolved', ->
-            expect(instance.members).toEqual(['member1', 'member2'])
-
-          describe 'when the promise is resolved', ->
-            beforeEach -> promise.resolve()
-
-            it 'adds the created model when the promise is resolved', ->
-              expect(instance.members).toEqual(['member1', 'member2', jasmine.any(soilModelMock)])
-
-            it 'loads the added model with the passed data', ->
-              expect(instance.members[2].load).toHaveBeenCalledWith({ data: 'val' })
-
-            it 'resolves the returned promise', ->
-              returnedPromise.expectToBeResolved()
+        it 'adds the created model to the front', ->
+          response.respond { data: 'response val' }
+          httpBackend.flush()
+          expect(instance.members).toEqual([jasmine.any(soilModel), 'member1', 'member2'])
 
     # Remove an item from the collection by ID
     describe '#removeById', ->
