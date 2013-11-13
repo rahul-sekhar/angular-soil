@@ -2,20 +2,29 @@ angular.module('soil.collection', [])
 
   .factory('soilCollection', ['$http', ($http) ->
     class soilCollection
-      constructor: (@_modelClass, @_sourceUrl) ->
-        unless _.isFunction(@_modelClass)
-          throw 'Expected a model class as the first argument when instantiating soilCollection'
-
+      constructor: (@_modelClass) ->
         @members = undefined
 
-      loadAll: ->
-        return $http.get(@_sourceUrl).success (items) =>
-          @members = _.map(items, (item) => new @_modelClass(item))
+      load: (data) ->
+        data ||= []
+        @members = _.map data, (modelData) =>
+          new @_modelClass(modelData)
 
-      addItem: (data) ->
-        return if @members == undefined
+      get: (url) ->
+        return $http.get(url)
+          .success (data) => @load(data)
 
-        return $http.post(@_sourceUrl, data).success (response_data) =>
-          newModel = new @_modelClass(response_data)
-          @members.push(newModel)
+      add: (item) ->
+        @members.push(item)
+
+      addToFront: (item) ->
+        @members.unshift(item)
+
+      removeById: (id) ->
+        _.remove @members, (item) ->
+          item.id == id
+
+      remove: (itemToRemove) ->
+        _.remove @members, (item) ->
+          itemToRemove == item
   ])

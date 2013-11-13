@@ -4,43 +4,27 @@ describe 'soil.collection module', ->
   beforeEach module 'angular-mock-promise'
 
   describe 'soilCollection', ->
-    soilModel = soilCollection = instance = httpBackend = null
+    soilModel = instance = httpBackend = null
 
-    beforeEach inject (_soilCollection_, $httpBackend, _soilModel_) ->
+    beforeEach inject (soilCollection, $httpBackend, _soilModel_) ->
       httpBackend = $httpBackend
       soilModel = _soilModel_
-      soilCollection = _soilCollection_
-      instance = new soilCollection(soilModel, '/source_url')
+      instance = new soilCollection(soilModel)
 
     it 'sets members to undefined', ->
       expect(instance.members).toBeUndefined()
 
-    describe '#loadAll', ->
-      request = promise = null
+    # Load data into the collection
+    describe '#load', ->
+      beforeEach ->
+        instance.members = ['member1', 'member2', 'member3']
 
-      beforeEach inject (promiseExpectation) ->
-        request = httpBackend.expectGET('/source_url')
-        request.respond null
-        promise = promiseExpectation(instance.loadAll())
-
-      it 'sends a request to the source_url', ->
-        httpBackend.verifyNoOutstandingExpectation()
-
-      describe 'with an empty response', ->
+      describe 'with data passed', ->
         beforeEach ->
-          request.respond []
-          httpBackend.flush()
+          instance.load([{ id: 1, name: 'first' }, { id: 4, name: 'second' }])
 
-        it 'sets members to an empty array', ->
-          expect(instance.members).toEqual []
-
-        it 'resolves the promise', ->
-          promise.expectToBeResolved()
-
-      describe 'with a response', ->
-        beforeEach ->
-          request.respond [{id: 1, name: 'first'}, {id: 4, name: 'second'}]
-          httpBackend.flush()
+        it 'replaces old members', ->
+          expect(instance.members.length).toEqual(2)
 
         it 'creates a model for each member', ->
           _.each instance.members, (member) ->
@@ -48,6 +32,33 @@ describe 'soil.collection module', ->
 
         it 'sets members to the response', ->
           expect(_.map(instance.members, (member) -> member.id)).toEqual [1, 4]
+          expect(_.map(instance.members, (member) -> member.name)).toEqual ['first', 'second']
+
+      describe 'with null passed', ->
+        beforeEach -> instance.load(null)
+
+        it 'clears members', ->
+          expect(instance.members).toEqual([])
+
+    # Get data from a source
+    describe '#get', ->
+      request = promise = null
+      beforeEach inject (promiseExpectation) ->
+        spyOn(instance, 'load')
+        request = httpBackend.expectGET('/source_url')
+        request.respond null
+        promise = promiseExpectation(instance.get('/source_url'))
+
+      it 'sends a request to the source_url', ->
+        httpBackend.verifyNoOutstandingExpectation()
+
+      describe 'on success', ->
+        beforeEach ->
+          request.respond 'some data'
+          httpBackend.flush()
+
+        it 'loads the data', ->
+          expect(instance.load).toHaveBeenCalledWith('some data')
 
         it 'resolves the promise', ->
           promise.expectToBeResolved()
@@ -57,61 +68,50 @@ describe 'soil.collection module', ->
           request.respond 500
           httpBackend.flush()
 
-        it 'leaves members as is', ->
-          expect(instance.members).toBeUndefined
+        it 'does not load data', ->
+          expect(instance.load).not.toHaveBeenCalled()
 
         it 'rejects the promise', ->
           promise.expectToBeRejected()
 
-    describe '#addItem', ->
-      request = promise = null
+    # Add an item to the collection
+    describe '#add', ->
+      beforeEach ->
+        instance.members = ['member1', 'member2', 'member3']
+        instance.add('new member')
 
-      describe 'when not loaded', ->
+      it 'adds the new item to the end of the member array', ->
+        expect(instance.members).toEqual(['member1', 'member2', 'member3', 'new member'])
+
+    describe '#addToFront', ->
+      beforeEach ->
+        instance.members = ['member1', 'member2', 'member3']
+        instance.addToFront('new member')
+
+      it 'adds the new item to the front of the member array', ->
+        expect(instance.members).toEqual(['new member', 'member1', 'member2', 'member3'])
+
+    # Remove an item from the collection by ID
+    describe '#removeById', ->
+      beforeEach ->
+        instance.members = [{ id: 1, name: 'first' }, { id: 2, name: 'second' }, { id: 3, name: 'third' }, { id: 2, name: 'second' }]
+
+      describe 'when passed an id', ->
         beforeEach ->
-          instance.members = undefined
-          instance.addItem { data: 'val' }
+          instance.removeById(2)
 
-        it 'does not send a POST request', ->
-          httpBackend.verifyNoOutstandingExpectation()
+        it 'removes all instances of that id', ->
+          expect(instance.members).toEqual [{ id: 1, name: 'first' }, { id: 3, name: 'third' }]
 
-      describe 'when loaded', ->
-        beforeEach inject (promiseExpectation) ->
-          request = httpBackend.expectPOST('/source_url', { data: 'val' })
-          request.respond null
-          instance.members = ['data1', 'data2']
-          promise = promiseExpectation(instance.addItem { data: 'val' })
+    # Remove an item from the collection by passing the item
+    describe '#remove', ->
+      beforeEach ->
+        instance.members = [{ id: 1, name: 'first' }, { id: 2, name: 'second' }, { id: 3, name: 'third' }, { id: 2, name: 'second' }]
 
-        it 'sends a POST request', ->
-          httpBackend.verifyNoOutstandingExpectation()
+      describe 'when passed an object', ->
+        beforeEach ->
+          instance.remove(instance.members[1])
 
-        describe 'on success', ->
-          beforeEach ->
-            request.respond { response_data: 'formatted val' }
-            httpBackend.flush()
+        it 'removes only the instance passed', ->
+          expect(instance.members).toEqual [{ id: 1, name: 'first' }, { id: 3, name: 'third' }, { id: 2, name: 'second' }]
 
-          newModel = ->
-            _.last instance.members
-
-          it 'adds a model to the collection', ->
-            expect(instance.members.length).toEqual(3)
-
-          it 'adds a model of the collections class', ->
-            expect(newModel() instanceof soilModel).toBeTruthy()
-
-          it 'loads response data into the added model', ->
-            expect(newModel().response_data).toEqual('formatted val')
-            expect(newModel().savedData).toEqual { response_data: 'formatted val' }
-
-          it 'resolves the promise', ->
-            promise.expectToBeResolved()
-
-        describe 'on failure', ->
-          beforeEach ->
-            request.respond 500
-            httpBackend.flush()
-
-          it 'does not add a model to the collection', ->
-            expect(instance.members.length).toEqual(2)
-
-          it 'rejects the promise', ->
-            promise.expectToBeRejected()
