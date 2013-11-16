@@ -214,9 +214,11 @@
         };
 
         soilModel.prototype.load = function(data) {
+          var modifiedData;
+          modifiedData = this._modifyDataBeforeLoad(data);
           this._clearFields();
           this._setSavedData(data);
-          _.assign(this, this._modifyDataBeforeLoad(data));
+          _.assign(this, modifiedData);
           return this;
         };
 
@@ -303,19 +305,21 @@
         soilModel.prototype._fieldsToSave = [];
 
         soilModel.prototype._modifyDataBeforeLoad = function(loadData) {
-          var data;
+          var data,
+            _this = this;
           data = _.clone(loadData);
           _.each(this._associations, function(association) {
-            return association.beforeLoad(data, this);
+            return association.beforeLoad(data, _this);
           });
           return data;
         };
 
         soilModel.prototype._modifyDataBeforeSave = function(saveData) {
-          var data;
+          var data,
+            _this = this;
           data = _.clone(saveData);
           _.each(this._associations, function(association) {
-            return association.beforeSave(data, this);
+            return association.beforeSave(data, _this);
           });
           return data;
         };

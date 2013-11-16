@@ -22,9 +22,10 @@ angular.module('soil.model', [])
           @_baseUrl
 
       load: (data) ->
+        modifiedData = @_modifyDataBeforeLoad(data)
         @_clearFields()
         @_setSavedData(data)
-        _.assign this, @_modifyDataBeforeLoad(data)
+        _.assign this, modifiedData
         return this
 
       get: (id) ->
@@ -84,12 +85,12 @@ angular.module('soil.model', [])
 
       _modifyDataBeforeLoad: (loadData) ->
         data = _.clone(loadData)
-        _.each @_associations, (association) -> association.beforeLoad(data, this)
+        _.each @_associations, (association) => association.beforeLoad(data, @)
         return data
 
       _modifyDataBeforeSave: (saveData) ->
         data = _.clone(saveData)
-        _.each @_associations, (association) -> association.beforeSave(data, this)
+        _.each @_associations, (association) => association.beforeSave(data, @)
         return data
 
       _setSavedData: (data) ->

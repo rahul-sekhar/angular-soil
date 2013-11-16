@@ -70,13 +70,14 @@ describe 'soil.model module', ->
       result = null
       describe 'with data', ->
         beforeEach ->
-          instance._associations = [{ beforeLoad: (data) -> data.field5 += ' changed by association' }]
+          instance.url = -> '/some_path'
+          instance._associations = [{ beforeLoad: (data, parent) -> data.field5 += ' changed by association. url: ' + parent.url() }]
           instance._private = 'private val'
           result = instance.load { field: 'new val', field5: 'another val' }
 
         it 'contains the passed data, modified by associations', ->
           expect(instance.field).toBe('new val')
-          expect(instance.field5).toBe('another val changed by association')
+          expect(instance.field5).toBe('another val changed by association. url: /some_path')
 
         it 'clears old fields', ->
           expect(instance.field2).toBeUndefined()
@@ -184,8 +185,9 @@ describe 'soil.model module', ->
     # Get data to be saved
     describe '#dataToSave', ->
       beforeEach ->
-        instance._associations = [{ beforeSave: (data) ->
-          data.field3 = data.field3 += ' association'
+        instance.url = -> '/some_path'
+        instance._associations = [{ beforeSave: (data, parent) ->
+          data.field3 = data.field3 += ' association. url: ' + parent.url()
         }]
         instance._fieldsToSave = ['field', 'field3', 'field4']
         instance.field = 'new val'
@@ -193,7 +195,7 @@ describe 'soil.model module', ->
         instance.field3 = 'third new val'
 
       it 'selects fields to save and applies associations', ->
-        expect(instance.dataToSave()).toEqual({ field: 'new val', field3: 'third new val association', field4: null })
+        expect(instance.dataToSave()).toEqual({ field: 'new val', field3: 'third new val association. url: /some_path', field4: null })
 
     # Save the model
     describe '#save', ->
