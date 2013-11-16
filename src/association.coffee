@@ -33,7 +33,8 @@ angular.module('soil.association', ['soil.collection'])
 
       beforeLoad: (data, parent) ->
         if (data[@_field])
-          collection = new soilCollection(@_modelClass, parent.url() + '/' + @_field)
+          parentUrl = parent.url(data.id || parent.id)
+          collection = new soilCollection(@_modelClass, parentUrl + '/' + @_field)
           data[@_field] = collection.load(data[@_field])
 
       beforeSave: (data) ->

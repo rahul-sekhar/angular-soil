@@ -58,9 +58,10 @@
         }
 
         hasManyAssociation.prototype.beforeLoad = function(data, parent) {
-          var collection;
+          var collection, parentUrl;
           if (data[this._field]) {
-            collection = new soilCollection(this._modelClass, parent.url() + '/' + this._field);
+            parentUrl = parent.url(data.id || parent.id);
+            collection = new soilCollection(this._modelClass, parentUrl + '/' + this._field);
             return data[this._field] = collection.load(data[this._field]);
           }
         };

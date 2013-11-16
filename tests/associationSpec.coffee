@@ -95,7 +95,7 @@ describe 'soil.association module', ->
     beforeEach inject (hasManyAssociation, _soilModel_) ->
       soilModel = _soilModel_
       instance = new hasManyAssociation('associations', 'association_ids', soilModel)
-      parent = { url: -> '/association_url' }
+      parent = { url: (id) -> '/association_url/' + id }
 
     # Modify data before loading it
     describe '#beforeLoad', ->
@@ -110,7 +110,7 @@ describe 'soil.association module', ->
 
       describe 'when association data is passed', ->
         beforeEach ->
-          data = { associations: 'association data', other_field: 'other val' }
+          data = { associations: 'association data', other_field: 'other val', id: 6 }
           instance.beforeLoad(data, parent)
 
         it 'creates a collection', inject (soilCollection) ->
@@ -120,13 +120,22 @@ describe 'soil.association module', ->
           expect(data.associations.modelClass).toEqual(soilModel)
 
         it 'sets the url for the collection', ->
-          expect(data.associations._sourceUrl).toEqual('/association_url/associations')
+          expect(data.associations._sourceUrl).toEqual('/association_url/6/associations')
 
         it 'loads data into that instance', ->
           expect(data.associations.load).toHaveBeenCalledWith('association data')
 
         it 'leaves the other field intact', ->
           expect(data.other_field).toEqual('other val')
+
+      describe 'when the parent has an id', ->
+        beforeEach ->
+          parent.id = 4
+          data = { associations: 'association data', other_field: 'other val' }
+          instance.beforeLoad(data, parent)
+
+        it 'sets the url for the collection', ->
+          expect(data.associations._sourceUrl).toEqual('/association_url/4/associations')
 
 
     # Modify data before saving it
