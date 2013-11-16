@@ -3,9 +3,9 @@ angular.module('soil.collection.mock', ['soil.collection', 'angular-mock-promise
     $provide.decorator('soilCollection', ['$delegate', 'createMockPromise', ($delegate, createMockPromise) ->
       class soilCollectionMock extends $delegate
         constructor: ->
-          @load = jasmine.createSpy('load').andReturn(this)
-          @get = jasmine.createSpy('get').andReturn(createMockPromise())
-          @create = jasmine.createSpy('create').andReturn(createMockPromise())
+          spyOn(this, 'load').andCallThrough()
+          spyOn(this, 'get').andReturn(createMockPromise())
+          spyOn(this, 'create').andReturn(createMockPromise())
           super
 
     ])

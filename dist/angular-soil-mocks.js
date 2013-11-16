@@ -13,9 +13,9 @@
             __extends(soilCollectionMock, _super);
 
             function soilCollectionMock() {
-              this.load = jasmine.createSpy('load').andReturn(this);
-              this.get = jasmine.createSpy('get').andReturn(createMockPromise());
-              this.create = jasmine.createSpy('create').andReturn(createMockPromise());
+              spyOn(this, 'load').andCallThrough();
+              spyOn(this, 'get').andReturn(createMockPromise());
+              spyOn(this, 'create').andReturn(createMockPromise());
               soilCollectionMock.__super__.constructor.apply(this, arguments);
             }
 
@@ -42,11 +42,11 @@
             __extends(soilModelMock, _super);
 
             function soilModelMock() {
-              this.load = jasmine.createSpy('load').andReturn(this);
-              this.get = jasmine.createSpy('get').andReturn(createMockPromise());
-              this.save = jasmine.createSpy('save').andReturn(createMockPromise());
-              this["delete"] = jasmine.createSpy('delete').andReturn(createMockPromise());
-              this.updateField = jasmine.createSpy('updateField').andReturn(createMockPromise());
+              spyOn(this, 'load').andCallThrough();
+              spyOn(this, 'get').andReturn(createMockPromise());
+              spyOn(this, 'save').andReturn(createMockPromise());
+              spyOn(this, 'delete').andReturn(createMockPromise());
+              spyOn(this, 'updateField').andReturn(createMockPromise());
               soilModelMock.__super__.constructor.apply(this, arguments);
             }
 
