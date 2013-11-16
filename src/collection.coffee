@@ -21,10 +21,14 @@ angular.module('soil.collection', [])
           .success (data) => @load(data)
 
       add: (data) ->
-        @members.push(new @modelClass(data))
+        newItem = new @modelClass(data)
+        @members.push(newItem)
+        return newItem
 
       addToFront: (data) ->
-        @members.unshift(new @modelClass(data))
+        newItem = new @modelClass(data)
+        @members.unshift(newItem)
+        return newItem
 
       create: (data, options = {}) ->
         options = _.defaults(options, { addToFront: false })

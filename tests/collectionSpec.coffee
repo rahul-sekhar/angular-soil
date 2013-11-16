@@ -107,27 +107,34 @@ describe 'soil.collection module', ->
 
     # Add an item to the collection
     describe '#add', ->
-      describe 'when passed data', ->
-        beforeEach ->
-          instance.members = ['member1', 'member2', 'member3']
-          instance.add({ data: 'val' })
-
-        it 'adds the new item to the end of the member array', ->
-          expect(instance.members).toEqual(['member1', 'member2', 'member3', jasmine.any(soilModel)])
-
-        it 'loads data into the new member', ->
-          expect(instance.members[3].load).toHaveBeenCalledWith({ data: 'val' })
-
-    describe '#addToFront', ->
+      result = null
       beforeEach ->
         instance.members = ['member1', 'member2', 'member3']
-        instance.addToFront({ data: 'val' })
+        result = instance.add({ data: 'val' })
+
+      it 'adds the new item to the end of the member array', ->
+        expect(instance.members).toEqual(['member1', 'member2', 'member3', jasmine.any(soilModel)])
+
+      it 'loads data into the new member', ->
+        expect(instance.members[3].load).toHaveBeenCalledWith({ data: 'val' })
+
+      it 'returns the new item', ->
+        expect(result).toBe(_.last(instance.members))
+
+    describe '#addToFront', ->
+      result = null
+      beforeEach ->
+        instance.members = ['member1', 'member2', 'member3']
+        result = instance.addToFront({ data: 'val' })
 
       it 'adds the new item to the front of the member array', ->
         expect(instance.members).toEqual([jasmine.any(soilModel), 'member1', 'member2', 'member3'])
 
       it 'loads data into the new member', ->
-          expect(instance.members[0].load).toHaveBeenCalledWith({ data: 'val' })
+        expect(instance.members[0].load).toHaveBeenCalledWith({ data: 'val' })
+
+      it 'returns the new item', ->
+        expect(result).toBe(_.first(instance.members))
 
     # Create an item and add it to the collection
     describe '#create', ->
