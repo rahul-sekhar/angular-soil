@@ -91,10 +91,11 @@ describe 'soil.association module', ->
 
 
   describe 'hasManyAssocation', ->
-    instance = soilModel = null
+    instance = soilModel = parent = null
     beforeEach inject (hasManyAssociation, _soilModel_) ->
       soilModel = _soilModel_
       instance = new hasManyAssociation('associations', 'association_ids', soilModel)
+      parent = { url: -> '/association_url' }
 
     # Modify data before loading it
     describe '#beforeLoad', ->
@@ -102,7 +103,7 @@ describe 'soil.association module', ->
       describe 'when the field is not present in the passed data', ->
         beforeEach ->
           data = { other_field: 'other val' }
-          instance.beforeLoad(data)
+          instance.beforeLoad(data, parent)
 
         it 'does nothing to the data', ->
           expect(data).toEqual { other_field: 'other val' }
@@ -110,10 +111,16 @@ describe 'soil.association module', ->
       describe 'when association data is passed', ->
         beforeEach ->
           data = { associations: 'association data', other_field: 'other val' }
-          instance.beforeLoad(data)
+          instance.beforeLoad(data, parent)
 
         it 'creates a collection', inject (soilCollection) ->
           expect(data.associations).toEqual(jasmine.any(soilCollection))
+
+        it 'sets the model for the collection', ->
+          expect(data.associations.modelClass).toEqual(soilModel)
+
+        it 'sets the url for the collection', ->
+          expect(data.associations._sourceUrl).toEqual('/association_url/associations')
 
         it 'loads data into that instance', ->
           expect(data.associations.load).toHaveBeenCalledWith('association data')

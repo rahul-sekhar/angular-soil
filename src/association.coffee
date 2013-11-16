@@ -31,9 +31,9 @@ angular.module('soil.association', ['soil.collection'])
           saveData: false
         })
 
-      beforeLoad: (data) ->
+      beforeLoad: (data, parent) ->
         if (data[@_field])
-          collection = new soilCollection(@_modelClass)
+          collection = new soilCollection(@_modelClass, parent.url() + '/' + @_field)
           data[@_field] = collection.load(data[@_field])
 
       beforeSave: (data) ->
