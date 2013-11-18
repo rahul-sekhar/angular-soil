@@ -73,6 +73,7 @@ describe 'soil.model module', ->
           instance.url = -> '/some_path'
           instance._associations = [{ beforeLoad: (data, parent) -> data.field5 += ' changed by association. url: ' + parent.url() }]
           instance._private = 'private val'
+          instance.someFunction = -> 'Some return value'
           result = instance.load { field: 'new val', field5: 'another val' }
 
         it 'contains the passed data, modified by associations', ->
@@ -84,6 +85,9 @@ describe 'soil.model module', ->
 
         it 'does not clear private fields', ->
           expect(instance._private).toEqual('private val')
+
+        it 'does not clear functions', ->
+          expect(instance.someFunction).toBeTruthy()
 
         it 'sets saved data, unmodified by associations', ->
           expect(instance.savedData).toEqual { field: 'new val', field5: 'another val' }
@@ -361,6 +365,19 @@ describe 'soil.model module', ->
           it 'rejects the promise', ->
             promise.expectToBeRejected()
 
+    # Revert a field
+    describe '#revertField', ->
+      beforeEach ->
+        instance.load { field: 'val', field2: 'other val' }
+        instance._associations = [{
+          beforeSave: (data) -> data.field += ' association',
+          beforeLoad: (data) -> data.field += ' association load'
+        }]
+        instance.field = 'updated val'
+        instance.revertField('field')
+
+      it 'reverts the field to the old value with associations applied', ->
+        expect(instance.field).toEqual('val association load')
 
 
 

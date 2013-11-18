@@ -61,8 +61,11 @@ angular.module('soil.model', [])
             @[field] = fieldData[field]
 
           .error =>
-            restoreData = @_modifyDataBeforeLoad(@savedData)
-            @[field] = restoreData[field]
+            @revertField(field)
+
+      revertField: (field) ->
+        restoreData = @_modifyDataBeforeLoad(@savedData)
+        @[field] = restoreData[field]
 
       dataToSave: ->
         data = {}
@@ -74,9 +77,9 @@ angular.module('soil.model', [])
         throw 'Operation not permitted on an unloaded model' unless @loaded()
 
       _clearFields: () ->
-        # Do not remove private fields (fields beginning with an underscore)
+        # Do not remove private fields (fields beginning with an underscore), or functions
         _.forOwn this, (value, key, obj) ->
-          delete obj[key] unless _.first(key) == '_'
+          delete obj[key] unless _.first(key) == '_' or angular.isFunction(value)
 
       _withSlash: (url) ->
         url.replace /\/?$/, '/'

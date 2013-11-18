@@ -1,4 +1,4 @@
-/* angular-soil 0.6.10 %> */
+/* angular-soil 0.7.0 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -41,7 +41,7 @@
           return soilModelMock = (function(_super) {
             __extends(soilModelMock, _super);
 
-            function soilModelMock() {
+            function soilModelMock(arg) {
               spyOn(this, 'load').andCallThrough();
               spyOn(this, 'get').andReturn(createMockPromise());
               spyOn(this, 'save').andReturn(createMockPromise());
