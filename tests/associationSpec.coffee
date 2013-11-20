@@ -3,11 +3,11 @@ describe 'soil.association module', ->
   beforeEach module 'soil.model.mock'
   beforeEach module 'soil.collection.mock'
 
-  describe 'hasOneAssociation', ->
-    instance = soilModel = null
-    beforeEach inject (hasOneAssociation, _soilModel_) ->
-      soilModel = _soilModel_
-      instance = new hasOneAssociation('association', soilModel)
+  describe 'HasOneAssociation', ->
+    instance = SoilModel = null
+    beforeEach inject (HasOneAssociation, _SoilModel_) ->
+      SoilModel = _SoilModel_
+      instance = new HasOneAssociation('association', SoilModel)
 
     # Modify data before loading it
     describe '#beforeLoad', ->
@@ -27,7 +27,7 @@ describe 'soil.association module', ->
           instance.beforeLoad(data)
 
         it 'creates a model instance', ->
-          expect(data.association).toEqual(jasmine.any(soilModel))
+          expect(data.association).toEqual(jasmine.any(SoilModel))
 
         it 'loads data into that instance', ->
           expect(data.association.load).toHaveBeenCalledWith({ field: 'val' })
@@ -41,7 +41,7 @@ describe 'soil.association module', ->
           instance.beforeLoad(data)
 
         it 'creates a model instance', ->
-          expect(data.association).toEqual(jasmine.any(soilModel))
+          expect(data.association).toEqual(jasmine.any(SoilModel))
 
         it 'gets the instance by id', ->
           expect(data.association.get).toHaveBeenCalledWith(5)
@@ -78,9 +78,9 @@ describe 'soil.association module', ->
           expect(data.other_field).toEqual('other val')
 
       describe 'when the field is present, with the saveData option set', ->
-        beforeEach inject (hasOneAssociation) ->
+        beforeEach inject (HasOneAssociation) ->
           data = { association: { dataToSave: -> 'model data' }, other_field: 'other val' }
-          instance = new hasOneAssociation('association', soilModel, { saveData: true })
+          instance = new HasOneAssociation('association', SoilModel, { saveData: true })
           instance.beforeSave(data)
 
         it 'replaces the association with its data', ->
@@ -91,10 +91,10 @@ describe 'soil.association module', ->
 
 
   describe 'hasManyAssocation', ->
-    instance = soilModel = parent = null
-    beforeEach inject (hasManyAssociation, _soilModel_) ->
-      soilModel = _soilModel_
-      instance = new hasManyAssociation('associations', 'association_ids', soilModel)
+    instance = SoilModel = parent = null
+    beforeEach inject (HasManyAssociation, _SoilModel_) ->
+      SoilModel = _SoilModel_
+      instance = new HasManyAssociation('associations', 'association_ids', SoilModel)
       parent = { url: (id) -> '/association_url/' + id }
 
     # Modify data before loading it
@@ -113,11 +113,11 @@ describe 'soil.association module', ->
           data = { associations: 'association data', other_field: 'other val', id: 6 }
           instance.beforeLoad(data, parent)
 
-        it 'creates a collection', inject (soilCollection) ->
-          expect(data.associations).toEqual(jasmine.any(soilCollection))
+        it 'creates a collection', inject (SoilCollection) ->
+          expect(data.associations).toEqual(jasmine.any(SoilCollection))
 
         it 'sets the model for the collection', ->
-          expect(data.associations.modelClass).toEqual(soilModel)
+          expect(data.associations.modelClass).toEqual(SoilModel)
 
         it 'sets the url for the collection', ->
           expect(data.associations._sourceUrl).toEqual('/association_url/6/associations')
@@ -162,14 +162,14 @@ describe 'soil.association module', ->
           expect(data.other_field).toEqual('other val')
 
       describe 'when the field is present, with the saveData option set', ->
-        beforeEach inject (hasManyAssociation) ->
+        beforeEach inject (HasManyAssociation) ->
           data = { associations: { members: [
             { dataToSave: -> 'model 1 data' },
             { dataToSave: -> 'model 2 data' },
             { dataToSave: -> 'model 3 data' }
           ] }, other_field: 'other val' }
 
-          instance = new hasManyAssociation('associations', 'association_ids', soilModel, { saveData: true })
+          instance = new HasManyAssociation('associations', 'association_ids', SoilModel, { saveData: true })
           instance.beforeSave(data)
 
         it 'replaces the association with its data', ->

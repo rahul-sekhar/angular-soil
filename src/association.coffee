@@ -1,7 +1,7 @@
 angular.module('soil.association', ['soil.collection'])
 
-  .factory('hasOneAssociation', [ ->
-    class hasOneAssociation
+  .factory('HasOneAssociation', [ ->
+    class HasOneAssociation
       constructor: (@_field, @_modelClass, options = {}) ->
         @_options = _.defaults(options, {
           saveData: false
@@ -24,8 +24,8 @@ angular.module('soil.association', ['soil.collection'])
             delete data[@_field]
   ])
 
-  .factory('hasManyAssociation', ['soilCollection', (soilCollection) ->
-    class hasManyAssociation
+  .factory('HasManyAssociation', ['SoilCollection', (SoilCollection) ->
+    class HasManyAssociation
       constructor: (@_field, @_idField, @_modelClass, options = {}) ->
         @_options = _.defaults(options, {
           saveData: false
@@ -34,7 +34,7 @@ angular.module('soil.association', ['soil.collection'])
       beforeLoad: (data, parent) ->
         if (data[@_field])
           parentUrl = parent.url(data.id || parent.id)
-          collection = new soilCollection(@_modelClass, parentUrl + '/' + @_field)
+          collection = new SoilCollection(@_modelClass, parentUrl + '/' + @_field)
           data[@_field] = collection.load(data[@_field])
 
       beforeSave: (data) ->

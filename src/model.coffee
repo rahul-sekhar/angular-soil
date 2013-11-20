@@ -1,7 +1,7 @@
 angular.module('soil.model', [])
 
-  .factory('soilModel', ['$http', ($http) ->
-    class soilModel
+  .factory('SoilModel', ['$http', ($http) ->
+    class SoilModel
       _baseUrl: '/'
       _fieldsToSave: []
       _associations: []

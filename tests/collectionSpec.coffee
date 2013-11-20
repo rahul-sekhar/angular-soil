@@ -3,20 +3,20 @@ describe 'soil.collection module', ->
   beforeEach module 'soil.model.mock'
   beforeEach module 'angular-mock-promise'
 
-  describe 'soilCollection', ->
-    soilModel = instance = httpBackend = null
+  describe 'SoilCollection', ->
+    SoilModel = instance = httpBackend = null
 
-    beforeEach inject (soilCollection, $httpBackend, _soilModel_) ->
+    beforeEach inject (SoilCollection, $httpBackend, _SoilModel_) ->
       httpBackend = $httpBackend
-      soilModel = _soilModel_
-      instance = new soilCollection(soilModel, '/source_url')
+      SoilModel = _SoilModel_
+      instance = new SoilCollection(SoilModel, '/source_url')
 
     # Construction
     describe 'if constructed with the getData option set', ->
-      beforeEach inject (soilCollection) ->
-        class soilCollectionMock extends soilCollection
+      beforeEach inject (SoilCollection) ->
+        class SoilCollectionMock extends SoilCollection
           get: jasmine.createSpy()
-        instance = new soilCollectionMock(soilModel, '/source_url', { getData: true })
+        instance = new SoilCollectionMock(SoilModel, '/source_url', { getData: true })
 
       it 'gets data on construction', ->
         expect(instance.get).toHaveBeenCalled()
@@ -35,7 +35,7 @@ describe 'soil.collection module', ->
           result = instance.load([{ id: 1, name: 'first' }, { id: 4, name: 'second' }])
 
         it 'replaces members with a model for each member', ->
-          expect(instance.members).toEqual([jasmine.any(soilModel), jasmine.any(soilModel)])
+          expect(instance.members).toEqual([jasmine.any(SoilModel), jasmine.any(SoilModel)])
 
         it 'loads each models data', ->
           expect(instance.members[0].load).toHaveBeenCalledWith({ id: 1, name: 'first' })
@@ -113,7 +113,7 @@ describe 'soil.collection module', ->
         result = instance.add({ data: 'val' })
 
       it 'adds the new item to the end of the member array', ->
-        expect(instance.members).toEqual(['member1', 'member2', 'member3', jasmine.any(soilModel)])
+        expect(instance.members).toEqual(['member1', 'member2', 'member3', jasmine.any(SoilModel)])
 
       it 'loads data into the new member', ->
         expect(instance.members[3].load).toHaveBeenCalledWith({ data: 'val' })
@@ -128,7 +128,7 @@ describe 'soil.collection module', ->
         result = instance.addToFront({ data: 'val' })
 
       it 'adds the new item to the front of the member array', ->
-        expect(instance.members).toEqual([jasmine.any(soilModel), 'member1', 'member2', 'member3'])
+        expect(instance.members).toEqual([jasmine.any(SoilModel), 'member1', 'member2', 'member3'])
 
       it 'loads data into the new member', ->
         expect(instance.members[0].load).toHaveBeenCalledWith({ data: 'val' })

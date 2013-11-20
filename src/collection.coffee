@@ -1,7 +1,7 @@
 angular.module('soil.collection', [])
 
-  .factory('soilCollection', ['$http', ($http) ->
-    class soilCollection
+  .factory('SoilCollection', ['$http', ($http) ->
+    class SoilCollection
       constructor: (@modelClass, @_sourceUrl, options = {}) ->
         @_options = _.defaults(options, {
           getData: false

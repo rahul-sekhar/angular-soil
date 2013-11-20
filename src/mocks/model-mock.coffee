@@ -1,7 +1,7 @@
 angular.module('soil.model.mock', ['soil.model', 'angular-mock-promise'])
   .config(['$provide', ($provide) ->
-    $provide.decorator('soilModel', ['$delegate', 'createMockPromise', ($delegate, createMockPromise) ->
-      class soilModelMock extends $delegate
+    $provide.decorator('SoilModel', ['$delegate', 'createMockPromise', ($delegate, createMockPromise) ->
+      class SoilModelMock extends $delegate
         constructor: (arg) ->
           spyOn(@, 'load').andCallThrough()
 

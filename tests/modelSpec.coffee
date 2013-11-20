@@ -2,18 +2,18 @@ describe 'soil.model module', ->
   beforeEach module 'soil.model'
   beforeEach module 'angular-mock-promise'
 
-  describe 'soilModel', ->
-    soilModel = httpBackend = instance = null
-    beforeEach inject (_soilModel_, $httpBackend) ->
+  describe 'SoilModel', ->
+    SoilModel = httpBackend = instance = null
+    beforeEach inject (_SoilModel_, $httpBackend) ->
       httpBackend = $httpBackend
-      soilModel = _soilModel_
-      instance = new soilModel
+      SoilModel = _SoilModel_
+      instance = new SoilModel
 
     # Construction
     describe 'constructor', ->
       mockSoilModel = null
       beforeEach ->
-        class mockSoilModel extends soilModel
+        class mockSoilModel extends SoilModel
           load: jasmine.createSpy('load')
           get: jasmine.createSpy('get')
 

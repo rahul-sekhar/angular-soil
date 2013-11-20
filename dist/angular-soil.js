@@ -1,11 +1,11 @@
-/* angular-soil 0.7.0 %> */
+/* angular-soil 0.8.0 %> */
 
 (function() {
-  angular.module('soil.association', ['soil.collection']).factory('hasOneAssociation', [
+  angular.module('soil.association', ['soil.collection']).factory('HasOneAssociation', [
     function() {
-      var hasOneAssociation;
-      return hasOneAssociation = (function() {
-        function hasOneAssociation(_field, _modelClass, options) {
+      var HasOneAssociation;
+      return HasOneAssociation = (function() {
+        function HasOneAssociation(_field, _modelClass, options) {
           this._field = _field;
           this._modelClass = _modelClass;
           if (options == null) {
@@ -17,7 +17,7 @@
           this._idField = this._field + '_id';
         }
 
-        hasOneAssociation.prototype.beforeLoad = function(data) {
+        HasOneAssociation.prototype.beforeLoad = function(data) {
           if (data[this._field]) {
             return data[this._field] = new this._modelClass(data[this._field]);
           } else if (data[this._idField]) {
@@ -26,7 +26,7 @@
           }
         };
 
-        hasOneAssociation.prototype.beforeSave = function(data) {
+        HasOneAssociation.prototype.beforeSave = function(data) {
           if (data[this._field]) {
             if (this._options.saveData) {
               return data[this._field] = data[this._field].dataToSave();
@@ -37,15 +37,15 @@
           }
         };
 
-        return hasOneAssociation;
+        return HasOneAssociation;
 
       })();
     }
-  ]).factory('hasManyAssociation', [
-    'soilCollection', function(soilCollection) {
-      var hasManyAssociation;
-      return hasManyAssociation = (function() {
-        function hasManyAssociation(_field, _idField, _modelClass, options) {
+  ]).factory('HasManyAssociation', [
+    'SoilCollection', function(SoilCollection) {
+      var HasManyAssociation;
+      return HasManyAssociation = (function() {
+        function HasManyAssociation(_field, _idField, _modelClass, options) {
           this._field = _field;
           this._idField = _idField;
           this._modelClass = _modelClass;
@@ -57,16 +57,16 @@
           });
         }
 
-        hasManyAssociation.prototype.beforeLoad = function(data, parent) {
+        HasManyAssociation.prototype.beforeLoad = function(data, parent) {
           var collection, parentUrl;
           if (data[this._field]) {
             parentUrl = parent.url(data.id || parent.id);
-            collection = new soilCollection(this._modelClass, parentUrl + '/' + this._field);
+            collection = new SoilCollection(this._modelClass, parentUrl + '/' + this._field);
             return data[this._field] = collection.load(data[this._field]);
           }
         };
 
-        hasManyAssociation.prototype.beforeSave = function(data) {
+        HasManyAssociation.prototype.beforeSave = function(data) {
           if (data[this._field]) {
             if (this._options.saveData) {
               return data[this._field] = _.map(data[this._field].members, function(member) {
@@ -81,7 +81,7 @@
           }
         };
 
-        return hasManyAssociation;
+        return HasManyAssociation;
 
       })();
     }
@@ -90,11 +90,11 @@
 }).call(this);
 
 (function() {
-  angular.module('soil.collection', []).factory('soilCollection', [
+  angular.module('soil.collection', []).factory('SoilCollection', [
     '$http', function($http) {
-      var soilCollection;
-      return soilCollection = (function() {
-        function soilCollection(modelClass, _sourceUrl, options) {
+      var SoilCollection;
+      return SoilCollection = (function() {
+        function SoilCollection(modelClass, _sourceUrl, options) {
           this.modelClass = modelClass;
           this._sourceUrl = _sourceUrl;
           if (options == null) {
@@ -109,7 +109,7 @@
           }
         }
 
-        soilCollection.prototype.load = function(data) {
+        SoilCollection.prototype.load = function(data) {
           var _this = this;
           data || (data = []);
           this.members = _.map(data, function(modelData) {
@@ -118,28 +118,28 @@
           return this;
         };
 
-        soilCollection.prototype.get = function() {
+        SoilCollection.prototype.get = function() {
           var _this = this;
           return $http.get(this._sourceUrl).success(function(data) {
             return _this.load(data);
           });
         };
 
-        soilCollection.prototype.add = function(data) {
+        SoilCollection.prototype.add = function(data) {
           var newItem;
           newItem = new this.modelClass(data);
           this.members.push(newItem);
           return newItem;
         };
 
-        soilCollection.prototype.addToFront = function(data) {
+        SoilCollection.prototype.addToFront = function(data) {
           var newItem;
           newItem = new this.modelClass(data);
           this.members.unshift(newItem);
           return newItem;
         };
 
-        soilCollection.prototype.create = function(data, options) {
+        SoilCollection.prototype.create = function(data, options) {
           var _this = this;
           if (options == null) {
             options = {};
@@ -156,23 +156,23 @@
           });
         };
 
-        soilCollection.prototype.removeById = function(id) {
+        SoilCollection.prototype.removeById = function(id) {
           return _.remove(this.members, function(item) {
             return item.id === id;
           });
         };
 
-        soilCollection.prototype.remove = function(itemToRemove) {
+        SoilCollection.prototype.remove = function(itemToRemove) {
           return _.remove(this.members, function(item) {
             return itemToRemove === item;
           });
         };
 
-        soilCollection.prototype.loaded = function() {
+        SoilCollection.prototype.loaded = function() {
           return !(this.members === void 0);
         };
 
-        return soilCollection;
+        return SoilCollection;
 
       })();
     }
@@ -181,17 +181,17 @@
 }).call(this);
 
 (function() {
-  angular.module('soil.model', []).factory('soilModel', [
+  angular.module('soil.model', []).factory('SoilModel', [
     '$http', function($http) {
-      var soilModel;
-      return soilModel = (function() {
-        soilModel.prototype._baseUrl = '/';
+      var SoilModel;
+      return SoilModel = (function() {
+        SoilModel.prototype._baseUrl = '/';
 
-        soilModel.prototype._fieldsToSave = [];
+        SoilModel.prototype._fieldsToSave = [];
 
-        soilModel.prototype._associations = [];
+        SoilModel.prototype._associations = [];
 
-        function soilModel(arg) {
+        function SoilModel(arg) {
           if (angular.isObject(arg)) {
             this.load(arg);
           } else if (arg) {
@@ -199,11 +199,11 @@
           }
         }
 
-        soilModel.prototype.setBaseUrl = function(newUrl) {
+        SoilModel.prototype.setBaseUrl = function(newUrl) {
           return this._baseUrl = newUrl;
         };
 
-        soilModel.prototype.url = function(id) {
+        SoilModel.prototype.url = function(id) {
           if (id == null) {
             id = this.id;
           }
@@ -214,7 +214,7 @@
           }
         };
 
-        soilModel.prototype.load = function(data) {
+        SoilModel.prototype.load = function(data) {
           var modifiedData;
           modifiedData = this._modifyDataBeforeLoad(data);
           this._clearFields();
@@ -223,18 +223,18 @@
           return this;
         };
 
-        soilModel.prototype.get = function(id) {
+        SoilModel.prototype.get = function(id) {
           var _this = this;
           return $http.get(this.url(id)).success(function(responseData) {
             return _this.load(responseData);
           });
         };
 
-        soilModel.prototype.loaded = function() {
+        SoilModel.prototype.loaded = function() {
           return !!this.id;
         };
 
-        soilModel.prototype.save = function() {
+        SoilModel.prototype.save = function() {
           var _this = this;
           if (this.id) {
             return $http.put(this.url(), this.dataToSave()).success(function(responseData) {
@@ -247,7 +247,7 @@
           }
         };
 
-        soilModel.prototype["delete"] = function() {
+        SoilModel.prototype["delete"] = function() {
           var _this = this;
           this._checkIfLoaded();
           return $http["delete"](this.url()).success(function() {
@@ -255,7 +255,7 @@
           });
         };
 
-        soilModel.prototype.updateField = function(field) {
+        SoilModel.prototype.updateField = function(field) {
           var data,
             _this = this;
           this._checkIfLoaded();
@@ -273,13 +273,13 @@
           });
         };
 
-        soilModel.prototype.revertField = function(field) {
+        SoilModel.prototype.revertField = function(field) {
           var restoreData;
           restoreData = this._modifyDataBeforeLoad(this.savedData);
           return this[field] = restoreData[field];
         };
 
-        soilModel.prototype.dataToSave = function() {
+        SoilModel.prototype.dataToSave = function() {
           var data,
             _this = this;
           data = {};
@@ -289,13 +289,13 @@
           return this._modifyDataBeforeSave(data);
         };
 
-        soilModel.prototype._checkIfLoaded = function() {
+        SoilModel.prototype._checkIfLoaded = function() {
           if (!this.loaded()) {
             throw 'Operation not permitted on an unloaded model';
           }
         };
 
-        soilModel.prototype._clearFields = function() {
+        SoilModel.prototype._clearFields = function() {
           return _.forOwn(this, function(value, key, obj) {
             if (!(_.first(key) === '_' || angular.isFunction(value))) {
               return delete obj[key];
@@ -303,13 +303,13 @@
           });
         };
 
-        soilModel.prototype._withSlash = function(url) {
+        SoilModel.prototype._withSlash = function(url) {
           return url.replace(/\/?$/, '/');
         };
 
-        soilModel.prototype._fieldsToSave = [];
+        SoilModel.prototype._fieldsToSave = [];
 
-        soilModel.prototype._modifyDataBeforeLoad = function(loadData) {
+        SoilModel.prototype._modifyDataBeforeLoad = function(loadData) {
           var data,
             _this = this;
           data = _.clone(loadData);
@@ -319,7 +319,7 @@
           return data;
         };
 
-        soilModel.prototype._modifyDataBeforeSave = function(saveData) {
+        SoilModel.prototype._modifyDataBeforeSave = function(saveData) {
           var data,
             _this = this;
           data = _.clone(saveData);
@@ -329,11 +329,11 @@
           return data;
         };
 
-        soilModel.prototype._setSavedData = function(data) {
+        SoilModel.prototype._setSavedData = function(data) {
           return this.savedData = data ? _.cloneDeep(data) : {};
         };
 
-        return soilModel;
+        return SoilModel;
 
       })();
     }

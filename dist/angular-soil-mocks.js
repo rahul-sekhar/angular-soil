@@ -1,4 +1,4 @@
-/* angular-soil 0.7.0 %> */
+/* angular-soil 0.8.0 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -6,22 +6,22 @@
 
   angular.module('soil.collection.mock', ['soil.collection', 'angular-mock-promise']).config([
     '$provide', function($provide) {
-      return $provide.decorator('soilCollection', [
+      return $provide.decorator('SoilCollection', [
         '$delegate', 'createMockPromise', function($delegate, createMockPromise) {
-          var soilCollectionMock;
-          return soilCollectionMock = (function(_super) {
-            __extends(soilCollectionMock, _super);
+          var SoilCollectionMock;
+          return SoilCollectionMock = (function(_super) {
+            __extends(SoilCollectionMock, _super);
 
-            function soilCollectionMock() {
+            function SoilCollectionMock() {
               spyOn(this, 'load').andCallThrough();
               this.getPromise = createMockPromise();
               spyOn(this, 'get').andReturn(this.getPromise);
               this.createPromise = createMockPromise();
               spyOn(this, 'create').andReturn(this.createPromise);
-              soilCollectionMock.__super__.constructor.apply(this, arguments);
+              SoilCollectionMock.__super__.constructor.apply(this, arguments);
             }
 
-            return soilCollectionMock;
+            return SoilCollectionMock;
 
           })($delegate);
         }
@@ -37,13 +37,13 @@
 
   angular.module('soil.model.mock', ['soil.model', 'angular-mock-promise']).config([
     '$provide', function($provide) {
-      return $provide.decorator('soilModel', [
+      return $provide.decorator('SoilModel', [
         '$delegate', 'createMockPromise', function($delegate, createMockPromise) {
-          var soilModelMock;
-          return soilModelMock = (function(_super) {
-            __extends(soilModelMock, _super);
+          var SoilModelMock;
+          return SoilModelMock = (function(_super) {
+            __extends(SoilModelMock, _super);
 
-            function soilModelMock(arg) {
+            function SoilModelMock(arg) {
               spyOn(this, 'load').andCallThrough();
               this.getPromise = createMockPromise();
               spyOn(this, 'get').andReturn(this.getPromise);
@@ -53,10 +53,10 @@
               spyOn(this, 'delete').andReturn(this.deletePromise);
               this.updatePromise = createMockPromise();
               spyOn(this, 'updateField').andReturn(this.updatePromise);
-              soilModelMock.__super__.constructor.apply(this, arguments);
+              SoilModelMock.__super__.constructor.apply(this, arguments);
             }
 
-            return soilModelMock;
+            return SoilModelMock;
 
           })($delegate);
         }
