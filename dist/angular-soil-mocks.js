@@ -14,8 +14,10 @@
 
             function soilCollectionMock() {
               spyOn(this, 'load').andCallThrough();
-              spyOn(this, 'get').andReturn(createMockPromise());
-              spyOn(this, 'create').andReturn(createMockPromise());
+              this.getPromise = createMockPromise();
+              spyOn(this, 'get').andReturn(this.getPromise);
+              this.createPromise = createMockPromise();
+              spyOn(this, 'create').andReturn(this.createPromise);
               soilCollectionMock.__super__.constructor.apply(this, arguments);
             }
 
@@ -43,10 +45,14 @@
 
             function soilModelMock(arg) {
               spyOn(this, 'load').andCallThrough();
-              spyOn(this, 'get').andReturn(createMockPromise());
-              spyOn(this, 'save').andReturn(createMockPromise());
-              spyOn(this, 'delete').andReturn(createMockPromise());
-              spyOn(this, 'updateField').andReturn(createMockPromise());
+              this.getPromise = createMockPromise();
+              spyOn(this, 'get').andReturn(this.getPromise);
+              this.savePromise = createMockPromise();
+              spyOn(this, 'save').andReturn(this.savePromise);
+              this.deletePromise = createMockPromise();
+              spyOn(this, 'delete').andReturn(this.deletePromise);
+              this.updatePromise = createMockPromise();
+              spyOn(this, 'updateField').andReturn(this.updatePromise);
               soilModelMock.__super__.constructor.apply(this, arguments);
             }
 
