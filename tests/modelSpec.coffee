@@ -58,6 +58,10 @@ describe 'soil.model module', ->
       it 'is set to an empty array', ->
         expect(instance._associations).toEqual([])
 
+    describe 'saved', ->
+      it 'is set to an empty object', ->
+        expect(instance.saved).toEqual({})
+
     # Set the base url
     describe '#setBaseUrl', ->
       it 'can be used to set _baseUrl', ->

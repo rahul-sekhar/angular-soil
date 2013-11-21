@@ -7,6 +7,7 @@ angular.module('soil.model', [])
       _associations: []
 
       constructor: (arg) ->
+        @saved = {}
         if angular.isObject(arg)
           @load(arg)
         else if arg

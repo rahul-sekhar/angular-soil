@@ -1,4 +1,4 @@
-/* angular-soil 0.8.2 %> */
+/* angular-soil 0.8.3 %> */
 
 (function() {
   angular.module('soil.association', ['soil.collection']).factory('HasOneAssociation', [
@@ -192,6 +192,7 @@
         SoilModel.prototype._associations = [];
 
         function SoilModel(arg) {
+          this.saved = {};
           if (angular.isObject(arg)) {
             this.load(arg);
           } else if (arg) {
