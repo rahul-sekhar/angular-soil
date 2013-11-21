@@ -22,10 +22,9 @@ angular.module('soil.model', [])
           @_baseUrl
 
       load: (data) ->
-        modifiedData = @_modifyDataBeforeLoad(data)
         @_clearFields()
         @_setSavedData(data)
-        _.assign this, modifiedData
+        _.assign this, @_modifyDataBeforeLoad(data)
         return this
 
       get: (id) ->
@@ -46,6 +45,14 @@ angular.module('soil.model', [])
         @_checkIfLoaded()
         return $http.delete(@url())
           .success => @load(null)
+
+      revert: ->
+        savedData = @saved
+        @_clearFields()
+        @_setSavedData(savedData)
+        _.assign this, @_modifyDataBeforeLoad(savedData)
+        return this
+
 
       updateField: (field) ->
         @_checkIfLoaded()

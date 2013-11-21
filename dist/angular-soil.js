@@ -1,4 +1,4 @@
-/* angular-soil 0.8.1 %> */
+/* angular-soil 0.8.2 %> */
 
 (function() {
   angular.module('soil.association', ['soil.collection']).factory('HasOneAssociation', [
@@ -215,11 +215,9 @@
         };
 
         SoilModel.prototype.load = function(data) {
-          var modifiedData;
-          modifiedData = this._modifyDataBeforeLoad(data);
           this._clearFields();
           this._setSavedData(data);
-          _.assign(this, modifiedData);
+          _.assign(this, this._modifyDataBeforeLoad(data));
           return this;
         };
 
@@ -253,6 +251,15 @@
           return $http["delete"](this.url()).success(function() {
             return _this.load(null);
           });
+        };
+
+        SoilModel.prototype.revert = function() {
+          var savedData;
+          savedData = this.saved;
+          this._clearFields();
+          this._setSavedData(savedData);
+          _.assign(this, this._modifyDataBeforeLoad(savedData));
+          return this;
         };
 
         SoilModel.prototype.updateField = function(field) {

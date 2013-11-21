@@ -379,5 +379,30 @@ describe 'soil.model module', ->
       it 'reverts the field to the old value with associations applied', ->
         expect(instance.field).toEqual('val association load')
 
+    # Revert all fields
+    describe '#revert', ->
+      result = null
+      beforeEach ->
+        instance.load { field: 'val', field2: 'other val', field3: 'third val' }
+        instance._associations = [{
+          beforeSave: (data) -> data.field += ' association',
+          beforeLoad: (data) -> data.field += ' association load'
+        }]
+        instance.field = 'updated val'
+        instance.field3 = 'some val'
+        instance.field4 = 'new val'
+        result = instance.revert()
+
+      it 'reverts each field to its old value with associations applied', ->
+        expect(instance.field).toEqual('val association load')
+        expect(instance.field2).toEqual('other val')
+        expect(instance.field3).toEqual('third val')
+        expect(instance.field4).toBeUndefined()
+
+      it 'leaves saved data as is', ->
+        expect(instance.saved).toEqual { field: 'val', field2: 'other val', field3: 'third val' }
+
+      it 'returns the instance', ->
+        expect(result).toBe(instance)
 
 
