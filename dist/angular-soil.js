@@ -1,4 +1,4 @@
-/* angular-soil 0.8.3 %> */
+/* angular-soil 0.8.4 %> */
 
 (function() {
   angular.module('soil.association', ['soil.collection']).factory('HasOneAssociation', [
@@ -94,9 +94,9 @@
     '$http', function($http) {
       var SoilCollection;
       return SoilCollection = (function() {
-        function SoilCollection(modelClass, _sourceUrl, options) {
+        function SoilCollection(modelClass, sourceUrl, options) {
           this.modelClass = modelClass;
-          this._sourceUrl = _sourceUrl;
+          this.sourceUrl = sourceUrl;
           if (options == null) {
             options = {};
           }
@@ -120,7 +120,7 @@
 
         SoilCollection.prototype.get = function() {
           var _this = this;
-          return $http.get(this._sourceUrl).success(function(data) {
+          return $http.get(this.sourceUrl).success(function(data) {
             return _this.load(data);
           });
         };
@@ -147,7 +147,7 @@
           options = _.defaults(options, {
             addToFront: false
           });
-          return $http.post(this._sourceUrl, data).success(function(responseData) {
+          return $http.post(this.sourceUrl, data).success(function(responseData) {
             if (options.addToFront) {
               return _this.addToFront(responseData);
             } else {

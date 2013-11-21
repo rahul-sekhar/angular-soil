@@ -120,7 +120,7 @@ describe 'soil.association module', ->
           expect(data.associations.modelClass).toEqual(SoilModel)
 
         it 'sets the url for the collection', ->
-          expect(data.associations._sourceUrl).toEqual('/association_url/6/associations')
+          expect(data.associations.sourceUrl).toEqual('/association_url/6/associations')
 
         it 'loads data into that instance', ->
           expect(data.associations.load).toHaveBeenCalledWith('association data')
@@ -135,7 +135,7 @@ describe 'soil.association module', ->
           instance.beforeLoad(data, parent)
 
         it 'sets the url for the collection', ->
-          expect(data.associations._sourceUrl).toEqual('/association_url/4/associations')
+          expect(data.associations.sourceUrl).toEqual('/association_url/4/associations')
 
 
     # Modify data before saving it

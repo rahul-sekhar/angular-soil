@@ -2,7 +2,7 @@ angular.module('soil.collection', [])
 
   .factory('SoilCollection', ['$http', ($http) ->
     class SoilCollection
-      constructor: (@modelClass, @_sourceUrl, options = {}) ->
+      constructor: (@modelClass, @sourceUrl, options = {}) ->
         @_options = _.defaults(options, {
           getData: false
         })
@@ -17,7 +17,7 @@ angular.module('soil.collection', [])
         return this
 
       get: ->
-        return $http.get(@_sourceUrl)
+        return $http.get(@sourceUrl)
           .success (data) => @load(data)
 
       add: (data) ->
@@ -32,7 +32,7 @@ angular.module('soil.collection', [])
 
       create: (data, options = {}) ->
         options = _.defaults(options, { addToFront: false })
-        return $http.post(@_sourceUrl, data).success (responseData) =>
+        return $http.post(@sourceUrl, data).success (responseData) =>
           if options.addToFront
             @addToFront(responseData)
           else
