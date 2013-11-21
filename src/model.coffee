@@ -55,7 +55,7 @@ angular.module('soil.model', [])
 
         return $http.put(@url(), data)
           .success (responseData) =>
-            @savedData = _.cloneDeep(responseData)
+            @saved = _.cloneDeep(responseData)
             fieldData = _.pick(responseData, field)
             fieldData = @_modifyDataBeforeLoad(fieldData)
             @[field] = fieldData[field]
@@ -64,7 +64,7 @@ angular.module('soil.model', [])
             @revertField(field)
 
       revertField: (field) ->
-        restoreData = @_modifyDataBeforeLoad(@savedData)
+        restoreData = @_modifyDataBeforeLoad(@saved)
         @[field] = restoreData[field]
 
       dataToSave: ->
@@ -97,5 +97,5 @@ angular.module('soil.model', [])
         return data
 
       _setSavedData: (data) ->
-        @savedData = if data then _.cloneDeep(data) else {}
+        @saved = if data then _.cloneDeep(data) else {}
   ])

@@ -90,7 +90,7 @@ describe 'soil.model module', ->
           expect(instance.someFunction).toBeTruthy()
 
         it 'sets saved data, unmodified by associations', ->
-          expect(instance.savedData).toEqual { field: 'new val', field5: 'another val' }
+          expect(instance.saved).toEqual { field: 'new val', field5: 'another val' }
 
         it 'returns the instance', ->
           expect(result).toBe(instance)
@@ -106,7 +106,7 @@ describe 'soil.model module', ->
           expect(instance._private).toEqual('private val')
 
         it 'clears saved data', ->
-          expect(instance.savedData).toEqual {}
+          expect(instance.saved).toEqual {}
 
         it 'returns the instance', ->
           expect(result).toBe(instance)
@@ -349,7 +349,7 @@ describe 'soil.model module', ->
             expect(instance.other_field).toBeUndefined()
 
           it 'replaces saved data with the response, unmodified by the association', ->
-            expect(instance.savedData).toEqual { field: 'formatted updated val', other_field: 'other val' }
+            expect(instance.saved).toEqual { field: 'formatted updated val', other_field: 'other val' }
 
           it 'resolves the promise', ->
             promise.expectToBeResolved()

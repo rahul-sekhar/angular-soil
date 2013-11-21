@@ -1,4 +1,4 @@
-/* angular-soil 0.8.0 %> */
+/* angular-soil 0.8.1 %> */
 
 (function() {
   angular.module('soil.association', ['soil.collection']).factory('HasOneAssociation', [
@@ -264,7 +264,7 @@
           data = this._modifyDataBeforeSave(data);
           return $http.put(this.url(), data).success(function(responseData) {
             var fieldData;
-            _this.savedData = _.cloneDeep(responseData);
+            _this.saved = _.cloneDeep(responseData);
             fieldData = _.pick(responseData, field);
             fieldData = _this._modifyDataBeforeLoad(fieldData);
             return _this[field] = fieldData[field];
@@ -275,7 +275,7 @@
 
         SoilModel.prototype.revertField = function(field) {
           var restoreData;
-          restoreData = this._modifyDataBeforeLoad(this.savedData);
+          restoreData = this._modifyDataBeforeLoad(this.saved);
           return this[field] = restoreData[field];
         };
 
@@ -330,7 +330,7 @@
         };
 
         SoilModel.prototype._setSavedData = function(data) {
-          return this.savedData = data ? _.cloneDeep(data) : {};
+          return this.saved = data ? _.cloneDeep(data) : {};
         };
 
         return SoilModel;
