@@ -127,7 +127,7 @@ describe 'soil.association module', ->
           expect(data.associations.sourceUrl).toEqual('/association_url/6/associations')
 
         it 'loads data into that instance', ->
-          expect(data.associations.load).toHaveBeenCalledWith('association data')
+          expect(data.associations.$load).toHaveBeenCalledWith('association data')
 
         it 'leaves the other field intact', ->
           expect(data.other_field).toEqual('other val')
@@ -143,7 +143,7 @@ describe 'soil.association module', ->
           expect(instance._baseUrl).toEqual('/association_url/6/associations')
 
         it 'loads data into the instance', ->
-          expect(data.associations.load).toHaveBeenCalledWith('association data')
+          expect(data.associations.$load).toHaveBeenCalledWith('association data')
 
       describe 'when the parent has an id', ->
         beforeEach ->

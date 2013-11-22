@@ -3,35 +3,35 @@ angular.module('soil.collection', [])
   .factory('SoilCollection', ['$http', ($http) ->
     class SoilCollection
       constructor: (@modelClass, @sourceUrl) ->
-        @members = []
+        @$members = []
 
-      load: (data) ->
+      $load: (data) ->
         data ||= []
-        @members = _.map data, (modelData) =>
+        @$members = _.map data, (modelData) =>
           new @modelClass(modelData)
         return this
 
-      get: ->
+      $get: ->
         return $http.get(@sourceUrl)
-          .success (data) => @load(data)
+          .success (data) => @$load(data)
 
-      add: (data) ->
+      $add: (data) ->
         newItem = new @modelClass(data)
         newItem.$setPostUrl @sourceUrl
-        @members.push(newItem)
+        @$members.push(newItem)
         return newItem
 
-      addToFront: (data) ->
+      $addToFront: (data) ->
         newItem = new @modelClass(data)
         newItem.$setPostUrl @sourceUrl
-        @members.unshift(newItem)
+        @$members.unshift(newItem)
         return newItem
 
-      removeById: (id) ->
-        _.remove @members, (item) ->
+      $removeById: (id) ->
+        _.remove @$members, (item) ->
           item.id == id
 
-      remove: (itemToRemove) ->
-        _.remove @members, (item) ->
+      $remove: (itemToRemove) ->
+        _.remove @$members, (item) ->
           itemToRemove == item
   ])

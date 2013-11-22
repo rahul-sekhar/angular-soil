@@ -66,7 +66,7 @@
           if (data[this._field]) {
             associationUrl = parent.$url(data.id || parent.id) + '/' + this._field;
             collection = new SoilCollection(this._modelClassFor(associationUrl), associationUrl);
-            return data[this._field] = collection.load(data[this._field]);
+            return data[this._field] = collection.$load(data[this._field]);
           }
         };
 
@@ -122,49 +122,49 @@
         function SoilCollection(modelClass, sourceUrl) {
           this.modelClass = modelClass;
           this.sourceUrl = sourceUrl;
-          this.members = [];
+          this.$members = [];
         }
 
-        SoilCollection.prototype.load = function(data) {
+        SoilCollection.prototype.$load = function(data) {
           var _this = this;
           data || (data = []);
-          this.members = _.map(data, function(modelData) {
+          this.$members = _.map(data, function(modelData) {
             return new _this.modelClass(modelData);
           });
           return this;
         };
 
-        SoilCollection.prototype.get = function() {
+        SoilCollection.prototype.$get = function() {
           var _this = this;
           return $http.get(this.sourceUrl).success(function(data) {
-            return _this.load(data);
+            return _this.$load(data);
           });
         };
 
-        SoilCollection.prototype.add = function(data) {
+        SoilCollection.prototype.$add = function(data) {
           var newItem;
           newItem = new this.modelClass(data);
           newItem.$setPostUrl(this.sourceUrl);
-          this.members.push(newItem);
+          this.$members.push(newItem);
           return newItem;
         };
 
-        SoilCollection.prototype.addToFront = function(data) {
+        SoilCollection.prototype.$addToFront = function(data) {
           var newItem;
           newItem = new this.modelClass(data);
           newItem.$setPostUrl(this.sourceUrl);
-          this.members.unshift(newItem);
+          this.$members.unshift(newItem);
           return newItem;
         };
 
-        SoilCollection.prototype.removeById = function(id) {
-          return _.remove(this.members, function(item) {
+        SoilCollection.prototype.$removeById = function(id) {
+          return _.remove(this.$members, function(item) {
             return item.id === id;
           });
         };
 
-        SoilCollection.prototype.remove = function(itemToRemove) {
-          return _.remove(this.members, function(item) {
+        SoilCollection.prototype.$remove = function(itemToRemove) {
+          return _.remove(this.$members, function(item) {
             return itemToRemove === item;
           });
         };

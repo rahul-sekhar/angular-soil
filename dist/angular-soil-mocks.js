@@ -13,9 +13,9 @@
             __extends(SoilCollectionMock, _super);
 
             function SoilCollectionMock() {
-              spyOn(this, 'load').andCallThrough();
+              spyOn(this, '$load').andCallThrough();
               this.getPromise = createMockPromise();
-              spyOn(this, 'get').andReturn(this.getPromise);
+              spyOn(this, '$get').andReturn(this.getPromise);
               SoilCollectionMock.__super__.constructor.apply(this, arguments);
             }
 
