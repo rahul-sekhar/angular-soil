@@ -119,6 +119,10 @@ describe 'soil.association module', ->
         it 'sets the model for the collection', ->
           expect(data.associations.modelClass).toEqual(SoilModel)
 
+        it 'does not change the model base url', ->
+          instance = new data.associations.modelClass()
+          expect(instance._baseUrl).toEqual('/')
+
         it 'sets the url for the collection', ->
           expect(data.associations.sourceUrl).toEqual('/association_url/6/associations')
 
@@ -127,6 +131,19 @@ describe 'soil.association module', ->
 
         it 'leaves the other field intact', ->
           expect(data.other_field).toEqual('other val')
+
+      describe 'with the nestedUpdate option set', ->
+        beforeEach inject (HasManyAssociation) ->
+          instance = new HasManyAssociation('associations', 'association_ids', SoilModel, { nestedUpdate: true })
+          data = { associations: 'association data', other_field: 'other val', id: 6 }
+          instance.beforeLoad(data, parent)
+
+        it 'sets the model base url to the collection url', ->
+          instance = new data.associations.modelClass()
+          expect(instance._baseUrl).toEqual('/association_url/6/associations')
+
+        it 'loads data into the instance', ->
+          expect(data.associations.load).toHaveBeenCalledWith('association data')
 
       describe 'when the parent has an id', ->
         beforeEach ->

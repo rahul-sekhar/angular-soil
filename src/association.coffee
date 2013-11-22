@@ -28,13 +28,14 @@ angular.module('soil.association', ['soil.collection'])
     class HasManyAssociation
       constructor: (@_field, @_idField, @_modelClass, options = {}) ->
         @_options = _.defaults(options, {
-          saveData: false
+          saveData: false,
+          nestedUpdate: false
         })
 
       beforeLoad: (data, parent) ->
         if (data[@_field])
-          parentUrl = parent.url(data.id || parent.id)
-          collection = new SoilCollection(@_modelClass, parentUrl + '/' + @_field)
+          associationUrl = parent.url(data.id || parent.id)  + '/' + @_field
+          collection = new SoilCollection(@_modelClassFor(associationUrl), associationUrl)
           data[@_field] = collection.load(data[@_field])
 
       beforeSave: (data) ->
@@ -44,4 +45,11 @@ angular.module('soil.association', ['soil.collection'])
           else
             data[@_idField] = _.map data[@_field].members, (member) -> member.id
             delete data[@_field]
+
+      _modelClassFor: (url) ->
+        if @_options.nestedUpdate
+          class extendedModel extends @_modelClass
+            _baseUrl: url
+        else
+          @_modelClass
   ])

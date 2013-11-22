@@ -1,6 +1,9 @@
-/* angular-soil 0.9.2 %> */
+/* angular-soil 0.9.3 %> */
 
 (function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
   angular.module('soil.association', ['soil.collection']).factory('HasOneAssociation', [
     function() {
       var HasOneAssociation;
@@ -53,15 +56,16 @@
             options = {};
           }
           this._options = _.defaults(options, {
-            saveData: false
+            saveData: false,
+            nestedUpdate: false
           });
         }
 
         HasManyAssociation.prototype.beforeLoad = function(data, parent) {
-          var collection, parentUrl;
+          var associationUrl, collection;
           if (data[this._field]) {
-            parentUrl = parent.url(data.id || parent.id);
-            collection = new SoilCollection(this._modelClass, parentUrl + '/' + this._field);
+            associationUrl = parent.url(data.id || parent.id) + '/' + this._field;
+            collection = new SoilCollection(this._modelClassFor(associationUrl), associationUrl);
             return data[this._field] = collection.load(data[this._field]);
           }
         };
@@ -78,6 +82,27 @@
               });
               return delete data[this._field];
             }
+          }
+        };
+
+        HasManyAssociation.prototype._modelClassFor = function(url) {
+          var extendedModel, _ref;
+          if (this._options.nestedUpdate) {
+            return extendedModel = (function(_super) {
+              __extends(extendedModel, _super);
+
+              function extendedModel() {
+                _ref = extendedModel.__super__.constructor.apply(this, arguments);
+                return _ref;
+              }
+
+              extendedModel.prototype._baseUrl = url;
+
+              return extendedModel;
+
+            })(this._modelClass);
+          } else {
+            return this._modelClass;
           }
         };
 
