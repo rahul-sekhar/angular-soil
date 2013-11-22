@@ -4,6 +4,7 @@ angular.module('soil.model', [])
     class SoilModel
       _baseUrl: '/'
       _fieldsToSave: []
+      _fieldsToSaveOnCreate: []
       _associations: []
 
       constructor: (arg) ->
@@ -76,9 +77,14 @@ angular.module('soil.model', [])
         @[field] = restoreData[field]
 
       dataToSave: ->
+        fields = @_fieldsToSave
+        unless @loaded()
+          fields = fields.concat @_fieldsToSaveOnCreate
+
         data = {}
-        _.each @_fieldsToSave, (field) =>
+        _.each fields, (field) =>
           data[field] = if @[field] == undefined then null else @[field]
+
         return @_modifyDataBeforeSave(data)
 
       _checkIfLoaded: ->

@@ -1,4 +1,4 @@
-/* angular-soil 0.9.1 %> */
+/* angular-soil 0.9.2 %> */
 
 (function() {
   angular.module('soil.association', ['soil.collection']).factory('HasOneAssociation', [
@@ -161,6 +161,8 @@
 
         SoilModel.prototype._fieldsToSave = [];
 
+        SoilModel.prototype._fieldsToSaveOnCreate = [];
+
         SoilModel.prototype._associations = [];
 
         function SoilModel(arg) {
@@ -260,10 +262,14 @@
         };
 
         SoilModel.prototype.dataToSave = function() {
-          var data,
+          var data, fields,
             _this = this;
+          fields = this._fieldsToSave;
+          if (!this.loaded()) {
+            fields = fields.concat(this._fieldsToSaveOnCreate);
+          }
           data = {};
-          _.each(this._fieldsToSave, function(field) {
+          _.each(fields, function(field) {
             return data[field] = _this[field] === void 0 ? null : _this[field];
           });
           return this._modifyDataBeforeSave(data);

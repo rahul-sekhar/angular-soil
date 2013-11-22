@@ -54,6 +54,10 @@ describe 'soil.model module', ->
       it 'is set to an empty array', ->
         expect(instance._fieldsToSave).toEqual([])
 
+    describe '_fieldsToSaveOnCreate', ->
+      it 'is set to an empty array', ->
+        expect(instance._fieldsToSaveOnCreate).toEqual([])
+
     describe '_associations', ->
       it 'is set to an empty array', ->
         expect(instance._associations).toEqual([])
@@ -207,15 +211,37 @@ describe 'soil.model module', ->
       beforeEach ->
         instance.url = -> '/some_path'
         instance._associations = [{ beforeSave: (data, parent) ->
-          data.field3 = data.field3 += ' association. url: ' + parent.url()
+          data.field3 += ' association. url: ' + parent.url()
+          if data.field5
+            data.field5 += ' assoc'
         }]
         instance._fieldsToSave = ['field', 'field3', 'field4']
+        instance._fieldsToSaveOnCreate = ['field5', 'field6']
         instance.field = 'new val'
         instance.field2 = 'other new val'
         instance.field3 = 'third new val'
+        instance.field5 = 'create val'
+        instance.field6 = 'other create val'
 
-      it 'selects fields to save and applies associations', ->
-        expect(instance.dataToSave()).toEqual({ field: 'new val', field3: 'third new val association. url: /some_path', field4: null })
+      describe 'on create', ->
+        it 'selects fields to save and fields to create and applies associations', ->
+          expect(instance.dataToSave()).toEqual({
+            field: 'new val',
+            field3: 'third new val association. url: /some_path',
+            field4: null,
+            field5: 'create val assoc',
+            field6: 'other create val'
+          })
+
+      describe 'on update', ->
+        beforeEach -> instance.id = 21
+
+        it 'selects fields to save and applies associations', ->
+          expect(instance.dataToSave()).toEqual({
+            field: 'new val',
+            field3: 'third new val association. url: /some_path',
+            field4: null
+          })
 
     # Save the model
     describe '#save', ->
