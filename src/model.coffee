@@ -8,77 +8,80 @@ angular.module('soil.model', [])
       _associations: []
 
       constructor: (arg) ->
-        @saved = {}
+        @$saved = {}
         if angular.isObject(arg)
-          @load(arg)
+          @$load(arg)
         else if arg
-          @get(arg)
+          @$get(arg)
 
-      setBaseUrl: (newUrl) ->
+      $setBaseUrl: (newUrl) ->
         @_baseUrl = newUrl
 
-      url: (id = @id) ->
+      $setPostUrl: (newUrl) ->
+        @_postUrl = newUrl
+
+      $url: (id = @id) ->
         if id
           @_withSlash(@_baseUrl) + id
         else
           @_postUrl || @_baseUrl
 
-      load: (data) ->
+      $load: (data) ->
         @_clearFields()
         @_setSavedData(data)
         _.assign this, @_modifyDataBeforeLoad(data)
         return this
 
-      get: (id) ->
-        return $http.get(@url(id)).success (responseData) =>
-          @load(responseData)
+      $get: (id) ->
+        return $http.get(@$url(id)).success (responseData) =>
+          @$load(responseData)
 
-      loaded: -> !!@id
+      $loaded: -> !!@id
 
-      save: ->
+      $save: ->
         if @id
-          return $http.put(@url(), @dataToSave())
-            .success (responseData) => @load(responseData)
+          return $http.put(@$url(), @$dataToSave())
+            .success (responseData) => @$load(responseData)
         else
-          return $http.post(@url(), @dataToSave())
-            .success (responseData) => @load(responseData)
+          return $http.post(@$url(), @$dataToSave())
+            .success (responseData) => @$load(responseData)
 
-      delete: ->
+      $delete: ->
         @_checkIfLoaded()
-        return $http.delete(@url())
-          .success => @load(null)
+        return $http.delete(@$url())
+          .success => @$load(null)
 
-      revert: ->
-        savedData = @saved
+      $revert: ->
+        savedData = @$saved
         @_clearFields()
         @_setSavedData(savedData)
         _.assign this, @_modifyDataBeforeLoad(savedData)
         return this
 
 
-      updateField: (field) ->
+      $updateField: (field) ->
         @_checkIfLoaded()
         data = {}
         data[field] = @[field]
         data = @_modifyDataBeforeSave(data)
 
-        return $http.put(@url(), data)
+        return $http.put(@$url(), data)
           .success (responseData) =>
-            @saved = _.cloneDeep(responseData)
+            @$saved = _.cloneDeep(responseData)
             fieldData = _.pick(responseData, field)
             fieldData = @_modifyDataBeforeLoad(fieldData)
             @[field] = fieldData[field]
 
           .error =>
-            @revertField(field)
+            @$revertField(field)
 
-      revertField: (field) ->
-        restoreData = @_modifyDataBeforeLoad(@saved)
+      $revertField: (field) ->
+        restoreData = @_modifyDataBeforeLoad(@$saved)
         @[field] = restoreData[field]
 
-      dataToSave: ->
+      $dataToSave: ->
         fields = @_fieldsToSave
-        unless @loaded()
+        unless @$loaded()
           fields = fields.concat @_fieldsToSaveOnCreate
 
         data = {}
@@ -88,7 +91,7 @@ angular.module('soil.model', [])
         return @_modifyDataBeforeSave(data)
 
       _checkIfLoaded: ->
-        throw 'Operation not permitted on an unloaded model' unless @loaded()
+        throw 'Operation not permitted on an unloaded model' unless @$loaded()
 
       _clearFields: () ->
         # Do not remove private fields (fields beginning with an underscore), or functions
@@ -111,5 +114,5 @@ angular.module('soil.model', [])
         return data
 
       _setSavedData: (data) ->
-        @saved = if data then _.cloneDeep(data) else {}
+        @$saved = if data then _.cloneDeep(data) else {}
   ])

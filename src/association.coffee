@@ -18,7 +18,7 @@ angular.module('soil.association', ['soil.collection'])
       beforeSave: (data) ->
         if (data[@_field])
           if @_options.saveData
-            data[@_field] = data[@_field].dataToSave()
+            data[@_field] = data[@_field].$dataToSave()
           else
             data[@_idField] = data[@_field].id
             delete data[@_field]
@@ -34,14 +34,14 @@ angular.module('soil.association', ['soil.collection'])
 
       beforeLoad: (data, parent) ->
         if (data[@_field])
-          associationUrl = parent.url(data.id || parent.id)  + '/' + @_field
+          associationUrl = parent.$url(data.id || parent.id)  + '/' + @_field
           collection = new SoilCollection(@_modelClassFor(associationUrl), associationUrl)
           data[@_field] = collection.load(data[@_field])
 
       beforeSave: (data) ->
         if (data[@_field])
           if @_options.saveData
-            data[@_field] = _.map data[@_field].members, (member) -> member.dataToSave()
+            data[@_field] = _.map data[@_field].members, (member) -> member.$dataToSave()
           else
             data[@_idField] = _.map data[@_field].members, (member) -> member.id
             delete data[@_field]

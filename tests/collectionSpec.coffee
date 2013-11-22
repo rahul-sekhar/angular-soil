@@ -28,8 +28,8 @@ describe 'soil.collection module', ->
           expect(instance.members).toEqual([jasmine.any(SoilModel), jasmine.any(SoilModel)])
 
         it 'loads each models data', ->
-          expect(instance.members[0].load).toHaveBeenCalledWith({ id: 1, name: 'first' })
-          expect(instance.members[1].load).toHaveBeenCalledWith({ id: 4, name: 'second' })
+          expect(instance.members[0].$load).toHaveBeenCalledWith({ id: 1, name: 'first' })
+          expect(instance.members[1].$load).toHaveBeenCalledWith({ id: 4, name: 'second' })
 
         it 'returns the instance', ->
           expect(result).toBe(instance)
@@ -88,7 +88,7 @@ describe 'soil.collection module', ->
         expect(instance.members).toEqual(['member1', 'member2', 'member3', jasmine.any(SoilModel)])
 
       it 'loads data into the new member', ->
-        expect(instance.members[3].load).toHaveBeenCalledWith({ data: 'val' })
+        expect(instance.members[3].$load).toHaveBeenCalledWith({ data: 'val' })
 
       it 'sets the members postUrl to its source', ->
         expect(instance.members[3]._postUrl).toEqual('/source_url')
@@ -106,7 +106,7 @@ describe 'soil.collection module', ->
         expect(instance.members).toEqual([jasmine.any(SoilModel), 'member1', 'member2', 'member3'])
 
       it 'loads data into the new member', ->
-        expect(instance.members[0].load).toHaveBeenCalledWith({ data: 'val' })
+        expect(instance.members[0].$load).toHaveBeenCalledWith({ data: 'val' })
 
       it 'sets the members postUrl to its source', ->
         expect(instance.members[0]._postUrl).toEqual('/source_url')

@@ -17,13 +17,13 @@ angular.module('soil.collection', [])
 
       add: (data) ->
         newItem = new @modelClass(data)
-        newItem._postUrl = @sourceUrl
+        newItem.$setPostUrl @sourceUrl
         @members.push(newItem)
         return newItem
 
       addToFront: (data) ->
         newItem = new @modelClass(data)
-        newItem._postUrl = @sourceUrl
+        newItem.$setPostUrl @sourceUrl
         @members.unshift(newItem)
         return newItem
 

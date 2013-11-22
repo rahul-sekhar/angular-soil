@@ -1,4 +1,4 @@
-/* angular-soil 0.9.3 %> */
+/* angular-soil 0.9.4 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -42,16 +42,16 @@
             __extends(SoilModelMock, _super);
 
             function SoilModelMock(arg) {
-              spyOn(this, 'load').andCallThrough();
-              spyOn(this, 'revert').andCallThrough();
+              spyOn(this, '$load').andCallThrough();
+              spyOn(this, '$revert').andCallThrough();
               this.getPromise = createMockPromise();
-              spyOn(this, 'get').andReturn(this.getPromise);
+              spyOn(this, '$get').andReturn(this.getPromise);
               this.savePromise = createMockPromise();
-              spyOn(this, 'save').andReturn(this.savePromise);
+              spyOn(this, '$save').andReturn(this.savePromise);
               this.deletePromise = createMockPromise();
-              spyOn(this, 'delete').andReturn(this.deletePromise);
+              spyOn(this, '$delete').andReturn(this.deletePromise);
               this.updatePromise = createMockPromise();
-              spyOn(this, 'updateField').andReturn(this.updatePromise);
+              spyOn(this, '$updateField').andReturn(this.updatePromise);
               SoilModelMock.__super__.constructor.apply(this, arguments);
             }
 

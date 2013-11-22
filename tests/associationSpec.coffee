@@ -30,7 +30,7 @@ describe 'soil.association module', ->
           expect(data.association).toEqual(jasmine.any(SoilModel))
 
         it 'loads data into that instance', ->
-          expect(data.association.load).toHaveBeenCalledWith({ field: 'val' })
+          expect(data.association.$load).toHaveBeenCalledWith({ field: 'val' })
 
         it 'leaves the other field intact', ->
           expect(data.other_field).toEqual('other val')
@@ -44,7 +44,7 @@ describe 'soil.association module', ->
           expect(data.association).toEqual(jasmine.any(SoilModel))
 
         it 'gets the instance by id', ->
-          expect(data.association.get).toHaveBeenCalledWith(5)
+          expect(data.association.$get).toHaveBeenCalledWith(5)
 
         it 'removes the association id field', ->
           expect(data.association_id).toBeUndefined()
@@ -79,7 +79,7 @@ describe 'soil.association module', ->
 
       describe 'when the field is present, with the saveData option set', ->
         beforeEach inject (HasOneAssociation) ->
-          data = { association: { dataToSave: -> 'model data' }, other_field: 'other val' }
+          data = { association: { $dataToSave: -> 'model data' }, other_field: 'other val' }
           instance = new HasOneAssociation('association', SoilModel, { saveData: true })
           instance.beforeSave(data)
 
@@ -95,7 +95,7 @@ describe 'soil.association module', ->
     beforeEach inject (HasManyAssociation, _SoilModel_) ->
       SoilModel = _SoilModel_
       instance = new HasManyAssociation('associations', 'association_ids', SoilModel)
-      parent = { url: (id) -> '/association_url/' + id }
+      parent = { $url: (id) -> '/association_url/' + id }
 
     # Modify data before loading it
     describe '#beforeLoad', ->
@@ -181,9 +181,9 @@ describe 'soil.association module', ->
       describe 'when the field is present, with the saveData option set', ->
         beforeEach inject (HasManyAssociation) ->
           data = { associations: { members: [
-            { dataToSave: -> 'model 1 data' },
-            { dataToSave: -> 'model 2 data' },
-            { dataToSave: -> 'model 3 data' }
+            { $dataToSave: -> 'model 1 data' },
+            { $dataToSave: -> 'model 2 data' },
+            { $dataToSave: -> 'model 3 data' }
           ] }, other_field: 'other val' }
 
           instance = new HasManyAssociation('associations', 'association_ids', SoilModel, { saveData: true })
