@@ -11,18 +11,8 @@ describe 'soil.collection module', ->
       SoilModel = _SoilModel_
       instance = new SoilCollection(SoilModel, '/source_url')
 
-    # Construction
-    describe 'if constructed with the getData option set', ->
-      beforeEach inject (SoilCollection) ->
-        class SoilCollectionMock extends SoilCollection
-          get: jasmine.createSpy()
-        instance = new SoilCollectionMock(SoilModel, '/source_url', { getData: true })
-
-      it 'gets data on construction', ->
-        expect(instance.get).toHaveBeenCalled()
-
-    it 'sets members to undefined', ->
-      expect(instance.members).toBeUndefined()
+    it 'sets members to an empty array', ->
+      expect(instance.members).toEqual []
 
     # Load data into the collection
     describe '#load', ->
@@ -52,24 +42,6 @@ describe 'soil.collection module', ->
 
         it 'returns the instance', ->
           expect(result).toBe(instance)
-
-    # Check whether data has been loaded
-    describe '#loaded', ->
-      describe 'with no data', ->
-        it 'returns false', ->
-          expect(instance.loaded()).toBe(false)
-
-      describe 'with an empty array of members', ->
-        beforeEach -> instance.members = []
-
-        it 'returns true', ->
-          expect(instance.loaded()).toBe(true)
-
-      describe 'with an array of members', ->
-        beforeEach -> instance.members = ['member1', 'member2']
-
-        it 'returns true', ->
-          expect(instance.loaded()).toBe(true)
 
     # Get data from a source
     describe '#get', ->

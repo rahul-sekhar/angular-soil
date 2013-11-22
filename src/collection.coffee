@@ -2,13 +2,8 @@ angular.module('soil.collection', [])
 
   .factory('SoilCollection', ['$http', ($http) ->
     class SoilCollection
-      constructor: (@modelClass, @sourceUrl, options = {}) ->
-        @_options = _.defaults(options, {
-          getData: false
-        })
-        @members = undefined
-        if @_options.getData
-          @get()
+      constructor: (@modelClass, @sourceUrl) ->
+        @members = []
 
       load: (data) ->
         data ||= []
@@ -39,7 +34,4 @@ angular.module('soil.collection', [])
       remove: (itemToRemove) ->
         _.remove @members, (item) ->
           itemToRemove == item
-
-      loaded: ->
-        return !(@members == undefined)
   ])
