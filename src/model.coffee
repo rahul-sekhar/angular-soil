@@ -36,8 +36,6 @@ angular.module('soil.model', [])
         return $http.get(@$url(id)).success (responseData) =>
           @$load(responseData)
 
-      $loaded: -> !!@id
-
       $save: ->
         if @id
           return $http.put(@$url(), @$dataToSave())
@@ -81,7 +79,7 @@ angular.module('soil.model', [])
 
       $dataToSave: ->
         fields = @_fieldsToSave
-        unless @$loaded()
+        unless @id
           fields = fields.concat @_fieldsToSaveOnCreate
 
         data = {}
@@ -91,7 +89,7 @@ angular.module('soil.model', [])
         return @_modifyDataBeforeSave(data)
 
       _checkIfLoaded: ->
-        throw 'Operation not permitted on an unloaded model' unless @$loaded()
+        throw 'Operation not permitted on an unloaded model' unless @id
 
       _clearFields: () ->
         # Do not remove private fields (fields beginning with an underscore), or functions

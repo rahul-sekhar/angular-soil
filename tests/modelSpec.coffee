@@ -200,19 +200,6 @@ describe 'soil.model module', ->
             expect(instance.$url()).toBe('/model_path/56')
 
 
-    # Check if model is loaded
-    describe '#$loaded', ->
-      describe 'without id set', ->
-        it 'is false', ->
-          expect(instance.$loaded()).toBeFalsy()
-
-      describe 'with an id set', ->
-        beforeEach -> instance.id = 7
-
-        it 'is true', ->
-          expect(instance.$loaded()).toBeTruthy()
-
-
     # Get data to be saved
     describe '#$dataToSave', ->
       beforeEach ->

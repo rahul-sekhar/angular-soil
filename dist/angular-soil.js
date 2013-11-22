@@ -1,4 +1,4 @@
-/* angular-soil 0.9.4 %> */
+/* angular-soil 0.9.5 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -232,10 +232,6 @@
           });
         };
 
-        SoilModel.prototype.$loaded = function() {
-          return !!this.id;
-        };
-
         SoilModel.prototype.$save = function() {
           var _this = this;
           if (this.id) {
@@ -294,7 +290,7 @@
           var data, fields,
             _this = this;
           fields = this._fieldsToSave;
-          if (!this.$loaded()) {
+          if (!this.id) {
             fields = fields.concat(this._fieldsToSaveOnCreate);
           }
           data = {};
@@ -305,7 +301,7 @@
         };
 
         SoilModel.prototype._checkIfLoaded = function() {
-          if (!this.$loaded()) {
+          if (!this.id) {
             throw 'Operation not permitted on an unloaded model';
           }
         };
