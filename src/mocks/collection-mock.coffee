@@ -8,9 +8,6 @@ angular.module('soil.collection.mock', ['soil.collection', 'angular-mock-promise
           @getPromise = createMockPromise()
           spyOn(this, 'get').andReturn(@getPromise)
 
-          @createPromise = createMockPromise()
-          spyOn(this, 'create').andReturn(@createPromise)
           super
-
     ])
   ])

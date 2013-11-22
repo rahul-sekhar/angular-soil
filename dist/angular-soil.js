@@ -1,4 +1,4 @@
-/* angular-soil 0.8.4 %> */
+/* angular-soil 0.9.0 %> */
 
 (function() {
   angular.module('soil.association', ['soil.collection']).factory('HasOneAssociation', [
@@ -128,6 +128,7 @@
         SoilCollection.prototype.add = function(data) {
           var newItem;
           newItem = new this.modelClass(data);
+          newItem._postUrl = this.sourceUrl;
           this.members.push(newItem);
           return newItem;
         };
@@ -135,25 +136,9 @@
         SoilCollection.prototype.addToFront = function(data) {
           var newItem;
           newItem = new this.modelClass(data);
+          newItem._postUrl = this.sourceUrl;
           this.members.unshift(newItem);
           return newItem;
-        };
-
-        SoilCollection.prototype.create = function(data, options) {
-          var _this = this;
-          if (options == null) {
-            options = {};
-          }
-          options = _.defaults(options, {
-            addToFront: false
-          });
-          return $http.post(this.sourceUrl, data).success(function(responseData) {
-            if (options.addToFront) {
-              return _this.addToFront(responseData);
-            } else {
-              return _this.add(responseData);
-            }
-          });
         };
 
         SoilCollection.prototype.removeById = function(id) {
@@ -211,7 +196,7 @@
           if (id) {
             return this._withSlash(this._baseUrl) + id;
           } else {
-            return this._baseUrl;
+            return this._postUrl || this._baseUrl;
           }
         };
 

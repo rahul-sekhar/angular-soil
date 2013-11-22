@@ -22,21 +22,15 @@ angular.module('soil.collection', [])
 
       add: (data) ->
         newItem = new @modelClass(data)
+        newItem._postUrl = @sourceUrl
         @members.push(newItem)
         return newItem
 
       addToFront: (data) ->
         newItem = new @modelClass(data)
+        newItem._postUrl = @sourceUrl
         @members.unshift(newItem)
         return newItem
-
-      create: (data, options = {}) ->
-        options = _.defaults(options, { addToFront: false })
-        return $http.post(@sourceUrl, data).success (responseData) =>
-          if options.addToFront
-            @addToFront(responseData)
-          else
-            @add(responseData)
 
       removeById: (id) ->
         _.remove @members, (item) ->

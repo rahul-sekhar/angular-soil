@@ -176,6 +176,18 @@ describe 'soil.model module', ->
         it 'returns the model url for that id', ->
           expect(instance.url(12)).toBe('/model_path/12')
 
+      describe 'with postUrl set', ->
+        beforeEach -> instance._postUrl = '/model_source'
+
+        describe 'without an id', ->
+          it 'returns the source url', ->
+            expect(instance.url()).toBe('/model_source')
+
+        describe 'with an id', ->
+          beforeEach -> instance.id = 56
+
+          it 'returns the base url with the id', ->
+            expect(instance.url()).toBe('/model_path/56')
 
     # Check if model is loaded
     describe '#loaded', ->

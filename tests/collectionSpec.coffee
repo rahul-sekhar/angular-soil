@@ -118,6 +118,9 @@ describe 'soil.collection module', ->
       it 'loads data into the new member', ->
         expect(instance.members[3].load).toHaveBeenCalledWith({ data: 'val' })
 
+      it 'sets the members postUrl to its source', ->
+        expect(instance.members[3]._postUrl).toEqual('/source_url')
+
       it 'returns the new item', ->
         expect(result).toBe(_.last(instance.members))
 
@@ -133,59 +136,11 @@ describe 'soil.collection module', ->
       it 'loads data into the new member', ->
         expect(instance.members[0].load).toHaveBeenCalledWith({ data: 'val' })
 
+      it 'sets the members postUrl to its source', ->
+        expect(instance.members[0]._postUrl).toEqual('/source_url')
+
       it 'returns the new item', ->
         expect(result).toBe(_.first(instance.members))
-
-    # Create an item and add it to the collection
-    describe '#create', ->
-      promise = response = null
-      beforeEach  ->
-        instance.members = ['member1', 'member2']
-        response = httpBackend.expectPOST('/source_url', { data: 'val' })
-        response.respond null
-
-      describe 'with default options', ->
-        beforeEach inject (promiseExpectation) ->
-          spyOn(instance, 'add')
-          promise = promiseExpectation(instance.create({ data: 'val' }))
-
-        it 'sends a POST request', ->
-          httpBackend.verifyNoOutstandingExpectation()
-
-        it 'does nothing until the backend responds', ->
-          expect(instance.members).toEqual(['member1', 'member2'])
-
-        describe 'on success', ->
-          beforeEach ->
-            response.respond { data: 'response val' }
-            httpBackend.flush()
-
-          it 'adds the created model', ->
-            expect(instance.add).toHaveBeenCalledWith({ data: 'response val' })
-
-          it 'resolves the returned promise', ->
-            promise.expectToBeResolved()
-
-        describe 'on failure', ->
-          beforeEach ->
-            response.respond 500
-            httpBackend.flush()
-
-          it 'does not add a member', ->
-            expect(instance.members).toEqual(['member1', 'member2'])
-
-          it 'rejects the returned promise', ->
-            promise.expectToBeRejected()
-
-      describe 'with addToFront set', ->
-        beforeEach ->
-          spyOn(instance, 'addToFront')
-          instance.create({ data: 'val' }, { addToFront: true })
-
-        it 'adds the created model to the front', ->
-          response.respond { data: 'response val' }
-          httpBackend.flush()
-          expect(instance.addToFront).toHaveBeenCalledWith({ data: 'response val' })
 
     # Remove an item from the collection by ID
     describe '#removeById', ->

@@ -20,7 +20,7 @@ angular.module('soil.model', [])
         if id
           @_withSlash(@_baseUrl) + id
         else
-          @_baseUrl
+          @_postUrl || @_baseUrl
 
       load: (data) ->
         @_clearFields()
