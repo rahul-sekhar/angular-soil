@@ -9,6 +9,8 @@ angular.module('soil.association', ['soil.collection'])
         @_idField = @_field + '_id'
 
       beforeLoad: (data, parent) ->
+        return if !data
+
         if (data[@_field])
           data[@_field] = new @_modelClass(parent._scope, data[@_field])
         else if (data[@_idField])
@@ -33,6 +35,8 @@ angular.module('soil.association', ['soil.collection'])
         })
 
       beforeLoad: (data, parent) ->
+        return if !data
+
         if (data[@_field])
           associationUrl = parent.$url(data.id || parent.id)  + '/' + @_field
           collection = new SoilCollection(parent._scope, @_modelClassFor(associationUrl), associationUrl)

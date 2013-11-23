@@ -1,4 +1,4 @@
-/* angular-soil 1.0.0 %> */
+/* angular-soil 1.0.1 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -21,6 +21,9 @@
         }
 
         HasOneAssociation.prototype.beforeLoad = function(data, parent) {
+          if (!data) {
+            return;
+          }
           if (data[this._field]) {
             return data[this._field] = new this._modelClass(parent._scope, data[this._field]);
           } else if (data[this._idField]) {
@@ -63,6 +66,9 @@
 
         HasManyAssociation.prototype.beforeLoad = function(data, parent) {
           var associationUrl, collection;
+          if (!data) {
+            return;
+          }
           if (data[this._field]) {
             associationUrl = parent.$url(data.id || parent.id) + '/' + this._field;
             collection = new SoilCollection(parent._scope, this._modelClassFor(associationUrl), associationUrl);

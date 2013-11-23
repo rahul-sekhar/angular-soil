@@ -22,6 +22,14 @@ describe 'soil.association module', ->
         it 'does nothing to the data', ->
           expect(data).toEqual { other_field: 'other val' }
 
+      describe 'when null is passed', ->
+        beforeEach ->
+          data = null
+          instance.beforeLoad(data, parent)
+
+        it 'does nothing to the data', ->
+          expect(data).toBeNull()
+
       describe 'when association data is passed', ->
         beforeEach ->
           data = { association: { field: 'val' }, other_field: 'other val' }
@@ -114,6 +122,14 @@ describe 'soil.association module', ->
 
         it 'does nothing to the data', ->
           expect(data).toEqual { other_field: 'other val' }
+
+      describe 'when null is passed', ->
+        beforeEach ->
+          data = null
+          instance.beforeLoad(data, parent)
+
+        it 'does nothing to the data', ->
+          expect(data).toBeNull()
 
       describe 'when association data is passed', ->
         beforeEach ->
