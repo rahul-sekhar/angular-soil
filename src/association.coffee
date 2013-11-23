@@ -45,9 +45,9 @@ angular.module('soil.association', ['soil.collection'])
       beforeSave: (data, parent) ->
         if (data[@_field])
           if @_options.saveData
-            data[@_field] = _.map data[@_field].members, (member) -> member.$dataToSave()
+            data[@_field] = _.map data[@_field].$members, (member) -> member.$dataToSave()
           else
-            data[@_idField] = _.map data[@_field].members, (member) -> member.id
+            data[@_idField] = _.map data[@_field].$members, (member) -> member.id
             delete data[@_field]
 
       _modelClassFor: (url) ->

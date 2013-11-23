@@ -194,7 +194,7 @@ describe 'soil.association module', ->
 
       describe 'when the field is present', ->
         beforeEach ->
-          data = { associations: { members: [{ id: 7 }, { id: 10 }, { id: 12 }] }, other_field: 'other val' }
+          data = { associations: { $members: [{ id: 7 }, { id: 10 }, { id: 12 }] }, other_field: 'other val' }
           instance.beforeSave(data, parent)
 
         it 'replaces the association with its ids', ->
@@ -206,7 +206,7 @@ describe 'soil.association module', ->
 
       describe 'when the field is present, with the saveData option set', ->
         beforeEach inject (HasManyAssociation) ->
-          data = { associations: { members: [
+          data = { associations: { $members: [
             { $dataToSave: -> 'model 1 data' },
             { $dataToSave: -> 'model 2 data' },
             { $dataToSave: -> 'model 3 data' }

@@ -79,11 +79,11 @@
         HasManyAssociation.prototype.beforeSave = function(data, parent) {
           if (data[this._field]) {
             if (this._options.saveData) {
-              return data[this._field] = _.map(data[this._field].members, function(member) {
+              return data[this._field] = _.map(data[this._field].$members, function(member) {
                 return member.$dataToSave();
               });
             } else {
-              data[this._idField] = _.map(data[this._field].members, function(member) {
+              data[this._idField] = _.map(data[this._field].$members, function(member) {
                 return member.id;
               });
               return delete data[this._field];
