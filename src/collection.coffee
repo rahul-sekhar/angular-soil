@@ -2,16 +2,16 @@ angular.module('soil.collection', [])
 
   .factory('SoilCollection', ['$http', ($http) ->
     class SoilCollection
-      constructor: (@scope, @modelClass, @sourceUrl) ->
+      constructor: (@_scope, @modelClass, @sourceUrl) ->
         @$members = []
 
-        if @scope
+        if @_scope
           @_setupListeners()
 
       $load: (data) ->
         data ||= []
         @$members = _.map data, (modelData) =>
-          new @modelClass(@scope, modelData)
+          new @modelClass(@_scope, modelData)
         return this
 
       $get: ->
@@ -19,13 +19,13 @@ angular.module('soil.collection', [])
           .success (data) => @$load(data)
 
       $add: (data) ->
-        newItem = new @modelClass(@scope, data)
+        newItem = new @modelClass(@_scope, data)
         newItem.$setPostUrl @sourceUrl
         @$members.push(newItem)
         return newItem
 
       $addToFront: (data) ->
-        newItem = new @modelClass(@scope, data)
+        newItem = new @modelClass(@_scope, data)
         newItem.$setPostUrl @sourceUrl
         @$members.unshift(newItem)
         return newItem
@@ -39,7 +39,7 @@ angular.module('soil.collection', [])
           itemToRemove == item
 
       _setupListeners: ->
-        @scope.$on 'modelDeleted', (e, type, id) =>
+        @_scope.$on 'modelDeleted', (e, type, id) =>
           if type == @modelClass.prototype._modelType
             @$removeById(id)
   ])
@@ -52,7 +52,7 @@ angular.module('soil.collection', [])
         @_setupCreateListener()
 
       _setupCreateListener: ->
-        @scope.$on 'modelSaved', (e, model, data) =>
+        @_scope.$on 'modelSaved', (e, model, data) =>
           if model._modelType == @modelClass.prototype._modelType
             # Check if the id of the saved model is present and only add it if it is not
             if !_.any(@$members, (member) -> member.id == model.id )

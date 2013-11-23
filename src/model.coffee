@@ -8,15 +8,14 @@ angular.module('soil.model', [])
       _associations: []
       _modelType: 'model'
 
-      constructor: (scope, arg) ->
+      constructor: (@_scope, arg) ->
         @$saved = {}
         if angular.isObject(arg)
           @$load(arg)
         else if arg
           @$get(arg)
 
-        @scope = scope
-        if @scope
+        if @_scope
           @_setupListeners()
 
       $setBaseUrl: (newUrl) ->
@@ -125,11 +124,11 @@ angular.module('soil.model', [])
         @$saved = if data then _.cloneDeep(data) else {}
 
       _setupListeners: ->
-        @scope.$on 'modelSaved', (e, model, data) =>
+        @_scope.$on 'modelSaved', (e, model, data) =>
           if @id && model._modelType == @_modelType && model.id == @id
             @$load(data)
 
-        @scope.$on 'modelFieldUpdated', (e, model, field, data) =>
+        @_scope.$on 'modelFieldUpdated', (e, model, field, data) =>
           if @id && model._modelType == @_modelType && model.id == @id
             @_loadField(field, data)
   ])

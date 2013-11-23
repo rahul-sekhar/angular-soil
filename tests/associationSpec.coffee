@@ -34,7 +34,7 @@ describe 'soil.association module', ->
           expect(data.association.$load).toHaveBeenCalledWith({ field: 'val' })
 
         it 'sets the instance scope', ->
-          expect(data.association.scope).toBe(scope)
+          expect(data.association._scope).toBe(scope)
 
         it 'leaves the other field intact', ->
           expect(data.other_field).toEqual('other val')
@@ -134,7 +134,7 @@ describe 'soil.association module', ->
           expect(data.associations.sourceUrl).toEqual('/association_url/6/associations')
 
         it 'sets the collection scope', ->
-          expect(data.associations.scope).toBe(scope)
+          expect(data.associations._scope).toBe(scope)
 
         it 'loads data into that instance', ->
           expect(data.associations.$load).toHaveBeenCalledWith('association data')

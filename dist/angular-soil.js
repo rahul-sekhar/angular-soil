@@ -22,9 +22,9 @@
 
         HasOneAssociation.prototype.beforeLoad = function(data, parent) {
           if (data[this._field]) {
-            return data[this._field] = new this._modelClass(parent.scope, data[this._field]);
+            return data[this._field] = new this._modelClass(parent._scope, data[this._field]);
           } else if (data[this._idField]) {
-            data[this._field] = new this._modelClass(parent.scope, data[this._idField]);
+            data[this._field] = new this._modelClass(parent._scope, data[this._idField]);
             return delete data[this._idField];
           }
         };
@@ -65,7 +65,7 @@
           var associationUrl, collection;
           if (data[this._field]) {
             associationUrl = parent.$url(data.id || parent.id) + '/' + this._field;
-            collection = new SoilCollection(parent.scope, this._modelClassFor(associationUrl), associationUrl);
+            collection = new SoilCollection(parent._scope, this._modelClassFor(associationUrl), associationUrl);
             return data[this._field] = collection.$load(data[this._field]);
           }
         };
@@ -122,12 +122,12 @@
     '$http', function($http) {
       var SoilCollection;
       return SoilCollection = (function() {
-        function SoilCollection(scope, modelClass, sourceUrl) {
-          this.scope = scope;
+        function SoilCollection(_scope, modelClass, sourceUrl) {
+          this._scope = _scope;
           this.modelClass = modelClass;
           this.sourceUrl = sourceUrl;
           this.$members = [];
-          if (this.scope) {
+          if (this._scope) {
             this._setupListeners();
           }
         }
@@ -136,7 +136,7 @@
           var _this = this;
           data || (data = []);
           this.$members = _.map(data, function(modelData) {
-            return new _this.modelClass(_this.scope, modelData);
+            return new _this.modelClass(_this._scope, modelData);
           });
           return this;
         };
@@ -150,7 +150,7 @@
 
         SoilCollection.prototype.$add = function(data) {
           var newItem;
-          newItem = new this.modelClass(this.scope, data);
+          newItem = new this.modelClass(this._scope, data);
           newItem.$setPostUrl(this.sourceUrl);
           this.$members.push(newItem);
           return newItem;
@@ -158,7 +158,7 @@
 
         SoilCollection.prototype.$addToFront = function(data) {
           var newItem;
-          newItem = new this.modelClass(this.scope, data);
+          newItem = new this.modelClass(this._scope, data);
           newItem.$setPostUrl(this.sourceUrl);
           this.$members.unshift(newItem);
           return newItem;
@@ -178,7 +178,7 @@
 
         SoilCollection.prototype._setupListeners = function() {
           var _this = this;
-          return this.scope.$on('modelDeleted', function(e, type, id) {
+          return this._scope.$on('modelDeleted', function(e, type, id) {
             if (type === _this.modelClass.prototype._modelType) {
               return _this.$removeById(id);
             }
@@ -202,7 +202,7 @@
 
         GlobalSoilCollection.prototype._setupCreateListener = function() {
           var _this = this;
-          return this.scope.$on('modelSaved', function(e, model, data) {
+          return this._scope.$on('modelSaved', function(e, model, data) {
             if (model._modelType === _this.modelClass.prototype._modelType) {
               if (!_.any(_this.$members, function(member) {
                 return member.id === model.id;
@@ -236,15 +236,15 @@
 
         SoilModel.prototype._modelType = 'model';
 
-        function SoilModel(scope, arg) {
+        function SoilModel(_scope, arg) {
+          this._scope = _scope;
           this.$saved = {};
           if (angular.isObject(arg)) {
             this.$load(arg);
           } else if (arg) {
             this.$get(arg);
           }
-          this.scope = scope;
-          if (this.scope) {
+          if (this._scope) {
             this._setupListeners();
           }
         }
@@ -399,12 +399,12 @@
 
         SoilModel.prototype._setupListeners = function() {
           var _this = this;
-          this.scope.$on('modelSaved', function(e, model, data) {
+          this._scope.$on('modelSaved', function(e, model, data) {
             if (_this.id && model._modelType === _this._modelType && model.id === _this.id) {
               return _this.$load(data);
             }
           });
-          return this.scope.$on('modelFieldUpdated', function(e, model, field, data) {
+          return this._scope.$on('modelFieldUpdated', function(e, model, field, data) {
             if (_this.id && model._modelType === _this._modelType && model.id === _this.id) {
               return _this._loadField(field, data);
             }

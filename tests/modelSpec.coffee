@@ -53,7 +53,7 @@ describe 'soil.model module', ->
           instance = new mockSoilModel(scope)
 
         it 'saves the scope', ->
-          expect(instance.scope).toBe(scope)
+          expect(instance._scope).toBe(scope)
 
     # Default data
     describe '_baseUrl', ->

@@ -20,7 +20,7 @@ describe 'soil.collection module', ->
       expect(instance.modelClass).toBe(SoilModel)
 
     it 'sets the scope', ->
-      expect(instance.scope).toBe(scope)
+      expect(instance._scope).toBe(scope)
 
     # Load data into the collection
     describe '#$load', ->
@@ -40,8 +40,8 @@ describe 'soil.collection module', ->
           expect(instance.$members[1].$load).toHaveBeenCalledWith({ id: 4, name: 'second' })
 
         it 'sets the scope for each model', ->
-          expect(instance.$members[0].scope).toBe(scope)
-          expect(instance.$members[1].scope).toBe(scope)
+          expect(instance.$members[0]._scope).toBe(scope)
+          expect(instance.$members[1]._scope).toBe(scope)
 
         it 'returns the instance', ->
           expect(result).toBe(instance)
@@ -103,7 +103,7 @@ describe 'soil.collection module', ->
         expect(instance.$members[3].$load).toHaveBeenCalledWith({ data: 'val' })
 
       it 'sets the scope of the member', ->
-        expect(instance.$members[3].scope).toBe(scope)
+        expect(instance.$members[3]._scope).toBe(scope)
 
       it 'sets the members postUrl to its source', ->
         expect(instance.$members[3]._postUrl).toEqual('/source_url')
@@ -124,7 +124,7 @@ describe 'soil.collection module', ->
         expect(instance.$members[0].$load).toHaveBeenCalledWith({ data: 'val' })
 
       it 'sets the scope of the member', ->
-        expect(instance.$members[0].scope).toBe(scope)
+        expect(instance.$members[0]._scope).toBe(scope)
 
       it 'sets the members postUrl to its source', ->
         expect(instance.$members[0]._postUrl).toEqual('/source_url')
@@ -213,7 +213,7 @@ describe 'soil.collection module', ->
       expect(instance.modelClass).toBe(SoilModelWithType)
 
     it 'sets the scope to rootScope', ->
-      expect(instance.scope).toBe(rootScope)
+      expect(instance._scope).toBe(rootScope)
 
     # Event listeners
     describe 'on model creation', ->
