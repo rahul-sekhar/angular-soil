@@ -3,8 +3,9 @@ describe 'soil.model module', ->
   beforeEach module 'angular-mock-promise'
 
   describe 'SoilModel', ->
-    SoilModel = httpBackend = instance = null
-    beforeEach inject (_SoilModel_, $httpBackend) ->
+    SoilModel = httpBackend = instance = rootScope = null
+    beforeEach inject (_SoilModel_, $httpBackend, $rootScope) ->
+      rootScope = $rootScope
       httpBackend = $httpBackend
       SoilModel = _SoilModel_
       instance = new SoilModel
@@ -18,32 +19,41 @@ describe 'soil.model module', ->
           $get: jasmine.createSpy('$get')
 
       describe 'when passed nothing', ->
-        beforeEach -> instance = new mockSoilModel
+        beforeEach -> instance = new mockSoilModel(null)
 
         it 'does not load or get data', ->
           expect(instance.$load).not.toHaveBeenCalled()
           expect(instance.$get).not.toHaveBeenCalled()
 
       describe 'when passed an integer', ->
-        beforeEach -> instance = new mockSoilModel(15)
+        beforeEach -> instance = new mockSoilModel(null, 15)
 
         it 'gets data from the server', ->
           expect(instance.$get).toHaveBeenCalledWith(15)
           expect(instance.$load).not.toHaveBeenCalled()
 
       describe 'when passed a string', ->
-        beforeEach -> instance = new mockSoilModel('15')
+        beforeEach -> instance = new mockSoilModel(null, '15')
 
         it 'gets data from the server', ->
           expect(instance.$get).toHaveBeenCalledWith('15')
           expect(instance.$load).not.toHaveBeenCalled()
 
       describe 'when passed an object', ->
-        beforeEach -> instance = new mockSoilModel({ data: 'val' })
+        beforeEach -> instance = new mockSoilModel(null, { data: 'val' })
 
         it 'loads the object', ->
           expect(instance.$load).toHaveBeenCalledWith({ data: 'val' })
           expect(instance.$get).not.toHaveBeenCalled()
+
+      describe 'when passed a scope', ->
+        scope = null
+        beforeEach ->
+          scope = rootScope.$new()
+          instance = new mockSoilModel(scope)
+
+        it 'saves the scope', ->
+          expect(instance.scope).toBe(scope)
 
     # Default data
     describe '_baseUrl', ->
@@ -62,7 +72,11 @@ describe 'soil.model module', ->
       it 'is set to an empty array', ->
         expect(instance._associations).toEqual([])
 
-    describe 'saved', ->
+    describe '_modelType', ->
+      it 'is set to a default type', ->
+        expect(instance._modelType).toEqual('model')
+
+    describe '$saved', ->
       it 'is set to an empty object', ->
         expect(instance.$saved).toEqual({})
 
@@ -240,20 +254,17 @@ describe 'soil.model module', ->
 
     # Save the model
     describe '#$save', ->
-      request = promise = null
+      request = promise = saveSpy = null
       beforeEach ->
         instance.$setBaseUrl('/model_path')
         spyOn(instance, '$dataToSave').andReturn('save data')
         spyOn(instance, '$load')
 
-      describe 'without an id', ->
-        request = promise = null
-        beforeEach inject (promiseExpectation) ->
-          request = httpBackend.expectPOST('/model_path', 'save data')
-          request.respond null
-          promise = promiseExpectation(instance.$save())
+        saveSpy = jasmine.createSpy('rootScope save watcher')
+        rootScope.$on('modelSaved', saveSpy)
 
-        it 'sends a POST request', ->
+      runSaveTests = ->
+        it 'sends a request', ->
           httpBackend.verifyNoOutstandingExpectation()
 
         describe 'on success', ->
@@ -267,6 +278,15 @@ describe 'soil.model module', ->
           it 'resolves the promise', ->
             promise.expectToBeResolved()
 
+          it 'broadcasts an event', ->
+            expect(saveSpy).toHaveBeenCalled()
+
+          it 'sends itself in the event', ->
+            expect(saveSpy.mostRecentCall.args[1]).toBe(instance)
+
+          it 'sends the response data in the event', ->
+            expect(saveSpy.mostRecentCall.args[2]).toEqual({ field: 'formatted new val', field4: 'side effect' })
+
         describe 'on failure', ->
           beforeEach ->
             request.respond 500
@@ -277,6 +297,17 @@ describe 'soil.model module', ->
 
           it 'rejects the promise', ->
             promise.expectToBeRejected()
+
+          it 'does not broadcast an event', ->
+            expect(saveSpy).not.toHaveBeenCalled()
+
+      describe 'without an id', ->
+        beforeEach inject (promiseExpectation) ->
+          request = httpBackend.expectPOST('/model_path', 'save data')
+          request.respond null
+          promise = promiseExpectation(instance.$save())
+
+        runSaveTests()
 
       describe 'with an id', ->
         beforeEach inject (promiseExpectation) ->
@@ -285,31 +316,7 @@ describe 'soil.model module', ->
           request.respond null
           promise = promiseExpectation(instance.$save())
 
-        it 'sends a PUT request', ->
-          httpBackend.verifyNoOutstandingExpectation()
-
-        describe 'on success', ->
-          beforeEach ->
-            request.respond { field: 'formatted new val', field4: 'side effect' }
-            httpBackend.flush()
-
-          it 'loads the response data', ->
-            expect(instance.$load).toHaveBeenCalledWith { field: 'formatted new val', field4: 'side effect' }
-
-          it 'resolves the promise', ->
-            promise.expectToBeResolved()
-
-        describe 'on failure', ->
-          beforeEach ->
-            request.respond 500
-            httpBackend.flush()
-
-          it 'does not load the response data', ->
-            expect(instance.$load).not.toHaveBeenCalled()
-
-          it 'rejects the promise', ->
-            promise.expectToBeRejected()
-
+        runSaveTests()
 
     # Delete the model
     describe '#$delete', ->
@@ -318,13 +325,17 @@ describe 'soil.model module', ->
           expect(-> instance.$delete()).toThrow()
 
       describe 'with an id', ->
-        request = promise = null
+        request = promise = deleteSpy = null
         beforeEach inject (promiseExpectation) ->
           instance.id = 5
+          instance._modelType = 'a particular model'
           request = httpBackend.expectDELETE('/5')
           request.respond null
           spyOn(instance, '$load')
           promise = promiseExpectation(instance.$delete())
+
+          deleteSpy = jasmine.createSpy('rootScope delete watcher')
+          rootScope.$on('modelDeleted', deleteSpy)
 
         it 'sends a DELETE request', ->
           httpBackend.verifyNoOutstandingExpectation()
@@ -340,6 +351,15 @@ describe 'soil.model module', ->
           it 'resolves the promise', ->
             promise.expectToBeResolved()
 
+          it 'broadcasts an event', ->
+            expect(deleteSpy).toHaveBeenCalled()
+
+          it 'sends its type in the event', ->
+            expect(deleteSpy.mostRecentCall.args[1]).toEqual('a particular model')
+
+          it 'sends its id in the event', ->
+            expect(deleteSpy.mostRecentCall.args[2]).toEqual(5)
+
         describe 'on failure', ->
           beforeEach ->
             request.respond 500
@@ -351,6 +371,27 @@ describe 'soil.model module', ->
           it 'rejects the promise', ->
             promise.expectToBeRejected()
 
+          it 'does not broadcast an event', ->
+            expect(deleteSpy).not.toHaveBeenCalled()
+
+
+    # Load a single field from data
+    describe '#_loadField', ->
+      beforeEach ->
+        instance.$load { id: 5, field: 'val', field2: 'other val' }
+        instance._associations = [{
+          beforeLoad: (data) -> data.field += ' association load'
+        }]
+        instance._loadField('field', { field: 'formatted updated val', other_field: 'other val' })
+
+      it 'sets the field to the response, modified by the association', ->
+        expect(instance.field).toEqual('formatted updated val association load')
+
+      it 'does not set other fields from the response', ->
+        expect(instance.other_field).toBeUndefined()
+
+      it 'replaces saved data with the response, unmodified by the association', ->
+        expect(instance.$saved).toEqual { field: 'formatted updated val', other_field: 'other val' }
 
     # Update a single field
     describe '#$updateField', ->
@@ -359,16 +400,22 @@ describe 'soil.model module', ->
           expect(-> instance.$updateField()).toThrow()
 
       describe 'with an id', ->
-        request = promise = null
+        request = promise = updateSpy = null
         beforeEach inject (promiseExpectation) ->
+          updateSpy = jasmine.createSpy('rootScope update watcher')
+          rootScope.$on('modelFieldUpdated', updateSpy)
+
           instance.$load { id: 5, field: 'val', field2: 'other val' }
           instance._associations = [{
             beforeSave: (data) -> data.field += ' association',
-            beforeLoad: (data) -> data.field += ' association load'
           }]
           instance.field = 'updated val'
           request = httpBackend.expectPUT('/5', { field: 'updated val association' })
           request.respond null
+
+          spyOn(instance, '_loadField')
+          spyOn(instance, '$revertField')
+
           promise = promiseExpectation(instance.$updateField('field'))
 
         it 'sends a PUT request', ->
@@ -376,35 +423,44 @@ describe 'soil.model module', ->
 
         describe 'on success', ->
           beforeEach ->
-            request.respond { field: 'formatted updated val', other_field: 'other val' }
+            request.respond 'response data'
             httpBackend.flush()
 
-          it 'sets the field to the response, modified by the association', ->
-            expect(instance.field).toEqual('formatted updated val association load')
-
-          it 'does not set other fields from the response', ->
-            expect(instance.other_field).toBeUndefined()
-
-          it 'replaces saved data with the response, unmodified by the association', ->
-            expect(instance.$saved).toEqual { field: 'formatted updated val', other_field: 'other val' }
+          it 'loads the field', ->
+            expect(instance._loadField).toHaveBeenCalledWith('field', 'response data')
 
           it 'resolves the promise', ->
             promise.expectToBeResolved()
+
+          it 'broadcasts an event', ->
+            expect(updateSpy).toHaveBeenCalled()
+
+          it 'sends itself in the event', ->
+            expect(updateSpy.mostRecentCall.args[1]).toBe(instance)
+
+          it 'sends the field in the event', ->
+            expect(updateSpy.mostRecentCall.args[2]).toEqual('field')
+
+          it 'sends the response data in the event', ->
+            expect(updateSpy.mostRecentCall.args[3]).toEqual('response data')
 
         describe 'on failure', ->
           beforeEach ->
             request.respond 500
             httpBackend.flush()
 
-          it 'restores the field to the old saved data, modified by the association', ->
-            expect(instance.field).toEqual('val association load')
+          it 'reverts the field', ->
+            expect(instance.$revertField).toHaveBeenCalledWith('field')
 
           it 'rejects the promise', ->
             promise.expectToBeRejected()
 
+          it 'does not broadcast an event', ->
+            expect(updateSpy).not.toHaveBeenCalled()
+
 
     # Revert a field
-    describe '#revertField', ->
+    describe '#$revertField', ->
       beforeEach ->
         instance.$load { field: 'val', field2: 'other val' }
         instance._associations = [{
@@ -444,4 +500,90 @@ describe 'soil.model module', ->
       it 'returns the instance', ->
         expect(result).toBe(instance)
 
+    # Event listeners
+    describe 'event listeners', ->
+      scope = null
+      beforeEach ->
+        scope = rootScope.$new()
+        instance = new SoilModel(scope, { id: 6 })
+        instance._modelType = 'specific model'
 
+      describe 'on a modelSaved event', ->
+        beforeEach -> spyOn(instance, '$load')
+
+        describe 'if the event model has a different type', ->
+          beforeEach ->
+            other = new SoilModel(null, { id: 6 })
+            other._modelType = 'other model'
+            rootScope.$broadcast('modelSaved', other, 'data')
+
+          it 'does not load data', ->
+            expect(instance.$load).not.toHaveBeenCalled()
+
+        describe 'if the event model has a different id', ->
+          beforeEach ->
+            other = new SoilModel(null, { id: 5 })
+            other._modelType = 'specific model'
+            rootScope.$broadcast('modelSaved', other, 'data')
+
+          it 'does not load data', ->
+            expect(instance.$load).not.toHaveBeenCalled()
+
+        describe 'if both models have no ids', ->
+          beforeEach ->
+            instance.id = undefined
+            other = new SoilModel(null)
+            other._modelType = 'specific model'
+            rootScope.$broadcast('modelSaved', other, 'data')
+
+          it 'does not load data', ->
+            expect(instance.$load).not.toHaveBeenCalled()
+
+        describe 'if the event model has the same type and id', ->
+          beforeEach ->
+            other = new SoilModel(null, { id: 6 })
+            other._modelType = 'specific model'
+            rootScope.$broadcast('modelSaved', other, 'data')
+
+          it 'does not load data', ->
+            expect(instance.$load).toHaveBeenCalledWith('data')
+
+      describe 'on a modelFieldUpdated event', ->
+        beforeEach -> spyOn(instance, '_loadField')
+
+        describe 'if the event model has a different type', ->
+          beforeEach ->
+            other = new SoilModel(null, { id: 6 })
+            other._modelType = 'other model'
+            rootScope.$broadcast('modelFieldUpdated', other, 'field', 'data')
+
+          it 'does not load data', ->
+            expect(instance._loadField).not.toHaveBeenCalled()
+
+        describe 'if the event model has a different id', ->
+          beforeEach ->
+            other = new SoilModel(null, { id: 5 })
+            other._modelType = 'specific model'
+            rootScope.$broadcast('modelFieldUpdated', other, 'field', 'data')
+
+          it 'does not load data', ->
+            expect(instance._loadField).not.toHaveBeenCalled()
+
+        describe 'if both models have no ids', ->
+          beforeEach ->
+            instance.id = undefined
+            other = new SoilModel(null)
+            other._modelType = 'specific model'
+            rootScope.$broadcast('modelFieldUpdated', other, 'field', 'data')
+
+          it 'does not load data', ->
+            expect(instance._loadField).not.toHaveBeenCalled()
+
+        describe 'if the event model has the same type and id', ->
+          beforeEach ->
+            other = new SoilModel(null, { id: 6 })
+            other._modelType = 'specific model'
+            rootScope.$broadcast('modelFieldUpdated', other, 'field', 'data')
+
+          it 'does not load data', ->
+            expect(instance._loadField).toHaveBeenCalledWith('field', 'data')

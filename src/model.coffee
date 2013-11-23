@@ -1,18 +1,23 @@
 angular.module('soil.model', [])
 
-  .factory('SoilModel', ['$http', ($http) ->
+  .factory('SoilModel', ['$http', '$rootScope', ($http, $rootScope) ->
     class SoilModel
       _baseUrl: '/'
       _fieldsToSave: []
       _fieldsToSaveOnCreate: []
       _associations: []
+      _modelType: 'model'
 
-      constructor: (arg) ->
+      constructor: (scope, arg) ->
         @$saved = {}
         if angular.isObject(arg)
           @$load(arg)
         else if arg
           @$get(arg)
+
+        @scope = scope
+        if @scope
+          @_setupListeners()
 
       $setBaseUrl: (newUrl) ->
         @_baseUrl = newUrl
@@ -37,17 +42,18 @@ angular.module('soil.model', [])
           @$load(responseData)
 
       $save: ->
-        if @id
-          return $http.put(@$url(), @$dataToSave())
-            .success (responseData) => @$load(responseData)
-        else
-          return $http.post(@$url(), @$dataToSave())
-            .success (responseData) => @$load(responseData)
+        sendRequest = if @id then $http.put else $http.post
+        return sendRequest(@$url(), @$dataToSave())
+          .success (responseData) =>
+            @$load(responseData)
+            $rootScope.$broadcast('modelSaved', this, responseData)
 
       $delete: ->
         @_checkIfLoaded()
         return $http.delete(@$url())
-          .success => @$load(null)
+          .success =>
+            $rootScope.$broadcast('modelDeleted', @_modelType, @id)
+            @$load(null)
 
       $revert: ->
         savedData = @$saved
@@ -65,10 +71,8 @@ angular.module('soil.model', [])
 
         return $http.put(@$url(), data)
           .success (responseData) =>
-            @$saved = _.cloneDeep(responseData)
-            fieldData = _.pick(responseData, field)
-            fieldData = @_modifyDataBeforeLoad(fieldData)
-            @[field] = fieldData[field]
+            @_loadField(field, responseData)
+            $rootScope.$broadcast('modelFieldUpdated', this, field, responseData)
 
           .error =>
             @$revertField(field)
@@ -88,6 +92,12 @@ angular.module('soil.model', [])
 
         return @_modifyDataBeforeSave(data)
 
+      _loadField: (field, data) ->
+        @$saved = _.cloneDeep(data)
+        fieldData = _.pick(data, field)
+        fieldData = @_modifyDataBeforeLoad(fieldData)
+        @[field] = fieldData[field]
+
       _checkIfLoaded: ->
         throw 'Operation not permitted on an unloaded model' unless @id
 
@@ -103,14 +113,23 @@ angular.module('soil.model', [])
 
       _modifyDataBeforeLoad: (loadData) ->
         data = _.clone(loadData)
-        _.each @_associations, (association) => association.beforeLoad(data, @)
+        _.each @_associations, (association) => association.beforeLoad(data, this)
         return data
 
       _modifyDataBeforeSave: (saveData) ->
         data = _.clone(saveData)
-        _.each @_associations, (association) => association.beforeSave(data, @)
+        _.each @_associations, (association) => association.beforeSave(data, this)
         return data
 
       _setSavedData: (data) ->
         @$saved = if data then _.cloneDeep(data) else {}
+
+      _setupListeners: ->
+        @scope.$on 'modelSaved', (e, model, data) =>
+          if @id && model._modelType == @_modelType && model.id == @id
+            @$load(data)
+
+        @scope.$on 'modelFieldUpdated', (e, model, field, data) =>
+          if @id && model._modelType == @_modelType && model.id == @id
+            @_loadField(field, data)
   ])

@@ -4,15 +4,23 @@ describe 'soil.collection module', ->
   beforeEach module 'angular-mock-promise'
 
   describe 'SoilCollection', ->
-    SoilModel = instance = httpBackend = null
+    SoilModel = instance = httpBackend = scope = rootScope = null
 
-    beforeEach inject (SoilCollection, $httpBackend, _SoilModel_) ->
+    beforeEach inject (SoilCollection, $httpBackend, _SoilModel_, $rootScope) ->
       httpBackend = $httpBackend
+      rootScope = $rootScope
+      scope = rootScope.$new()
       SoilModel = _SoilModel_
-      instance = new SoilCollection(SoilModel, '/source_url')
+      instance = new SoilCollection(scope, SoilModel, '/source_url')
 
     it 'sets members to an empty array', ->
       expect(instance.$members).toEqual []
+
+    it 'sets the modelClass', ->
+      expect(instance.modelClass).toBe(SoilModel)
+
+    it 'sets the scope', ->
+      expect(instance.scope).toBe(scope)
 
     # Load data into the collection
     describe '#$load', ->
@@ -30,6 +38,10 @@ describe 'soil.collection module', ->
         it 'loads each models data', ->
           expect(instance.$members[0].$load).toHaveBeenCalledWith({ id: 1, name: 'first' })
           expect(instance.$members[1].$load).toHaveBeenCalledWith({ id: 4, name: 'second' })
+
+        it 'sets the scope for each model', ->
+          expect(instance.$members[0].scope).toBe(scope)
+          expect(instance.$members[1].scope).toBe(scope)
 
         it 'returns the instance', ->
           expect(result).toBe(instance)
@@ -90,6 +102,9 @@ describe 'soil.collection module', ->
       it 'loads data into the new member', ->
         expect(instance.$members[3].$load).toHaveBeenCalledWith({ data: 'val' })
 
+      it 'sets the scope of the member', ->
+        expect(instance.$members[3].scope).toBe(scope)
+
       it 'sets the members postUrl to its source', ->
         expect(instance.$members[3]._postUrl).toEqual('/source_url')
 
@@ -107,6 +122,9 @@ describe 'soil.collection module', ->
 
       it 'loads data into the new member', ->
         expect(instance.$members[0].$load).toHaveBeenCalledWith({ data: 'val' })
+
+      it 'sets the scope of the member', ->
+        expect(instance.$members[0].scope).toBe(scope)
 
       it 'sets the members postUrl to its source', ->
         expect(instance.$members[0]._postUrl).toEqual('/source_url')
@@ -138,3 +156,88 @@ describe 'soil.collection module', ->
         it 'removes only the instance passed', ->
           expect(instance.$members).toEqual [{ id: 1, name: 'first' }, { id: 3, name: 'third' }, { id: 2, name: 'second' }]
 
+
+    # Event listeners
+    describe 'Event listeners', ->
+      beforeEach inject (SoilCollection) ->
+        class SoilModelWithType extends SoilModel
+          _modelType: 'some type'
+        instance = new SoilCollection(scope, SoilModelWithType, '/source_url')
+        instance.$load [{ id: 1 }, { id: 2 }, { id: 3 }]
+
+      memberIds = ->
+        _.map instance.$members, (member) ->
+          member.id
+
+      describe 'on model deletion', ->
+        describe 'with a different model type', ->
+          beforeEach ->
+            rootScope.$broadcast('modelDeleted', 'different type', 2)
+
+          it 'does not remove any models', ->
+            expect(memberIds()).toEqual [1, 2, 3]
+
+        describe 'with the same model type, but an id not present', ->
+          beforeEach ->
+            rootScope.$broadcast('modelDeleted', 'some type', 4)
+
+          it 'does not remove any models', ->
+            expect(memberIds()).toEqual [1, 2, 3]
+
+        describe 'with the same model type and an id that is present', ->
+          beforeEach ->
+            rootScope.$broadcast('modelDeleted', 'some type', 2)
+
+          it 'removes matching models', ->
+            expect(memberIds()).toEqual [1, 3]
+
+  describe 'SoilGlobalCollection', ->
+    SoilModelWithType = SoilModel = instance = rootScope = null
+
+    beforeEach inject (SoilGlobalCollection, $httpBackend, _SoilModel_, $rootScope) ->
+      rootScope = $rootScope
+
+      SoilModel = _SoilModel_
+      class SoilModelWithType extends SoilModel
+        _modelType: 'some type'
+
+      instance = new SoilGlobalCollection(SoilModelWithType, '/source_url')
+
+    it 'is an instance of a SoilCollection', inject (SoilCollection) ->
+      expect(instance instanceof SoilCollection).toBeTruthy()
+
+    it 'sets members to an empty array', ->
+      expect(instance.$members).toEqual []
+
+    it 'sets the modelClass', ->
+      expect(instance.modelClass).toBe(SoilModelWithType)
+
+    it 'sets the scope to rootScope', ->
+      expect(instance.scope).toBe(rootScope)
+
+    # Event listeners
+    describe 'on model creation', ->
+      beforeEach ->
+        instance.$load [{ id: 1 }, { id: 2 }, { id: 3 }]
+        spyOn(instance, '$add')
+
+      describe 'with a different model type', ->
+        beforeEach ->
+          rootScope.$broadcast('modelSaved', new SoilModel(null, { id: 4 }), { id: 4, data: 'val' })
+
+        it 'does not add any models', ->
+          expect(instance.$add).not.toHaveBeenCalled()
+
+      describe 'with the same model type, but an id already present', ->
+        beforeEach ->
+          rootScope.$broadcast('modelSaved', new SoilModelWithType(null, { id: 2 }), { id: 2, data: 'val' })
+
+        it 'does not add any models', ->
+          expect(instance.$add).not.toHaveBeenCalled()
+
+      describe 'with the same model type and an id that is not present', ->
+        beforeEach ->
+          rootScope.$broadcast('modelSaved', new SoilModelWithType(null, { id: 4 }), { id: 4, data: 'val' })
+
+        it 'adds the model', ->
+          expect(instance.$add).toHaveBeenCalledWith({ id: 4, data: 'val' })

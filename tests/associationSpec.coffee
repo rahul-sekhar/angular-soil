@@ -4,19 +4,20 @@ describe 'soil.association module', ->
   beforeEach module 'soil.collection.mock'
 
   describe 'HasOneAssociation', ->
-    instance = SoilModel = null
-    beforeEach inject (HasOneAssociation, _SoilModel_) ->
+    instance = SoilModel = parent = scope = null
+    beforeEach inject (HasOneAssociation, _SoilModel_, $rootScope) ->
       SoilModel = _SoilModel_
       instance = new HasOneAssociation('association', SoilModel)
+      scope = $rootScope.$new()
+      parent = new SoilModel(scope)
 
     # Modify data before loading it
     describe '#beforeLoad', ->
       data = null
-
       describe 'when the field is not present in the passed data', ->
         beforeEach ->
           data = { other_field: 'other val' }
-          instance.beforeLoad(data)
+          instance.beforeLoad(data, parent)
 
         it 'does nothing to the data', ->
           expect(data).toEqual { other_field: 'other val' }
@@ -24,7 +25,7 @@ describe 'soil.association module', ->
       describe 'when association data is passed', ->
         beforeEach ->
           data = { association: { field: 'val' }, other_field: 'other val' }
-          instance.beforeLoad(data)
+          instance.beforeLoad(data, parent)
 
         it 'creates a model instance', ->
           expect(data.association).toEqual(jasmine.any(SoilModel))
@@ -32,13 +33,16 @@ describe 'soil.association module', ->
         it 'loads data into that instance', ->
           expect(data.association.$load).toHaveBeenCalledWith({ field: 'val' })
 
+        it 'sets the instance scope', ->
+          expect(data.association.scope).toBe(scope)
+
         it 'leaves the other field intact', ->
           expect(data.other_field).toEqual('other val')
 
       describe 'when an id is passed', ->
         beforeEach ->
           data = { association_id: 5, other_field: 'other val' }
-          instance.beforeLoad(data)
+          instance.beforeLoad(data, parent)
 
         it 'creates a model instance', ->
           expect(data.association).toEqual(jasmine.any(SoilModel))
@@ -60,7 +64,7 @@ describe 'soil.association module', ->
       describe 'when the field is not present in the passed data', ->
         beforeEach ->
           data = { other_field: 'other val' }
-          instance.beforeSave(data)
+          instance.beforeSave(data, parent)
 
         it 'does nothing to the data', ->
           expect(data).toEqual { other_field: 'other val' }
@@ -68,7 +72,7 @@ describe 'soil.association module', ->
       describe 'when the field is present', ->
         beforeEach ->
           data = { association: { id: 7 }, other_field: 'other val' }
-          instance.beforeSave(data)
+          instance.beforeSave(data, parent)
 
         it 'replaces the association with its id', ->
           expect(data.association_id).toEqual(7)
@@ -81,7 +85,7 @@ describe 'soil.association module', ->
         beforeEach inject (HasOneAssociation) ->
           data = { association: { $dataToSave: -> 'model data' }, other_field: 'other val' }
           instance = new HasOneAssociation('association', SoilModel, { saveData: true })
-          instance.beforeSave(data)
+          instance.beforeSave(data, parent)
 
         it 'replaces the association with its data', ->
           expect(data.association).toEqual('model data')
@@ -91,11 +95,14 @@ describe 'soil.association module', ->
 
 
   describe 'hasManyAssocation', ->
-    instance = SoilModel = parent = null
-    beforeEach inject (HasManyAssociation, _SoilModel_) ->
+    instance = SoilModel = parent = scope = null
+    beforeEach inject (HasManyAssociation, _SoilModel_, $rootScope) ->
       SoilModel = _SoilModel_
       instance = new HasManyAssociation('associations', 'association_ids', SoilModel)
-      parent = { $url: (id) -> '/association_url/' + id }
+
+      scope = $rootScope.$new()
+      parent = new SoilModel(scope)
+      parent.$setBaseUrl('/association_url')
 
     # Modify data before loading it
     describe '#beforeLoad', ->
@@ -125,6 +132,9 @@ describe 'soil.association module', ->
 
         it 'sets the url for the collection', ->
           expect(data.associations.sourceUrl).toEqual('/association_url/6/associations')
+
+        it 'sets the collection scope', ->
+          expect(data.associations.scope).toBe(scope)
 
         it 'loads data into that instance', ->
           expect(data.associations.$load).toHaveBeenCalledWith('association data')
@@ -161,7 +171,7 @@ describe 'soil.association module', ->
       describe 'when the field is not present in the passed data', ->
         beforeEach ->
           data = { other_field: 'other val' }
-          instance.beforeSave(data)
+          instance.beforeSave(data, parent)
 
         it 'does nothing to the data', ->
           expect(data).toEqual { other_field: 'other val' }
@@ -169,7 +179,7 @@ describe 'soil.association module', ->
       describe 'when the field is present', ->
         beforeEach ->
           data = { associations: { members: [{ id: 7 }, { id: 10 }, { id: 12 }] }, other_field: 'other val' }
-          instance.beforeSave(data)
+          instance.beforeSave(data, parent)
 
         it 'replaces the association with its ids', ->
           expect(data.association_ids).toEqual([7, 10, 12])
@@ -187,7 +197,7 @@ describe 'soil.association module', ->
           ] }, other_field: 'other val' }
 
           instance = new HasManyAssociation('associations', 'association_ids', SoilModel, { saveData: true })
-          instance.beforeSave(data)
+          instance.beforeSave(data, parent)
 
         it 'replaces the association with its data', ->
           expect(data.associations).toEqual(['model 1 data', 'model 2 data', 'model 3 data'])

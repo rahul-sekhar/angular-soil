@@ -8,11 +8,11 @@ angular.module('soil.association', ['soil.collection'])
         })
         @_idField = @_field + '_id'
 
-      beforeLoad: (data) ->
+      beforeLoad: (data, parent) ->
         if (data[@_field])
-          data[@_field] = new @_modelClass(data[@_field])
+          data[@_field] = new @_modelClass(parent.scope, data[@_field])
         else if (data[@_idField])
-          data[@_field] = new @_modelClass(data[@_idField])
+          data[@_field] = new @_modelClass(parent.scope, data[@_idField])
           delete data[@_idField]
 
       beforeSave: (data) ->
@@ -35,10 +35,10 @@ angular.module('soil.association', ['soil.collection'])
       beforeLoad: (data, parent) ->
         if (data[@_field])
           associationUrl = parent.$url(data.id || parent.id)  + '/' + @_field
-          collection = new SoilCollection(@_modelClassFor(associationUrl), associationUrl)
+          collection = new SoilCollection(parent.scope, @_modelClassFor(associationUrl), associationUrl)
           data[@_field] = collection.$load(data[@_field])
 
-      beforeSave: (data) ->
+      beforeSave: (data, parent) ->
         if (data[@_field])
           if @_options.saveData
             data[@_field] = _.map data[@_field].members, (member) -> member.$dataToSave()

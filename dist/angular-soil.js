@@ -1,4 +1,4 @@
-/* angular-soil 0.9.5 %> */
+/* angular-soil 1.0.0 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -20,11 +20,11 @@
           this._idField = this._field + '_id';
         }
 
-        HasOneAssociation.prototype.beforeLoad = function(data) {
+        HasOneAssociation.prototype.beforeLoad = function(data, parent) {
           if (data[this._field]) {
-            return data[this._field] = new this._modelClass(data[this._field]);
+            return data[this._field] = new this._modelClass(parent.scope, data[this._field]);
           } else if (data[this._idField]) {
-            data[this._field] = new this._modelClass(data[this._idField]);
+            data[this._field] = new this._modelClass(parent.scope, data[this._idField]);
             return delete data[this._idField];
           }
         };
@@ -65,12 +65,12 @@
           var associationUrl, collection;
           if (data[this._field]) {
             associationUrl = parent.$url(data.id || parent.id) + '/' + this._field;
-            collection = new SoilCollection(this._modelClassFor(associationUrl), associationUrl);
+            collection = new SoilCollection(parent.scope, this._modelClassFor(associationUrl), associationUrl);
             return data[this._field] = collection.$load(data[this._field]);
           }
         };
 
-        HasManyAssociation.prototype.beforeSave = function(data) {
+        HasManyAssociation.prototype.beforeSave = function(data, parent) {
           if (data[this._field]) {
             if (this._options.saveData) {
               return data[this._field] = _.map(data[this._field].members, function(member) {
@@ -115,21 +115,28 @@
 }).call(this);
 
 (function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
   angular.module('soil.collection', []).factory('SoilCollection', [
     '$http', function($http) {
       var SoilCollection;
       return SoilCollection = (function() {
-        function SoilCollection(modelClass, sourceUrl) {
+        function SoilCollection(scope, modelClass, sourceUrl) {
+          this.scope = scope;
           this.modelClass = modelClass;
           this.sourceUrl = sourceUrl;
           this.$members = [];
+          if (this.scope) {
+            this._setupListeners();
+          }
         }
 
         SoilCollection.prototype.$load = function(data) {
           var _this = this;
           data || (data = []);
           this.$members = _.map(data, function(modelData) {
-            return new _this.modelClass(modelData);
+            return new _this.modelClass(_this.scope, modelData);
           });
           return this;
         };
@@ -143,7 +150,7 @@
 
         SoilCollection.prototype.$add = function(data) {
           var newItem;
-          newItem = new this.modelClass(data);
+          newItem = new this.modelClass(this.scope, data);
           newItem.$setPostUrl(this.sourceUrl);
           this.$members.push(newItem);
           return newItem;
@@ -151,7 +158,7 @@
 
         SoilCollection.prototype.$addToFront = function(data) {
           var newItem;
-          newItem = new this.modelClass(data);
+          newItem = new this.modelClass(this.scope, data);
           newItem.$setPostUrl(this.sourceUrl);
           this.$members.unshift(newItem);
           return newItem;
@@ -169,9 +176,46 @@
           });
         };
 
+        SoilCollection.prototype._setupListeners = function() {
+          var _this = this;
+          return this.scope.$on('modelDeleted', function(e, type, id) {
+            if (type === _this.modelClass.prototype._modelType) {
+              return _this.$removeById(id);
+            }
+          });
+        };
+
         return SoilCollection;
 
       })();
+    }
+  ]).factory('SoilGlobalCollection', [
+    'SoilCollection', '$rootScope', function(SoilCollection, $rootScope) {
+      var GlobalSoilCollection;
+      return GlobalSoilCollection = (function(_super) {
+        __extends(GlobalSoilCollection, _super);
+
+        function GlobalSoilCollection(modelClass, sourceUrl) {
+          GlobalSoilCollection.__super__.constructor.call(this, $rootScope, modelClass, sourceUrl);
+          this._setupCreateListener();
+        }
+
+        GlobalSoilCollection.prototype._setupCreateListener = function() {
+          var _this = this;
+          return this.scope.$on('modelSaved', function(e, model, data) {
+            if (model._modelType === _this.modelClass.prototype._modelType) {
+              if (!_.any(_this.$members, function(member) {
+                return member.id === model.id;
+              })) {
+                return _this.$add(data);
+              }
+            }
+          });
+        };
+
+        return GlobalSoilCollection;
+
+      })(SoilCollection);
     }
   ]);
 
@@ -179,7 +223,7 @@
 
 (function() {
   angular.module('soil.model', []).factory('SoilModel', [
-    '$http', function($http) {
+    '$http', '$rootScope', function($http, $rootScope) {
       var SoilModel;
       return SoilModel = (function() {
         SoilModel.prototype._baseUrl = '/';
@@ -190,12 +234,18 @@
 
         SoilModel.prototype._associations = [];
 
-        function SoilModel(arg) {
+        SoilModel.prototype._modelType = 'model';
+
+        function SoilModel(scope, arg) {
           this.$saved = {};
           if (angular.isObject(arg)) {
             this.$load(arg);
           } else if (arg) {
             this.$get(arg);
+          }
+          this.scope = scope;
+          if (this.scope) {
+            this._setupListeners();
           }
         }
 
@@ -233,22 +283,20 @@
         };
 
         SoilModel.prototype.$save = function() {
-          var _this = this;
-          if (this.id) {
-            return $http.put(this.$url(), this.$dataToSave()).success(function(responseData) {
-              return _this.$load(responseData);
-            });
-          } else {
-            return $http.post(this.$url(), this.$dataToSave()).success(function(responseData) {
-              return _this.$load(responseData);
-            });
-          }
+          var sendRequest,
+            _this = this;
+          sendRequest = this.id ? $http.put : $http.post;
+          return sendRequest(this.$url(), this.$dataToSave()).success(function(responseData) {
+            _this.$load(responseData);
+            return $rootScope.$broadcast('modelSaved', _this, responseData);
+          });
         };
 
         SoilModel.prototype.$delete = function() {
           var _this = this;
           this._checkIfLoaded();
           return $http["delete"](this.$url()).success(function() {
+            $rootScope.$broadcast('modelDeleted', _this._modelType, _this.id);
             return _this.$load(null);
           });
         };
@@ -270,11 +318,8 @@
           data[field] = this[field];
           data = this._modifyDataBeforeSave(data);
           return $http.put(this.$url(), data).success(function(responseData) {
-            var fieldData;
-            _this.$saved = _.cloneDeep(responseData);
-            fieldData = _.pick(responseData, field);
-            fieldData = _this._modifyDataBeforeLoad(fieldData);
-            return _this[field] = fieldData[field];
+            _this._loadField(field, responseData);
+            return $rootScope.$broadcast('modelFieldUpdated', _this, field, responseData);
           }).error(function() {
             return _this.$revertField(field);
           });
@@ -298,6 +343,14 @@
             return data[field] = _this[field] === void 0 ? null : _this[field];
           });
           return this._modifyDataBeforeSave(data);
+        };
+
+        SoilModel.prototype._loadField = function(field, data) {
+          var fieldData;
+          this.$saved = _.cloneDeep(data);
+          fieldData = _.pick(data, field);
+          fieldData = this._modifyDataBeforeLoad(fieldData);
+          return this[field] = fieldData[field];
         };
 
         SoilModel.prototype._checkIfLoaded = function() {
@@ -342,6 +395,20 @@
 
         SoilModel.prototype._setSavedData = function(data) {
           return this.$saved = data ? _.cloneDeep(data) : {};
+        };
+
+        SoilModel.prototype._setupListeners = function() {
+          var _this = this;
+          this.scope.$on('modelSaved', function(e, model, data) {
+            if (_this.id && model._modelType === _this._modelType && model.id === _this.id) {
+              return _this.$load(data);
+            }
+          });
+          return this.scope.$on('modelFieldUpdated', function(e, model, field, data) {
+            if (_this.id && model._modelType === _this._modelType && model.id === _this.id) {
+              return _this._loadField(field, data);
+            }
+          });
         };
 
         return SoilModel;
