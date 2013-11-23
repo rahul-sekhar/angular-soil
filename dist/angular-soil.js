@@ -346,7 +346,7 @@
           }
           data = {};
           _.each(fields, function(field) {
-            return data[field] = _this[field] === void 0 ? null : _this[field];
+            data[field] = _this[field] === void 0 ? null : _this[field];
           });
           return this._modifyDataBeforeSave(data);
         };
@@ -368,7 +368,7 @@
         SoilModel.prototype._clearFields = function() {
           return _.forOwn(this, function(value, key, obj) {
             if (!(_.first(key) === '_' || angular.isFunction(value))) {
-              return delete obj[key];
+              delete obj[key];
             }
           });
         };
@@ -384,7 +384,7 @@
             _this = this;
           data = _.clone(loadData);
           _.each(this._associations, function(association) {
-            return association.beforeLoad(data, _this);
+            association.beforeLoad(data, _this);
           });
           return data;
         };
@@ -394,7 +394,7 @@
             _this = this;
           data = _.clone(saveData);
           _.each(this._associations, function(association) {
-            return association.beforeSave(data, _this);
+            association.beforeSave(data, _this);
           });
           return data;
         };

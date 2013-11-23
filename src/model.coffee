@@ -88,6 +88,7 @@ angular.module('soil.model', [])
         data = {}
         _.each fields, (field) =>
           data[field] = if @[field] == undefined then null else @[field]
+          return
 
         return @_modifyDataBeforeSave(data)
 
@@ -104,6 +105,7 @@ angular.module('soil.model', [])
         # Do not remove private fields (fields beginning with an underscore), or functions
         _.forOwn this, (value, key, obj) ->
           delete obj[key] unless _.first(key) == '_' or angular.isFunction(value)
+          return
 
       _withSlash: (url) ->
         url.replace /\/?$/, '/'
@@ -112,12 +114,16 @@ angular.module('soil.model', [])
 
       _modifyDataBeforeLoad: (loadData) ->
         data = _.clone(loadData)
-        _.each @_associations, (association) => association.beforeLoad(data, this)
+        _.each @_associations, (association) =>
+          association.beforeLoad(data, this)
+          return
         return data
 
       _modifyDataBeforeSave: (saveData) ->
         data = _.clone(saveData)
-        _.each @_associations, (association) => association.beforeSave(data, this)
+        _.each @_associations, (association) =>
+          association.beforeSave(data, this)
+          return
         return data
 
       _setSavedData: (data) ->
