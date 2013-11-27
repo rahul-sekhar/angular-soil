@@ -115,13 +115,39 @@ describe 'soil.association module', ->
     # Modify data before loading it
     describe '#beforeLoad', ->
       data = null
+
+      itAddsACollection = ->
+        it 'creates a collection', inject (SoilCollection) ->
+          expect(data.associations).toEqual(jasmine.any(SoilCollection))
+
+        it 'sets the model for the collection', ->
+          expect(data.associations.modelClass).toEqual(SoilModel)
+
+        it 'sets the collection scope', ->
+          expect(data.associations._scope).toBe(scope)
+
       describe 'when the field is not present in the passed data', ->
         beforeEach ->
           data = { other_field: 'other val' }
           instance.beforeLoad(data, parent)
 
-        it 'does nothing to the data', ->
-          expect(data).toEqual { other_field: 'other val' }
+        itAddsACollection()
+
+        it 'does not load data', ->
+          expect(data.associations.$load).not.toHaveBeenCalled()
+
+        it 'leaves the other data intact', ->
+          expect(data.other_field).toEqual('other val')
+
+      describe 'when an empty object is passed', ->
+        beforeEach ->
+          data = { }
+          instance.beforeLoad(data, parent)
+
+        itAddsACollection()
+
+        it 'does not load data', ->
+          expect(data.associations.$load).not.toHaveBeenCalled()
 
       describe 'when null is passed', ->
         beforeEach ->
@@ -136,11 +162,7 @@ describe 'soil.association module', ->
           data = { associations: 'association data', other_field: 'other val', id: 6 }
           instance.beforeLoad(data, parent)
 
-        it 'creates a collection', inject (SoilCollection) ->
-          expect(data.associations).toEqual(jasmine.any(SoilCollection))
-
-        it 'sets the model for the collection', ->
-          expect(data.associations.modelClass).toEqual(SoilModel)
+        itAddsACollection()
 
         it 'does not change the model base url', ->
           instance = new data.associations.modelClass()
@@ -148,9 +170,6 @@ describe 'soil.association module', ->
 
         it 'sets the url for the collection', ->
           expect(data.associations.sourceUrl).toEqual('/association_url/6/associations')
-
-        it 'sets the collection scope', ->
-          expect(data.associations._scope).toBe(scope)
 
         it 'loads data into that instance', ->
           expect(data.associations.$load).toHaveBeenCalledWith('association data')

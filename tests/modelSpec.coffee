@@ -21,8 +21,8 @@ describe 'soil.model module', ->
       describe 'when passed nothing', ->
         beforeEach -> instance = new mockSoilModel(null)
 
-        it 'does not load or get data', ->
-          expect(instance.$load).not.toHaveBeenCalled()
+        it 'loads a blank object', ->
+          expect(instance.$load).toHaveBeenCalledWith({})
           expect(instance.$get).not.toHaveBeenCalled()
 
       describe 'when passed an integer', ->

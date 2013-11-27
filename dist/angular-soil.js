@@ -1,4 +1,4 @@
-/* angular-soil 1.0.2 %> */
+/* angular-soil 1.0.3 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -73,6 +73,8 @@
             associationUrl = parent.$url(data.id || parent.id) + '/' + this._field;
             collection = new SoilCollection(parent._scope, this._modelClassFor(associationUrl), associationUrl);
             return data[this._field] = collection.$load(data[this._field]);
+          } else {
+            return data[this._field] = new SoilCollection(parent._scope, this._modelClass);
           }
         };
 
@@ -249,6 +251,8 @@
             this.$load(arg);
           } else if (arg) {
             this.$get(arg);
+          } else {
+            this.$load({});
           }
           if (this._scope) {
             this._setupListeners();

@@ -11,9 +11,11 @@ angular.module('soil.model', [])
       constructor: (@_scope, arg) ->
         @$saved = {}
         if angular.isObject(arg)
-          @$load(arg)
+          @$load arg
         else if arg
-          @$get(arg)
+          @$get arg
+        else
+          @$load {}
 
         if @_scope
           @_setupListeners()
