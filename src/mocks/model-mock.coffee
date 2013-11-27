@@ -6,17 +6,17 @@ angular.module('soil.model.mock', ['soil.model', 'angular-mock-promise'])
           spyOn(this, '$load').andCallThrough()
           spyOn(this, '$revert').andCallThrough()
 
-          @getPromise = createMockPromise()
-          spyOn(this, '$get').andReturn(@getPromise)
+          @_getPromise = createMockPromise()
+          spyOn(this, '$get').andReturn(@_getPromise)
 
-          @savePromise = createMockPromise()
-          spyOn(this, '$save').andReturn(@savePromise)
+          @_savePromise = createMockPromise()
+          spyOn(this, '$save').andReturn(@_savePromise)
 
-          @deletePromise = createMockPromise()
-          spyOn(this, '$delete').andReturn(@deletePromise)
+          @_deletePromise = createMockPromise()
+          spyOn(this, '$delete').andReturn(@_deletePromise)
 
-          @updatePromise = createMockPromise()
-          spyOn(this, '$updateField').andReturn(@updatePromise)
+          @_updatePromise = createMockPromise()
+          spyOn(this, '$updateField').andReturn(@_updatePromise)
           super
 
     ])

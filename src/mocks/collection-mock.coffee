@@ -5,8 +5,8 @@ angular.module('soil.collection.mock', ['soil.collection', 'angular-mock-promise
         constructor: ->
           spyOn(this, '$load').andCallThrough()
 
-          @getPromise = createMockPromise()
-          spyOn(this, '$get').andReturn(@getPromise)
+          @_getPromise = createMockPromise()
+          spyOn(this, '$get').andReturn(@_getPromise)
 
           super
     ])

@@ -1,4 +1,4 @@
-/* angular-soil 1.0.1 %> */
+/* angular-soil 1.0.2 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -14,8 +14,8 @@
 
             function SoilCollectionMock() {
               spyOn(this, '$load').andCallThrough();
-              this.getPromise = createMockPromise();
-              spyOn(this, '$get').andReturn(this.getPromise);
+              this._getPromise = createMockPromise();
+              spyOn(this, '$get').andReturn(this._getPromise);
               SoilCollectionMock.__super__.constructor.apply(this, arguments);
             }
 
@@ -44,14 +44,14 @@
             function SoilModelMock(arg) {
               spyOn(this, '$load').andCallThrough();
               spyOn(this, '$revert').andCallThrough();
-              this.getPromise = createMockPromise();
-              spyOn(this, '$get').andReturn(this.getPromise);
-              this.savePromise = createMockPromise();
-              spyOn(this, '$save').andReturn(this.savePromise);
-              this.deletePromise = createMockPromise();
-              spyOn(this, '$delete').andReturn(this.deletePromise);
-              this.updatePromise = createMockPromise();
-              spyOn(this, '$updateField').andReturn(this.updatePromise);
+              this._getPromise = createMockPromise();
+              spyOn(this, '$get').andReturn(this._getPromise);
+              this._savePromise = createMockPromise();
+              spyOn(this, '$save').andReturn(this._savePromise);
+              this._deletePromise = createMockPromise();
+              spyOn(this, '$delete').andReturn(this._deletePromise);
+              this._updatePromise = createMockPromise();
+              spyOn(this, '$updateField').andReturn(this._updatePromise);
               SoilModelMock.__super__.constructor.apply(this, arguments);
             }
 
