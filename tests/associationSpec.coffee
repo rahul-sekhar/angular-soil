@@ -89,18 +89,40 @@ describe 'soil.association module', ->
         it 'leaves the other field intact', ->
           expect(data.other_field).toEqual('other val')
 
-      describe 'when the field is present, with the saveData option set', ->
-        beforeEach inject (HasOneAssociation) ->
-          data = { association: { $dataToSave: -> 'model data' }, other_field: 'other val' }
-          instance = new HasOneAssociation('association', SoilModel, { saveData: true })
+      describe 'when the field is present and null', ->
+        beforeEach ->
+          data = { association: null, other_field: 'other val' }
           instance.beforeSave(data, parent)
 
-        it 'replaces the association with its data', ->
-          expect(data.association).toEqual('model data')
+        it 'sets the association id to null', ->
+          expect(data.association_id).toBeNull()
+          expect(data.association).toBeUndefined()
 
         it 'leaves the other field intact', ->
           expect(data.other_field).toEqual('other val')
 
+      describe 'with the saveData option set', ->
+        beforeEach inject (HasOneAssociation) ->
+          instance = new HasOneAssociation('association', SoilModel, { saveData: true })
+
+        describe 'when the field is present', ->
+          beforeEach ->
+            data = { association: { $dataToSave: -> 'model data' }, other_field: 'other val' }
+            instance.beforeSave(data, parent)
+
+          it 'replaces the association with its data', ->
+            expect(data.association).toEqual('model data')
+
+          it 'leaves the other field intact', ->
+            expect(data.other_field).toEqual('other val')
+
+        describe 'when the field is present and null', ->
+          beforeEach ->
+            data = { association: null, other_field: 'other val' }
+            instance.beforeSave(data, parent)
+
+          it 'leaves the data as it is', ->
+            expect(data).toEqual { association: null, other_field: 'other val' }
 
   describe 'hasManyAssocation', ->
     instance = SoilModel = parent = scope = null

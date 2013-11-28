@@ -24,6 +24,12 @@ angular.module('soil.association', ['soil.collection'])
           else
             data[@_idField] = data[@_field].id
             delete data[@_field]
+
+        else if data[@_field] != undefined
+          unless @_options.saveData
+            data[@_idField] = null
+            delete data[@_field]
+
   ])
 
   .factory('HasManyAssociation', ['SoilCollection', (SoilCollection) ->
