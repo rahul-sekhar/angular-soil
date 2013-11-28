@@ -20,7 +20,9 @@ angular.module('soil.association', ['soil.collection'])
       beforeSave: (data) ->
         if (data[@_field])
           if @_options.saveData
+            id = data[@_field].id
             data[@_field] = data[@_field].$dataToSave()
+            data[@_field].id = id
           else
             data[@_idField] = data[@_field].id
             delete data[@_field]
@@ -53,7 +55,8 @@ angular.module('soil.association', ['soil.collection'])
       beforeSave: (data, parent) ->
         if (data[@_field])
           if @_options.saveData
-            data[@_field] = _.map data[@_field].$members, (member) -> member.$dataToSave()
+            data[@_field] = _.map data[@_field].$members, (member) ->
+              _.merge { id: member.id }, member.$dataToSave()
           else
             data[@_idField] = _.map data[@_field].$members, (member) -> member.id
             delete data[@_field]

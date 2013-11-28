@@ -1,4 +1,4 @@
-/* angular-soil 1.0.4 %> */
+/* angular-soil 1.0.5 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -33,9 +33,12 @@
         };
 
         HasOneAssociation.prototype.beforeSave = function(data) {
+          var id;
           if (data[this._field]) {
             if (this._options.saveData) {
-              return data[this._field] = data[this._field].$dataToSave();
+              id = data[this._field].id;
+              data[this._field] = data[this._field].$dataToSave();
+              return data[this._field].id = id;
             } else {
               data[this._idField] = data[this._field].id;
               return delete data[this._field];
@@ -87,7 +90,9 @@
           if (data[this._field]) {
             if (this._options.saveData) {
               return data[this._field] = _.map(data[this._field].$members, function(member) {
-                return member.$dataToSave();
+                return _.merge({
+                  id: member.id
+                }, member.$dataToSave());
               });
             } else {
               data[this._idField] = _.map(data[this._field].$members, function(member) {

@@ -107,11 +107,22 @@ describe 'soil.association module', ->
 
         describe 'when the field is present', ->
           beforeEach ->
-            data = { association: { $dataToSave: -> 'model data' }, other_field: 'other val' }
+            data = { association: { $dataToSave: -> { modelData: 'val' } }, other_field: 'other val' }
             instance.beforeSave(data, parent)
 
           it 'replaces the association with its data', ->
-            expect(data.association).toEqual('model data')
+            expect(data.association).toEqual { modelData: 'val' }
+
+          it 'leaves the other field intact', ->
+            expect(data.other_field).toEqual('other val')
+
+        describe 'when the field is present, and the model has an id', ->
+          beforeEach ->
+            data = { association: { id: 5, $dataToSave: -> { modelData: 'val' } }, other_field: 'other val' }
+            instance.beforeSave(data, parent)
+
+          it 'replaces the association with its data, adding the id', ->
+            expect(data.association).toEqual { id: 5, modelData: 'val' }
 
           it 'leaves the other field intact', ->
             expect(data.other_field).toEqual('other val')
@@ -248,16 +259,20 @@ describe 'soil.association module', ->
       describe 'when the field is present, with the saveData option set', ->
         beforeEach inject (HasManyAssociation) ->
           data = { associations: { $members: [
-            { $dataToSave: -> 'model 1 data' },
-            { $dataToSave: -> 'model 2 data' },
-            { $dataToSave: -> 'model 3 data' }
+            { $dataToSave: -> { data1: 'val1' } },
+            { id: 5, $dataToSave: -> { data2: 'val2' } },
+            { id: 6, $dataToSave: -> { data3: 'val3' } }
           ] }, other_field: 'other val' }
 
           instance = new HasManyAssociation('associations', 'association_ids', SoilModel, { saveData: true })
           instance.beforeSave(data, parent)
 
-        it 'replaces the association with its data', ->
-          expect(data.associations).toEqual(['model 1 data', 'model 2 data', 'model 3 data'])
+        it 'replaces the association with its data, adding ids where present', ->
+          expect(data.associations).toEqual([
+            { data1: 'val1' },
+            { id: 5, data2: 'val2' },
+            { id: 6, data3: 'val3' }
+          ])
 
         it 'leaves the other field intact', ->
           expect(data.other_field).toEqual('other val')
