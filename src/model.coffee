@@ -9,6 +9,7 @@ angular.module('soil.model', [])
       _modelType: 'model'
 
       constructor: (@_scope, arg) ->
+        @_dataLoadedCallback = ->
         @$saved = {}
         if angular.isObject(arg)
           @$load arg
@@ -19,6 +20,8 @@ angular.module('soil.model', [])
 
         if @_scope
           @_setupListeners()
+
+      $onDataLoaded: (@_dataLoadedCallback) ->
 
       $setBaseUrl: (newUrl) ->
         @_baseUrl = newUrl
@@ -36,6 +39,7 @@ angular.module('soil.model', [])
         @_clearFields()
         @_setSavedData(data)
         _.assign this, @_modifyDataBeforeLoad(data)
+        @_dataLoadedCallback()
         return this
 
       $get: (id) ->
@@ -99,6 +103,7 @@ angular.module('soil.model', [])
         fieldData = _.pick(data, field)
         fieldData = @_modifyDataBeforeLoad(fieldData)
         @[field] = fieldData[field]
+        @_dataLoadedCallback()
 
       _checkIfLoaded: ->
         throw 'Operation not permitted on an unloaded model' unless @id

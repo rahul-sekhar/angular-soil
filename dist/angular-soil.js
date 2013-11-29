@@ -1,4 +1,4 @@
-/* angular-soil 1.0.5 %> */
+/* angular-soil 1.0.6 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -256,6 +256,7 @@
 
         function SoilModel(_scope, arg) {
           this._scope = _scope;
+          this._dataLoadedCallback = function() {};
           this.$saved = {};
           if (angular.isObject(arg)) {
             this.$load(arg);
@@ -268,6 +269,10 @@
             this._setupListeners();
           }
         }
+
+        SoilModel.prototype.$onDataLoaded = function(_dataLoadedCallback) {
+          this._dataLoadedCallback = _dataLoadedCallback;
+        };
 
         SoilModel.prototype.$setBaseUrl = function(newUrl) {
           return this._baseUrl = newUrl;
@@ -292,6 +297,7 @@
           this._clearFields();
           this._setSavedData(data);
           _.assign(this, this._modifyDataBeforeLoad(data));
+          this._dataLoadedCallback();
           return this;
         };
 
@@ -370,7 +376,8 @@
           this.$saved = _.cloneDeep(data);
           fieldData = _.pick(data, field);
           fieldData = this._modifyDataBeforeLoad(fieldData);
-          return this[field] = fieldData[field];
+          this[field] = fieldData[field];
+          return this._dataLoadedCallback();
         };
 
         SoilModel.prototype._checkIfLoaded = function() {

@@ -5,6 +5,7 @@ describe 'soil.model module', ->
   describe 'SoilModel', ->
     SoilModel = httpBackend = instance = rootScope = null
     beforeEach inject (_SoilModel_, $httpBackend, $rootScope) ->
+      dataLoadedCallback = jasmine.createSpy('data loaded')
       rootScope = $rootScope
       httpBackend = $httpBackend
       SoilModel = _SoilModel_
@@ -95,13 +96,15 @@ describe 'soil.model module', ->
 
     # Load data into the model
     describe '#$load', ->
-      result = null
+      result = dataLoadedCallback = null
       describe 'with data', ->
         beforeEach ->
           instance.url = -> '/some_path'
           instance._associations = [{ beforeLoad: (data, parent) -> data.field5 += ' changed by association. url: ' + parent.url() }]
           instance._private = 'private val'
           instance.someFunction = -> 'Some return value'
+          dataLoadedCallback = jasmine.createSpy('data loaded')
+          instance.$onDataLoaded dataLoadedCallback
           result = instance.$load { field: 'new val', field5: 'another val' }
 
         it 'contains the passed data, modified by associations', ->
@@ -123,6 +126,9 @@ describe 'soil.model module', ->
         it 'returns the instance', ->
           expect(result).toBe(instance)
 
+        it 'calls the data loaded callback', ->
+          expect(dataLoadedCallback).toHaveBeenCalled()
+
       describe 'with null passed', ->
         beforeEach ->
           instance._private = 'private val'
@@ -138,6 +144,9 @@ describe 'soil.model module', ->
 
         it 'returns the instance', ->
           expect(result).toBe(instance)
+
+        it 'calls the data loaded callback', ->
+          expect(dataLoadedCallback).toHaveBeenCalled()
 
     # Get, by passing an ID
     describe '#$get', ->
@@ -377,11 +386,14 @@ describe 'soil.model module', ->
 
     # Load a single field from data
     describe '#_loadField', ->
+      dataLoadedCallback = null
       beforeEach ->
         instance.$load { id: 5, field: 'val', field2: 'other val' }
         instance._associations = [{
           beforeLoad: (data) -> data.field += ' association load'
         }]
+        dataLoadedCallback = jasmine.createSpy('data loaded')
+        instance.$onDataLoaded dataLoadedCallback
         instance._loadField('field', { field: 'formatted updated val', other_field: 'other val' })
 
       it 'sets the field to the response, modified by the association', ->
@@ -392,6 +404,9 @@ describe 'soil.model module', ->
 
       it 'replaces saved data with the response, unmodified by the association', ->
         expect(instance.$saved).toEqual { field: 'formatted updated val', other_field: 'other val' }
+
+      it 'calls the data loaded callback', ->
+        expect(dataLoadedCallback).toHaveBeenCalled()
 
     # Update a single field
     describe '#$updateField', ->
