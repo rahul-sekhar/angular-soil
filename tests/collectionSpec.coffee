@@ -132,6 +132,28 @@ describe 'soil.collection module', ->
       it 'returns the new item', ->
         expect(result).toBe(_.first(instance.$members))
 
+    # Add an item at an index
+    describe '#$addAt', ->
+      result = null
+      beforeEach ->
+        instance.$members = ['member1', 'member2', 'member3']
+        result = instance.$addAt(1, { data: 'val' })
+
+      it 'adds the new item at the index', ->
+        expect(instance.$members).toEqual(['member1', jasmine.any(SoilModel), 'member2', 'member3'])
+
+      it 'loads data into the new member', ->
+        expect(instance.$members[1].$load).toHaveBeenCalledWith({ data: 'val' })
+
+      it 'sets the scope of the member', ->
+        expect(instance.$members[1]._scope).toBe(scope)
+
+      it 'sets the members postUrl to its source', ->
+        expect(instance.$members[1]._postUrl).toEqual('/source_url')
+
+      it 'returns the new item', ->
+        expect(result).toBe(instance.$members[1])
+
     # Remove an item from the collection by ID
     describe '#$removeById', ->
       beforeEach ->

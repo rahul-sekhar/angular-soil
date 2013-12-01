@@ -1,4 +1,4 @@
-/* angular-soil 1.0.6 %> */
+/* angular-soil 1.0.7 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -179,6 +179,14 @@
           newItem = new this.modelClass(this._scope, data);
           newItem.$setPostUrl(this.sourceUrl);
           this.$members.unshift(newItem);
+          return newItem;
+        };
+
+        SoilCollection.prototype.$addAt = function(index, data) {
+          var newItem;
+          newItem = new this.modelClass(this._scope, data);
+          newItem.$setPostUrl(this.sourceUrl);
+          this.$members.splice(index, 0, newItem);
           return newItem;
         };
 

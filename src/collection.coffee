@@ -30,6 +30,12 @@ angular.module('soil.collection', [])
         @$members.unshift(newItem)
         return newItem
 
+      $addAt: (index, data) ->
+        newItem = new @modelClass(@_scope, data)
+        newItem.$setPostUrl @sourceUrl
+        @$members.splice(index, 0, newItem)
+        return newItem
+
       $removeById: (id) ->
         _.remove @$members, (item) ->
           item.id == id
