@@ -7,7 +7,7 @@ describe 'soil.association module', ->
     instance = SoilModel = parent = scope = null
     beforeEach inject (HasOneAssociation, _SoilModel_, $rootScope) ->
       SoilModel = _SoilModel_
-      instance = new HasOneAssociation('association', SoilModel)
+      instance = new HasOneAssociation('association', 'SoilModel')
       scope = $rootScope.$new()
       parent = new SoilModel(scope)
 
@@ -103,7 +103,7 @@ describe 'soil.association module', ->
 
       describe 'with the saveData option set', ->
         beforeEach inject (HasOneAssociation) ->
-          instance = new HasOneAssociation('association', SoilModel, { saveData: true })
+          instance = new HasOneAssociation('association', 'SoilModel', { saveData: true })
 
         describe 'when the field is present', ->
           beforeEach ->
@@ -139,7 +139,7 @@ describe 'soil.association module', ->
     instance = SoilModel = parent = scope = null
     beforeEach inject (HasManyAssociation, _SoilModel_, $rootScope) ->
       SoilModel = _SoilModel_
-      instance = new HasManyAssociation('associations', 'association_ids', SoilModel)
+      instance = new HasManyAssociation('associations', 'association_ids', 'SoilModel')
 
       scope = $rootScope.$new()
       parent = new SoilModel(scope)
@@ -212,7 +212,7 @@ describe 'soil.association module', ->
 
       describe 'with the nestedUpdate option set', ->
         beforeEach inject (HasManyAssociation) ->
-          instance = new HasManyAssociation('associations', 'association_ids', SoilModel, { nestedUpdate: true })
+          instance = new HasManyAssociation('associations', 'association_ids', 'SoilModel', { nestedUpdate: true })
           data = { associations: 'association data', other_field: 'other val', id: 6 }
           instance.beforeLoad(data, parent)
 
@@ -264,7 +264,7 @@ describe 'soil.association module', ->
             { id: 6, $dataToSave: -> { data3: 'val3' } }
           ] }, other_field: 'other val' }
 
-          instance = new HasManyAssociation('associations', 'association_ids', SoilModel, { saveData: true })
+          instance = new HasManyAssociation('associations', 'association_ids', 'SoilModel', { saveData: true })
           instance.beforeSave(data, parent)
 
         it 'replaces the association with its data, adding ids where present', ->

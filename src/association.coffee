@@ -1,11 +1,12 @@
 angular.module('soil.association', ['soil.collection'])
 
-  .factory('HasOneAssociation', [ ->
+  .factory('HasOneAssociation', ['$injector', ($injector) ->
     class HasOneAssociation
-      constructor: (@_field, @_modelClass, options = {}) ->
+      constructor: (@_field, modelClass, options = {}) ->
         @_options = _.defaults(options, {
           saveData: false
         })
+        @_modelClass = $injector.get(modelClass)
         @_idField = @_field + '_id'
 
       beforeLoad: (data, parent) ->
@@ -34,13 +35,14 @@ angular.module('soil.association', ['soil.collection'])
 
   ])
 
-  .factory('HasManyAssociation', ['SoilCollection', (SoilCollection) ->
+  .factory('HasManyAssociation', ['SoilCollection', '$injector', (SoilCollection, $injector) ->
     class HasManyAssociation
-      constructor: (@_field, @_idField, @_modelClass, options = {}) ->
+      constructor: (@_field, @_idField, modelClass, options = {}) ->
         @_options = _.defaults(options, {
           saveData: false,
           nestedUpdate: false
         })
+        @_modelClass = $injector.get(modelClass)
 
       beforeLoad: (data, parent) ->
         return if !data

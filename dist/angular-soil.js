@@ -1,22 +1,22 @@
-/* angular-soil 1.0.7 %> */
+/* angular-soil 1.1.0 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   angular.module('soil.association', ['soil.collection']).factory('HasOneAssociation', [
-    function() {
+    '$injector', function($injector) {
       var HasOneAssociation;
       return HasOneAssociation = (function() {
-        function HasOneAssociation(_field, _modelClass, options) {
+        function HasOneAssociation(_field, modelClass, options) {
           this._field = _field;
-          this._modelClass = _modelClass;
           if (options == null) {
             options = {};
           }
           this._options = _.defaults(options, {
             saveData: false
           });
+          this._modelClass = $injector.get(modelClass);
           this._idField = this._field + '_id';
         }
 
@@ -56,13 +56,12 @@
       })();
     }
   ]).factory('HasManyAssociation', [
-    'SoilCollection', function(SoilCollection) {
+    'SoilCollection', '$injector', function(SoilCollection, $injector) {
       var HasManyAssociation;
       return HasManyAssociation = (function() {
-        function HasManyAssociation(_field, _idField, _modelClass, options) {
+        function HasManyAssociation(_field, _idField, modelClass, options) {
           this._field = _field;
           this._idField = _idField;
-          this._modelClass = _modelClass;
           if (options == null) {
             options = {};
           }
@@ -70,6 +69,7 @@
             saveData: false,
             nestedUpdate: false
           });
+          this._modelClass = $injector.get(modelClass);
         }
 
         HasManyAssociation.prototype.beforeLoad = function(data, parent) {
