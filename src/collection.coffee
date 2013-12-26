@@ -44,6 +44,10 @@ angular.module('soil.collection', [])
         _.remove @$members, (item) ->
           itemToRemove == item
 
+      $find: (id) ->
+        _.find @$members, (member) ->
+          member.id == id
+
       _setupListeners: ->
         @_scope.$on 'modelDeleted', (e, type, id) =>
           if type == @modelClass.prototype._modelType

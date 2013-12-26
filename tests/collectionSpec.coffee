@@ -178,6 +178,16 @@ describe 'soil.collection module', ->
         it 'removes only the instance passed', ->
           expect(instance.$members).toEqual [{ id: 1, name: 'first' }, { id: 3, name: 'third' }, { id: 2, name: 'second' }]
 
+    # Find an item by ID
+    describe '#$find', ->
+      beforeEach ->
+        instance.$members = [{ id: 1, name: 'first' }, { id: 2, name: 'second' }, { id: 3, name: 'third' }]
+
+      it 'returns the item if found', ->
+        expect(instance.$find(2)).toBe(instance.$members[1])
+
+      it 'returns false if nothing was found', ->
+        expect(instance.$find(4)).toBeFalsy()
 
     # Event listeners
     describe 'Event listeners', ->
