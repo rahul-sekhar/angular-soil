@@ -2,20 +2,20 @@ angular.module('soil.association', ['soil.collection'])
 
   .factory('HasOneAssociation', ['$injector', ($injector) ->
     class HasOneAssociation
-      constructor: (@_field, @_modelClass, options = {}) ->
+      constructor: (@_field, modelClass, options = {}) ->
         @_options = _.defaults(options, {
           saveData: false
         })
-        # @_modelClass = $injector.get(modelClass)
+        @_modelClass = $injector.get(modelClass)
         @_idField = @_field + '_id'
 
       beforeLoad: (data, parent) ->
         return if !data
 
         if (data[@_field])
-          data[@_field] = @_createModelInstance(parent._scope, data[@_field])
+          data[@_field] = @_createModelInstance(parent._scope, data[@_field], parent)
         else if (data[@_idField])
-          data[@_field] = @_createModelInstance(parent._scope, data[@_idField])
+          data[@_field] = @_createModelInstance(parent._scope, data[@_idField], parent)
           delete data[@_idField]
 
       beforeSave: (data) ->
@@ -33,20 +33,21 @@ angular.module('soil.association', ['soil.collection'])
             data[@_idField] = null
             delete data[@_field]
 
-      _createModelInstance: (scope, data) ->
-        modelClass = $injector.get(@_modelClass)
-        new modelClass(scope, data)
+      _createModelInstance: (scope, data, parent) ->
+        model = new @_modelClass(scope, data)
+        model._parent = parent
+        return model
 
   ])
 
   .factory('HasManyAssociation', ['SoilCollection', '$injector', (SoilCollection, $injector) ->
     class HasManyAssociation
-      constructor: (@_field, @_idField, @_modelClass, options = {}) ->
+      constructor: (@_field, @_idField, modelClass, options = {}) ->
         @_options = _.defaults(options, {
           saveData: false,
           nestedUpdate: false
         })
-        # @_modelClass = $injector.get(modelClass)
+        @_modelClass = $injector.get(modelClass)
 
       beforeLoad: (data, parent) ->
         return if !data
@@ -56,7 +57,10 @@ angular.module('soil.association', ['soil.collection'])
           collection = new SoilCollection(parent._scope, @_modelClassFor(associationUrl), associationUrl)
           data[@_field] = collection.$load(data[@_field])
         else
-          data[@_field] = new SoilCollection(parent._scope, @_getModelClass())
+          data[@_field] = new SoilCollection(parent._scope, @_modelClass)
+
+        # Set the parent
+        data[@_field]._parent = parent if data[@_field]
 
       beforeSave: (data, parent) ->
         if (data[@_field])
@@ -69,11 +73,8 @@ angular.module('soil.association', ['soil.collection'])
 
       _modelClassFor: (url) ->
         if @_options.nestedUpdate
-          class extendedModel extends @_getModelClass()
+          class extendedModel extends @_modelClass
             _baseUrl: url
         else
-          @_getModelClass()
-
-      _getModelClass: ->
-        $injector.get(@_modelClass)
+          @_modelClass
   ])

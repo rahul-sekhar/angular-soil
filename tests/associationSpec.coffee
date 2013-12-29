@@ -44,6 +44,9 @@ describe 'soil.association module', ->
         it 'sets the instance scope', ->
           expect(data.association._scope).toBe(scope)
 
+        it 'sets the instance parent', ->
+          expect(data.association._parent).toBe(parent)
+
         it 'leaves the other field intact', ->
           expect(data.other_field).toEqual('other val')
 
@@ -57,6 +60,12 @@ describe 'soil.association module', ->
 
         it 'gets the instance by id', ->
           expect(data.association.$get).toHaveBeenCalledWith(5)
+
+        it 'sets the instance scope', ->
+          expect(data.association._scope).toBe(scope)
+
+        it 'sets the instance parent', ->
+          expect(data.association._parent).toBe(parent)
 
         it 'removes the association id field', ->
           expect(data.association_id).toBeUndefined()
@@ -158,6 +167,9 @@ describe 'soil.association module', ->
 
         it 'sets the collection scope', ->
           expect(data.associations._scope).toBe(scope)
+
+        it 'sets the collection parent', ->
+          expect(data.associations._parent).toBe(parent)
 
       describe 'when the field is not present in the passed data', ->
         beforeEach ->

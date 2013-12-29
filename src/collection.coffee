@@ -11,7 +11,7 @@ angular.module('soil.collection', [])
       $load: (data) ->
         data ||= []
         @$members = _.map data, (modelData) =>
-          new @modelClass(@_scope, modelData)
+          @_createModel(modelData)
         return this
 
       $get: ->
@@ -19,20 +19,17 @@ angular.module('soil.collection', [])
           .success (data) => @$load(data)
 
       $add: (data) ->
-        newItem = new @modelClass(@_scope, data)
-        newItem.$setPostUrl @sourceUrl
+        newItem = @_createModel(data)
         @$members.push(newItem)
         return newItem
 
       $addToFront: (data) ->
-        newItem = new @modelClass(@_scope, data)
-        newItem.$setPostUrl @sourceUrl
+        newItem = @_createModel(data)
         @$members.unshift(newItem)
         return newItem
 
       $addAt: (index, data) ->
-        newItem = new @modelClass(@_scope, data)
-        newItem.$setPostUrl @sourceUrl
+        newItem = @_createModel(data)
         @$members.splice(index, 0, newItem)
         return newItem
 
@@ -52,6 +49,12 @@ angular.module('soil.collection', [])
         @_scope.$on 'modelDeleted', (e, type, id) =>
           if type == @modelClass.prototype._modelType
             @$removeById(id)
+
+      _createModel: (data) ->
+        model = new @modelClass(@_scope, data)
+        model.$setPostUrl @sourceUrl
+        model._parent = @_parent if @_parent
+        return model
   ])
 
   .factory('SoilGlobalCollection', ['SoilCollection', '$rootScope', (SoilCollection, $rootScope) ->

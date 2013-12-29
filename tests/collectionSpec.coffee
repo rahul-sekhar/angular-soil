@@ -189,6 +189,42 @@ describe 'soil.collection module', ->
       it 'returns false if nothing was found', ->
         expect(instance.$find(4)).toBeFalsy()
 
+    # A collection with a parent
+    describe 'with a parent', ->
+      beforeEach ->
+        instance._parent = 'parent obj'
+
+      describe '#$load', ->
+        beforeEach -> instance.$load([{ id: 1, name: 'first' }, { id: 4, name: 'second' }])
+
+        it 'sets the parent for each model', ->
+          expect(instance.$members[0]._parent).toBe('parent obj')
+          expect(instance.$members[1]._parent).toBe('parent obj')
+
+      describe '#$add', ->
+        beforeEach ->
+          instance.$members = ['member1', 'member2', 'member3']
+          instance.$add({ data: 'val' })
+
+        it 'sets the parent of the member', ->
+          expect(instance.$members[3]._parent).toBe('parent obj')
+
+      describe '#$addToFront', ->
+        beforeEach ->
+          instance.$members = ['member1', 'member2', 'member3']
+          instance.$addToFront({ data: 'val' })
+
+        it 'sets the parent of the member', ->
+          expect(instance.$members[0]._parent).toBe('parent obj')
+
+      describe '#$addAt', ->
+        beforeEach ->
+          instance.$members = ['member1', 'member2', 'member3']
+          instance.$addAt(1, { data: 'val' })
+
+        it 'sets the parent of the member', ->
+          expect(instance.$members[1]._parent).toBe('parent obj')
+
     # Event listeners
     describe 'Event listeners', ->
       beforeEach inject (SoilCollection) ->
