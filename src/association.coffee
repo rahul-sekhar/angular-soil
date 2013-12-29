@@ -13,9 +13,9 @@ angular.module('soil.association', ['soil.collection'])
         return if !data
 
         if (data[@_field])
-          data[@_field] = @_createModelInstance(parent._scope, data[@_field], parent)
+          data[@_field] = @_createModelInstance(parent, data[@_field])
         else if (data[@_idField])
-          data[@_field] = @_createModelInstance(parent._scope, data[@_idField], parent)
+          data[@_field] = @_createModelInstance(parent, data[@_idField])
           delete data[@_idField]
 
       beforeSave: (data) ->
@@ -33,8 +33,8 @@ angular.module('soil.association', ['soil.collection'])
             data[@_idField] = null
             delete data[@_field]
 
-      _createModelInstance: (scope, data, parent) ->
-        model = new @_modelClass(scope, data)
+      _createModelInstance: (parent, data) ->
+        model = new @_modelClass(parent._scope, data)
         model._parent = parent
         return model
 
@@ -54,13 +54,10 @@ angular.module('soil.association', ['soil.collection'])
 
         if (data[@_field])
           associationUrl = parent.$url(data.id || parent.id)  + '/' + @_field
-          collection = new SoilCollection(parent._scope, @_modelClassFor(associationUrl), associationUrl)
+          collection = @_createCollection(parent, @_modelClassFor(associationUrl), associationUrl)
           data[@_field] = collection.$load(data[@_field])
         else
-          data[@_field] = new SoilCollection(parent._scope, @_modelClass)
-
-        # Set the parent
-        data[@_field]._parent = parent if data[@_field]
+          data[@_field] = @_createCollection(parent, @_modelClass)
 
       beforeSave: (data, parent) ->
         if (data[@_field])
@@ -77,4 +74,9 @@ angular.module('soil.association', ['soil.collection'])
             _baseUrl: url
         else
           @_modelClass
+
+      _createCollection: (parent, modelClass, url) ->
+        collection = new SoilCollection(parent._scope, modelClass, url)
+        collection._parent = parent
+        return collection
   ])

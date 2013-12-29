@@ -1,4 +1,4 @@
-/* angular-soil 1.2.0 %> */
+/* angular-soil 1.2.1 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -25,9 +25,9 @@
             return;
           }
           if (data[this._field]) {
-            return data[this._field] = this._createModelInstance(parent._scope, data[this._field], parent);
+            return data[this._field] = this._createModelInstance(parent, data[this._field]);
           } else if (data[this._idField]) {
-            data[this._field] = this._createModelInstance(parent._scope, data[this._idField], parent);
+            data[this._field] = this._createModelInstance(parent, data[this._idField]);
             return delete data[this._idField];
           }
         };
@@ -51,9 +51,9 @@
           }
         };
 
-        HasOneAssociation.prototype._createModelInstance = function(scope, data, parent) {
+        HasOneAssociation.prototype._createModelInstance = function(parent, data) {
           var model;
-          model = new this._modelClass(scope, data);
+          model = new this._modelClass(parent._scope, data);
           model._parent = parent;
           return model;
         };
@@ -86,13 +86,10 @@
           }
           if (data[this._field]) {
             associationUrl = parent.$url(data.id || parent.id) + '/' + this._field;
-            collection = new SoilCollection(parent._scope, this._modelClassFor(associationUrl), associationUrl);
-            data[this._field] = collection.$load(data[this._field]);
+            collection = this._createCollection(parent, this._modelClassFor(associationUrl), associationUrl);
+            return data[this._field] = collection.$load(data[this._field]);
           } else {
-            data[this._field] = new SoilCollection(parent._scope, this._modelClass);
-          }
-          if (data[this._field]) {
-            return data[this._field]._parent = parent;
+            return data[this._field] = this._createCollection(parent, this._modelClass);
           }
         };
 
@@ -132,6 +129,13 @@
           } else {
             return this._modelClass;
           }
+        };
+
+        HasManyAssociation.prototype._createCollection = function(parent, modelClass, url) {
+          var collection;
+          collection = new SoilCollection(parent._scope, modelClass, url);
+          collection._parent = parent;
+          return collection;
         };
 
         return HasManyAssociation;
