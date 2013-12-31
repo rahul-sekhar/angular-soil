@@ -154,7 +154,7 @@ describe 'soil.model module', ->
       beforeEach inject (promiseExpectation) ->
         response = httpBackend.expectGET('/6')
         response.respond null
-        spyOn(instance, '$load')
+        spyOn(instance, '$load').andReturn(instance)
         promise = promiseExpectation(instance.$get(6))
 
       it 'sends a GET request', ->
@@ -171,6 +171,9 @@ describe 'soil.model module', ->
         it 'resolves the promise', ->
           promise.expectToBeResolved()
 
+        it 'resolves the promise with the instance', ->
+          expect(promise.arg).toBe(instance)
+
       describe 'on failure', ->
         beforeEach ->
           response.respond 500
@@ -181,6 +184,9 @@ describe 'soil.model module', ->
 
         it 'rejects the promise', ->
           promise.expectToBeRejected()
+
+        it 'rejects the promise with the error', ->
+          expect(promise.arg.status).toEqual 500
 
 
     # Get model URL
@@ -287,6 +293,9 @@ describe 'soil.model module', ->
           it 'resolves the promise', ->
             promise.expectToBeResolved()
 
+          it 'resolves the promise with the instance', ->
+            expect(promise.arg).toBe(instance)
+
           it 'broadcasts an event', ->
             expect(saveSpy).toHaveBeenCalled()
 
@@ -306,6 +315,9 @@ describe 'soil.model module', ->
 
           it 'rejects the promise', ->
             promise.expectToBeRejected()
+
+          it 'rejects the promise with the error', ->
+            expect(promise.arg.status).toEqual 500
 
           it 'does not broadcast an event', ->
             expect(saveSpy).not.toHaveBeenCalled()
@@ -447,6 +459,9 @@ describe 'soil.model module', ->
           it 'resolves the promise', ->
             promise.expectToBeResolved()
 
+          it 'resolves the promise with the instance', ->
+            expect(promise.arg).toBe(instance)
+
           it 'broadcasts an event', ->
             expect(updateSpy).toHaveBeenCalled()
 
@@ -469,6 +484,9 @@ describe 'soil.model module', ->
 
           it 'rejects the promise', ->
             promise.expectToBeRejected()
+
+          it 'rejects the promise with the error', ->
+            expect(promise.arg.status).toEqual 500
 
           it 'does not broadcast an event', ->
             expect(updateSpy).not.toHaveBeenCalled()

@@ -1,4 +1,4 @@
-/* angular-soil 1.2.1 %> */
+/* angular-soil 1.3.0 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -338,8 +338,8 @@
 
         SoilModel.prototype.$get = function(id) {
           var _this = this;
-          return $http.get(this.$url(id)).success(function(responseData) {
-            return _this.$load(responseData);
+          return $http.get(this.$url(id)).then(function(response) {
+            return _this.$load(response.data);
           });
         };
 
@@ -347,9 +347,10 @@
           var sendRequest,
             _this = this;
           sendRequest = this.id ? $http.put : $http.post;
-          return sendRequest(this.$url(), this.$dataToSave()).success(function(responseData) {
-            _this.$load(responseData);
-            return $rootScope.$broadcast('modelSaved', _this, responseData);
+          return sendRequest(this.$url(), this.$dataToSave()).then(function(response) {
+            _this.$load(response.data);
+            $rootScope.$broadcast('modelSaved', _this, response.data);
+            return _this;
           });
         };
 
@@ -383,6 +384,8 @@
             return $rootScope.$broadcast('modelFieldUpdated', _this, field, responseData);
           }).error(function() {
             return _this.$revertField(field);
+          }).then(function() {
+            return _this;
           });
         };
 

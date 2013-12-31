@@ -43,15 +43,16 @@ angular.module('soil.model', [])
         return this
 
       $get: (id) ->
-        return $http.get(@$url(id)).success (responseData) =>
-          @$load(responseData)
+        return $http.get(@$url(id)).then (response) =>
+          @$load(response.data)
 
       $save: ->
         sendRequest = if @id then $http.put else $http.post
         return sendRequest(@$url(), @$dataToSave())
-          .success (responseData) =>
-            @$load(responseData)
-            $rootScope.$broadcast('modelSaved', this, responseData)
+          .then (response) =>
+            @$load(response.data)
+            $rootScope.$broadcast('modelSaved', this, response.data)
+            return this
 
       $delete: ->
         @_checkIfLoaded()
@@ -81,6 +82,9 @@ angular.module('soil.model', [])
 
           .error =>
             @$revertField(field)
+
+          # Resolve the promise with the instance
+          .then => this
 
       $revertField: (field) ->
         restoreData = @_modifyDataBeforeLoad(@$saved)
