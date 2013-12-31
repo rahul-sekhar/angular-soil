@@ -33,6 +33,10 @@ angular.module('soil.association', ['soil.collection'])
             data[@_idField] = null
             delete data[@_field]
 
+      setScope: (scope, parent) ->
+        if parent[@_field]
+          parent[@_field].$setScope scope
+
       _createModelInstance: (parent, data) ->
         model = new @_modelClass(parent._scope, data)
         model._parent = parent
@@ -67,6 +71,10 @@ angular.module('soil.association', ['soil.collection'])
           else
             data[@_idField] = _.map data[@_field].$members, (member) -> member.id
             delete data[@_field]
+
+      setScope: (scope, parent) ->
+        if parent[@_field]
+          parent[@_field].$setScope scope
 
       _modelClassFor: (url) ->
         if @_options.nestedUpdate

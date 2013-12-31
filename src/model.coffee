@@ -102,6 +102,14 @@ angular.module('soil.model', [])
 
         return @_modifyDataBeforeSave(data)
 
+      $setScope: (scope) ->
+        throw 'Scope has already been set' if (@_scope)
+        @_scope = scope
+        @_setupListeners()
+        _.each @_associations, (association) =>
+          association.setScope(scope, this)
+          return
+
       _loadField: (field, data) ->
         @$saved = _.cloneDeep(data)
         fieldData = _.pick(data, field)

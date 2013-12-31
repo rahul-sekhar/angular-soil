@@ -225,6 +225,36 @@ describe 'soil.collection module', ->
         it 'sets the parent of the member', ->
           expect(instance.$members[1]._parent).toBe('parent obj')
 
+    # Set scope
+    describe '#$setScope', ->
+      scope = null
+      beforeEach inject (SoilCollection) ->
+        instance = new SoilCollection(null, SoilModel, '/source_url')
+        scope = rootScope.$new()
+        instance.$load [{ id: 1 }, { id: 2 }, { id: 3 }]
+        instance.$setScope(scope)
+
+      it 'sets the scope', ->
+        expect(instance._scope).toBe(scope)
+
+      it 'sets up event listeners', ->
+        memberIds = ->
+          _.map instance.$members, (member) ->
+            member.id
+
+        rootScope.$broadcast('modelDeleted', 'model', 2)
+        expect(memberIds()).toEqual [1, 3]
+
+      it 'sets model scopes', ->
+        expect(instance.$members[0]._scope).toBe(scope)
+        expect(instance.$members[1]._scope).toBe(scope)
+        expect(instance.$members[2]._scope).toBe(scope)
+
+      describe 'with the scope already set', ->
+        it 'raises an error', ->
+          newScope = rootScope.$new()
+          expect( -> instance.$setScope(newScope) ).toThrow('Scope has already been set')
+
     # Event listeners
     describe 'Event listeners', ->
       beforeEach inject (SoilCollection) ->

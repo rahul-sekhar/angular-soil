@@ -533,6 +533,36 @@ describe 'soil.model module', ->
       it 'returns the instance', ->
         expect(result).toBe(instance)
 
+    # Set scope
+    describe '#$setScope', ->
+      scope = null
+      beforeEach ->
+        scope = rootScope.$new()
+        instance._associations = [
+          { setScope: jasmine.createSpy('association 1 set scope') },
+          { setScope: jasmine.createSpy('association 2 set scope') }
+        ]
+        instance.$setScope(scope)
+
+      it 'sets the scope', ->
+        expect(instance._scope).toBe(scope)
+
+      it 'sets up event listeners', ->
+        instance.id = 1
+        other = new SoilModel(null, { id: 1 })
+        spyOn(instance, '$load')
+        rootScope.$broadcast('modelSaved', other, 'data')
+        expect(instance.$load).toHaveBeenCalledWith('data')
+
+      it 'sets association scopes', ->
+        expect(instance._associations[0].setScope).toHaveBeenCalledWith(scope, instance)
+        expect(instance._associations[1].setScope).toHaveBeenCalledWith(scope, instance)
+
+      describe 'with the scope already set', ->
+        it 'raises an error', ->
+          newScope = rootScope.$new()
+          expect( -> instance.$setScope(newScope) ).toThrow('Scope has already been set')
+
     # Event listeners
     describe 'event listeners', ->
       scope = null
@@ -578,7 +608,7 @@ describe 'soil.model module', ->
             other._modelType = 'specific model'
             rootScope.$broadcast('modelSaved', other, 'data')
 
-          it 'does not load data', ->
+          it 'does loads data', ->
             expect(instance.$load).toHaveBeenCalledWith('data')
 
       describe 'on a modelFieldUpdated event', ->
@@ -618,5 +648,5 @@ describe 'soil.model module', ->
             other._modelType = 'specific model'
             rootScope.$broadcast('modelFieldUpdated', other, 'field', 'data')
 
-          it 'does not load data', ->
+          it 'does loads data', ->
             expect(instance._loadField).toHaveBeenCalledWith('field', 'data')

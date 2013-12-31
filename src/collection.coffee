@@ -45,6 +45,14 @@ angular.module('soil.collection', [])
         _.find @$members, (member) ->
           member.id == id
 
+      $setScope: (scope) ->
+        throw 'Scope has already been set' if (@_scope)
+        @_scope = scope
+        @_setupListeners()
+        _.each @$members, (member) =>
+          member.$setScope(scope)
+          return
+
       _setupListeners: ->
         @_scope.$on 'modelDeleted', (e, type, id) =>
           if type == @modelClass.prototype._modelType

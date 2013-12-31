@@ -144,6 +144,24 @@ describe 'soil.association module', ->
           it 'leaves the data as it is', ->
             expect(data).toEqual { association: null, other_field: 'other val' }
 
+    # Set the association scope
+    describe '#setScope', ->
+      describe 'without the association set', ->
+        beforeEach ->
+          instance.setScope(scope, parent)
+
+        it 'does nothing', ->
+          expect(parent.association).toBeUndefined()
+
+      describe 'with the association set', ->
+        beforeEach ->
+          parent.association = new SoilModel
+          spyOn(parent.association, '$setScope')
+          instance.setScope(scope, parent)
+
+        it 'sets the association scope', ->
+          expect(parent.association.$setScope).toHaveBeenCalledWith scope
+
   describe 'hasManyAssocation', ->
     instance = SoilModel = parent = scope = null
     beforeEach inject (HasManyAssociation, _SoilModel_, $rootScope) ->
@@ -288,5 +306,23 @@ describe 'soil.association module', ->
 
         it 'leaves the other field intact', ->
           expect(data.other_field).toEqual('other val')
+
+    # Set the association scope
+    describe '#setScope', ->
+      describe 'without the association set', ->
+        beforeEach ->
+          instance.setScope(scope, parent)
+
+        it 'does nothing', ->
+          expect(parent.associations).toBeUndefined()
+
+      describe 'with the association set', ->
+        beforeEach inject (SoilCollection) ->
+          parent.associations = new SoilCollection
+          spyOn(parent.associations, '$setScope')
+          instance.setScope(scope, parent)
+
+        it 'sets the association scope', ->
+          expect(parent.associations.$setScope).toHaveBeenCalledWith scope
 
 

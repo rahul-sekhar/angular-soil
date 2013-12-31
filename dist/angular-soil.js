@@ -1,4 +1,4 @@
-/* angular-soil 1.3.0 %> */
+/* angular-soil 1.3.1 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -48,6 +48,12 @@
               data[this._idField] = null;
               return delete data[this._field];
             }
+          }
+        };
+
+        HasOneAssociation.prototype.setScope = function(scope, parent) {
+          if (parent[this._field]) {
+            return parent[this._field].$setScope(scope);
           }
         };
 
@@ -107,6 +113,12 @@
               });
               return delete data[this._field];
             }
+          }
+        };
+
+        HasManyAssociation.prototype.setScope = function(scope, parent) {
+          if (parent[this._field]) {
+            return parent[this._field].$setScope(scope);
           }
         };
 
@@ -216,6 +228,18 @@
         SoilCollection.prototype.$find = function(id) {
           return _.find(this.$members, function(member) {
             return member.id === id;
+          });
+        };
+
+        SoilCollection.prototype.$setScope = function(scope) {
+          var _this = this;
+          if (this._scope) {
+            throw 'Scope has already been set';
+          }
+          this._scope = scope;
+          this._setupListeners();
+          return _.each(this.$members, function(member) {
+            member.$setScope(scope);
           });
         };
 
@@ -407,6 +431,18 @@
             data[field] = _this[field] === void 0 ? null : _this[field];
           });
           return this._modifyDataBeforeSave(data);
+        };
+
+        SoilModel.prototype.$setScope = function(scope) {
+          var _this = this;
+          if (this._scope) {
+            throw 'Scope has already been set';
+          }
+          this._scope = scope;
+          this._setupListeners();
+          return _.each(this._associations, function(association) {
+            association.setScope(scope, _this);
+          });
         };
 
         SoilModel.prototype._loadField = function(field, data) {
