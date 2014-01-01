@@ -202,6 +202,9 @@ describe 'soil.association module', ->
         it 'leaves the other data intact', ->
           expect(data.other_field).toEqual('other val')
 
+        it 'sets the url for the collection', ->
+          expect(data.associations.sourceUrl).toEqual('/association_url/associations')
+
       describe 'when an empty object is passed', ->
         beforeEach ->
           data = { }
@@ -211,6 +214,9 @@ describe 'soil.association module', ->
 
         it 'does not load data', ->
           expect(data.associations.$load).not.toHaveBeenCalled()
+
+        it 'sets the url for the collection', ->
+          expect(data.associations.sourceUrl).toEqual('/association_url/associations')
 
       describe 'when null is passed', ->
         beforeEach ->
