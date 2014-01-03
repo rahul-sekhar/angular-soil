@@ -189,6 +189,44 @@ describe 'soil.collection module', ->
       it 'returns false if nothing was found', ->
         expect(instance.$find(4)).toBeFalsy()
 
+    # After initial load promise
+    describe '#$afterInitialLoad', ->
+      promise = null
+      beforeEach inject (promiseExpectation) ->
+        promise = promiseExpectation(instance.$afterInitialLoad)
+
+      it 'is initially not resolved', ->
+        promise.expectToBeUnresolved()
+
+      describe 'after $get is called', ->
+        beforeEach ->
+          httpBackend.expectGET('/source_url').respond 'data'
+          instance.$get()
+
+        it 'the promise is still not resolved', ->
+          promise.expectToBeUnresolved()
+
+        describe 'on success', ->
+          beforeEach -> httpBackend.flush()
+
+          it 'resolves the promise', ->
+            promise.expectToBeResolved()
+
+          describe 'on a subsequent call to $get', ->
+            beforeEach ->
+              httpBackend.expectGET('/source_url').respond 'other data'
+              instance.$get()
+
+            it 'the promise is still resolved', ->
+              promise.expectToBeResolved()
+
+            describe 'on success', ->
+              beforeEach -> httpBackend.flush()
+
+              it 'the promise is still resolved', ->
+                promise.expectToBeResolved()
+
+
     # A collection with a parent
     describe 'with a parent', ->
       beforeEach ->

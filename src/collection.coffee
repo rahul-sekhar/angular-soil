@@ -1,9 +1,12 @@
 angular.module('soil.collection', [])
 
-  .factory('SoilCollection', ['$http', ($http) ->
+  .factory('SoilCollection', ['$http', '$q', ($http, $q) ->
     class SoilCollection
       constructor: (@_scope, @modelClass, @sourceUrl) ->
         @$members = []
+
+        @_initialLoad = $q.defer()
+        @$afterInitialLoad = @_initialLoad.promise
 
         if @_scope
           @_setupListeners()
@@ -16,7 +19,9 @@ angular.module('soil.collection', [])
 
       $get: ->
         return $http.get(@sourceUrl)
-          .success (data) => @$load(data)
+          .success (data) =>
+            @$load(data)
+            @_initialLoad.resolve()
 
       $add: (data) ->
         newItem = @_createModel(data)

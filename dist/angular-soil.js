@@ -1,4 +1,4 @@
-/* angular-soil 1.3.1 %> */
+/* angular-soil 1.4.0 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -163,7 +163,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   angular.module('soil.collection', []).factory('SoilCollection', [
-    '$http', function($http) {
+    '$http', '$q', function($http, $q) {
       var SoilCollection;
       return SoilCollection = (function() {
         function SoilCollection(_scope, modelClass, sourceUrl) {
@@ -171,6 +171,8 @@
           this.modelClass = modelClass;
           this.sourceUrl = sourceUrl;
           this.$members = [];
+          this._initialLoad = $q.defer();
+          this.$afterInitialLoad = this._initialLoad.promise;
           if (this._scope) {
             this._setupListeners();
           }
@@ -188,7 +190,8 @@
         SoilCollection.prototype.$get = function() {
           var _this = this;
           return $http.get(this.sourceUrl).success(function(data) {
-            return _this.$load(data);
+            _this.$load(data);
+            return _this._initialLoad.resolve();
           });
         };
 
