@@ -49,7 +49,8 @@ angular.module('soil.association', ['soil.collection'])
       constructor: (@_field, @_idField, modelClass, options = {}) ->
         @_options = _.defaults(options, {
           saveData: false,
-          nestedUpdate: false
+          nestedUpdate: false,
+          ordered: false
         })
         @_modelClass = $injector.get(modelClass)
 
@@ -65,11 +66,14 @@ angular.module('soil.association', ['soil.collection'])
 
       beforeSave: (data, parent) ->
         if (data[@_field])
+          models = data[@_field].$members
+          models = _.sortBy(models, 'order') if @_options.ordered
+
           if @_options.saveData
-            data[@_field] = _.map data[@_field].$members, (member) ->
+            data[@_field] = _.map models, (member) ->
               _.merge { id: member.id }, member.$dataToSave()
           else
-            data[@_idField] = _.map data[@_field].$members, (member) -> member.id
+            data[@_idField] = _.map models, (member) -> member.id
             delete data[@_field]
 
       setScope: (scope, parent) ->

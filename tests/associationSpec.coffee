@@ -292,6 +292,19 @@ describe 'soil.association module', ->
         it 'leaves the other field intact', ->
           expect(data.other_field).toEqual('other val')
 
+      describe 'when the field is present, with the ordered option set', ->
+        beforeEach inject (HasManyAssociation) ->
+          data = { associations: { $members: [{ id: 7, order: 5 }, { id: 10, order: 0 }, { id: 12, order: 1 }] }, other_field: 'other val' }
+          instance = new HasManyAssociation('associations', 'association_ids', 'SoilModel', { ordered: true })
+          instance.beforeSave(data, parent)
+
+        it 'replaces the association with an ordered array of its ids', ->
+          expect(data.association_ids).toEqual([10, 12, 7])
+          expect(data.associations).toBeUndefined()
+
+        it 'leaves the other field intact', ->
+          expect(data.other_field).toEqual('other val')
+
       describe 'when the field is present, with the saveData option set', ->
         beforeEach inject (HasManyAssociation) ->
           data = { associations: { $members: [
