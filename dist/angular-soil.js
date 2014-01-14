@@ -1,4 +1,4 @@
-/* angular-soil 1.4.1 %> */
+/* angular-soil 1.4.2 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -80,8 +80,7 @@
           }
           this._options = _.defaults(options, {
             saveData: false,
-            nestedUpdate: false,
-            ordered: false
+            nestedUpdate: false
           });
           this._modelClass = $injector.get(modelClass);
         }
@@ -101,20 +100,15 @@
         };
 
         HasManyAssociation.prototype.beforeSave = function(data, parent) {
-          var models;
           if (data[this._field]) {
-            models = data[this._field].$members;
-            if (this._options.ordered) {
-              models = _.sortBy(models, 'order');
-            }
             if (this._options.saveData) {
-              return data[this._field] = _.map(models, function(member) {
+              return data[this._field] = _.map(data[this._field].$members, function(member) {
                 return _.merge({
                   id: member.id
                 }, member.$dataToSave());
               });
             } else {
-              data[this._idField] = _.map(models, function(member) {
+              data[this._idField] = _.map(data[this._field].$members, function(member) {
                 return member.id;
               });
               return delete data[this._field];
