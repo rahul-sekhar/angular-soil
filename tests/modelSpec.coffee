@@ -56,6 +56,19 @@ describe 'soil.model module', ->
         it 'saves the scope', ->
           expect(instance._scope).toBe(scope)
 
+    describe 'default fields', ->
+      mockSoilModel = null
+      beforeEach ->
+        class mockSoilModel extends SoilModel
+          _initializeFields: ->
+            @field1 = 'data1'
+            @field2 = 'data2'
+
+      it 'sets default data that can be overwritten', ->
+        instance = new mockSoilModel(null, { field2: 'new data2' })
+        expect(instance.field1).toBe 'data1'
+        expect(instance.field2).toBe 'new data2'
+
     # Default data
     describe '_baseUrl', ->
       it 'is the root by default', ->

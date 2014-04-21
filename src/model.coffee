@@ -8,6 +8,8 @@ angular.module('soil.model', [])
       _associations: []
       _modelType: 'model'
 
+      _initializeFields: ->
+
       constructor: (@_scope, arg) ->
         @_dataLoadedCallback = ->
         @$saved = {}
@@ -125,6 +127,9 @@ angular.module('soil.model', [])
         _.forOwn this, (value, key, obj) ->
           delete obj[key] unless _.first(key) == '_' or angular.isFunction(value)
           return
+
+        # Run function to initialize fields
+        @_initializeFields()
 
       _withSlash: (url) ->
         url.replace /\/?$/, '/'

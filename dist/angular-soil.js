@@ -1,4 +1,4 @@
-/* angular-soil 1.4.3 %> */
+/* angular-soil 1.5.0 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -320,6 +320,8 @@
 
         SoilModel.prototype._modelType = 'model';
 
+        SoilModel.prototype._initializeFields = function() {};
+
         function SoilModel(_scope, arg) {
           this._scope = _scope;
           this._dataLoadedCallback = function() {};
@@ -478,11 +480,12 @@
         };
 
         SoilModel.prototype._clearFields = function() {
-          return _.forOwn(this, function(value, key, obj) {
+          _.forOwn(this, function(value, key, obj) {
             if (!(_.first(key) === '_' || angular.isFunction(value))) {
               delete obj[key];
             }
           });
+          return this._initializeFields();
         };
 
         SoilModel.prototype._withSlash = function(url) {
