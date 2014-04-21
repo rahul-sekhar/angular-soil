@@ -1,17 +1,24 @@
 {
 	"name": "angular-soil",
-	"version": "1.4.2",
+	"version": "1.4.3",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/rahul-sekhar/angular-soil"
 	},
 	"devDependencies": {
-		"phantomjs": "1.9.1-0",
+		"phantomjs": "latest",
 		"karma": "latest",
-		"grunt": "~0.4.1",
+		"karma-cli": "latest",
+		"karma-jasmine": "latest",
+		"karma-phantomjs-launcher": "latest",
+		"karma-coffee-preprocessor": "latest",
+		"grunt": "latest",
 		"grunt-contrib-uglify": "latest",
 		"grunt-contrib-coffee": "latest",
 		"grunt-banner": "latest",
 		"grunt-json-replace": "latest"
+	},
+	"scripts": {
+		"test": "node_modules/.bin/karma start --single-run --reporters=dots"
 	}
 }

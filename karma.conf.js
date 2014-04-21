@@ -23,6 +23,10 @@ module.exports = function(config) {
       'tests/*.coffee'
     ],
 
+    preprocessors: {
+      '**/*.coffee': ['coffee']
+    },
+
 
     // list of files to exclude
     exclude: [
