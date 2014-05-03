@@ -393,3 +393,25 @@ describe 'soil.collection module', ->
 
         it 'adds the model', ->
           expect(instance.$add).toHaveBeenCalledWith({ id: 4, data: 'val' })
+
+
+    describe 'on model creation failure', ->
+      beforeEach ->
+        instance.$load [{ id: 1 }, { id: 2 }, { id: 3 }]
+        spyOn(instance, '$remove')
+
+      describe 'with a different model type', ->
+        beforeEach ->
+          rootScope.$broadcast('modelCreateFailed', new SoilModel(null, { id: 2 }))
+
+        it 'does not remove any model', ->
+          expect(instance.$remove).not.toHaveBeenCalled()
+
+      describe 'with the same model type', ->
+        modelToRemove = null
+        beforeEach ->
+          modelToRemove = new SoilModelWithType(null, { id: 4 })
+          rootScope.$broadcast('modelCreateFailed', modelToRemove)
+
+        it 'removes the model', ->
+          expect(instance.$remove).toHaveBeenCalledWith(modelToRemove)

@@ -51,10 +51,15 @@ angular.module('soil.model', [])
       $save: ->
         sendRequest = if @id then $http.put else $http.post
         return sendRequest(@$url(), @$dataToSave())
-          .then (response) =>
-            @$load(response.data)
-            $rootScope.$broadcast('modelSaved', this, response.data)
-            return this
+          .success (responseData) =>
+            @$load(responseData)
+            $rootScope.$broadcast('modelSaved', this, responseData)
+
+          .error =>
+            $rootScope.$broadcast('modelCreateFailed', this) unless @id
+
+          # Resolve the promise with the instance
+          .then => this
 
       $delete: ->
         @_checkIfLoaded()

@@ -282,7 +282,7 @@ describe 'soil.model module', ->
 
     # Save the model
     describe '#$save', ->
-      request = promise = saveSpy = null
+      request = promise = saveSpy = createFailedSpy = null
       beforeEach ->
         instance.$setBaseUrl('/model_path')
         spyOn(instance, '$dataToSave').andReturn('save data')
@@ -290,6 +290,9 @@ describe 'soil.model module', ->
 
         saveSpy = jasmine.createSpy('rootScope save watcher')
         rootScope.$on('modelSaved', saveSpy)
+
+        createFailedSpy = jasmine.createSpy('rootScope createFailed watcher')
+        rootScope.$on('modelCreateFailed', createFailedSpy)
 
       runSaveTests = ->
         it 'sends a request', ->
@@ -318,6 +321,9 @@ describe 'soil.model module', ->
           it 'sends the response data in the event', ->
             expect(saveSpy.mostRecentCall.args[2]).toEqual({ field: 'formatted new val', field4: 'side effect' })
 
+          it 'does not broadcast a modelCreateFailed event', ->
+            expect(createFailedSpy).not.toHaveBeenCalled()
+
         describe 'on failure', ->
           beforeEach ->
             request.respond 500
@@ -343,6 +349,12 @@ describe 'soil.model module', ->
 
         runSaveTests()
 
+        it 'broadcasts a modelCreateFailed event on failure', ->
+          request.respond 500
+          httpBackend.flush()
+          expect(createFailedSpy).toHaveBeenCalled()
+          expect(createFailedSpy.mostRecentCall.args[1]).toBe(instance)
+
       describe 'with an id', ->
         beforeEach inject (promiseExpectation) ->
           instance.id = 5
@@ -351,6 +363,11 @@ describe 'soil.model module', ->
           promise = promiseExpectation(instance.$save())
 
         runSaveTests()
+
+        it 'does not broadcast a modelCreateFailed event on failure', ->
+          request.respond 500
+          httpBackend.flush()
+          expect(createFailedSpy).not.toHaveBeenCalled()
 
     # Delete the model
     describe '#$delete', ->

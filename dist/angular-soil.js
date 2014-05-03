@@ -1,4 +1,4 @@
-/* angular-soil 1.5.1 %> */
+/* angular-soil 1.5.2 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -280,7 +280,7 @@
 
         function GlobalSoilCollection(modelClass, sourceUrl) {
           GlobalSoilCollection.__super__.constructor.call(this, $rootScope, modelClass, sourceUrl);
-          this._setupCreateListener();
+          this._setupCreateListeners();
           this.$afterInitialLoad.then((function(_this) {
             return function() {
               return _this._loaded = true;
@@ -289,8 +289,8 @@
           this.$get();
         }
 
-        GlobalSoilCollection.prototype._setupCreateListener = function() {
-          return this._scope.$on('modelSaved', (function(_this) {
+        GlobalSoilCollection.prototype._setupCreateListeners = function() {
+          this._scope.$on('modelSaved', (function(_this) {
             return function(e, model, data) {
               if (model._modelType === _this.modelClass.prototype._modelType) {
                 if (!_.any(_this.$members, function(member) {
@@ -298,6 +298,13 @@
                 })) {
                   return _this.$add(data);
                 }
+              }
+            };
+          })(this));
+          return this._scope.$on('modelCreateFailed', (function(_this) {
+            return function(e, model) {
+              if (model._modelType === _this.modelClass.prototype._modelType) {
+                return _this.$remove(model);
               }
             };
           })(this));
@@ -386,10 +393,19 @@
         SoilModel.prototype.$save = function() {
           var sendRequest;
           sendRequest = this.id ? $http.put : $http.post;
-          return sendRequest(this.$url(), this.$dataToSave()).then((function(_this) {
-            return function(response) {
-              _this.$load(response.data);
-              $rootScope.$broadcast('modelSaved', _this, response.data);
+          return sendRequest(this.$url(), this.$dataToSave()).success((function(_this) {
+            return function(responseData) {
+              _this.$load(responseData);
+              return $rootScope.$broadcast('modelSaved', _this, responseData);
+            };
+          })(this)).error((function(_this) {
+            return function() {
+              if (!_this.id) {
+                return $rootScope.$broadcast('modelCreateFailed', _this);
+              }
+            };
+          })(this)).then((function(_this) {
+            return function() {
               return _this;
             };
           })(this));
