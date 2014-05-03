@@ -76,6 +76,8 @@ angular.module('soil.collection', [])
         super($rootScope, modelClass, sourceUrl)
 
         @_setupCreateListener()
+        @$afterInitialLoad.then => @_loaded = true
+        @$get()
 
       _setupCreateListener: ->
         @_scope.$on 'modelSaved', (e, model, data) =>

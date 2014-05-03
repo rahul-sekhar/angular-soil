@@ -1,4 +1,4 @@
-/* angular-soil 1.5.0 %> */
+/* angular-soil 1.5.1 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -281,6 +281,12 @@
         function GlobalSoilCollection(modelClass, sourceUrl) {
           GlobalSoilCollection.__super__.constructor.call(this, $rootScope, modelClass, sourceUrl);
           this._setupCreateListener();
+          this.$afterInitialLoad.then((function(_this) {
+            return function() {
+              return _this._loaded = true;
+            };
+          })(this));
+          this.$get();
         }
 
         GlobalSoilCollection.prototype._setupCreateListener = function() {

@@ -328,7 +328,7 @@ describe 'soil.collection module', ->
             expect(memberIds()).toEqual [1, 3]
 
   describe 'SoilGlobalCollection', ->
-    SoilModelWithType = SoilModel = instance = rootScope = null
+    SoilModelWithType = SoilModel = instance = rootScope = httpBackend = null
 
     beforeEach inject (SoilGlobalCollection, $httpBackend, _SoilModel_, $rootScope) ->
       rootScope = $rootScope
@@ -337,6 +337,8 @@ describe 'soil.collection module', ->
       class SoilModelWithType extends SoilModel
         _modelType: 'some type'
 
+      httpBackend = $httpBackend
+      httpBackend.expectGET('/source_url').respond 'data'
       instance = new SoilGlobalCollection(SoilModelWithType, '/source_url')
 
     it 'is an instance of a SoilCollection', inject (SoilCollection) ->
@@ -350,6 +352,20 @@ describe 'soil.collection module', ->
 
     it 'sets the scope to rootScope', ->
       expect(instance._scope).toBe(rootScope)
+
+    it 'gets data from the server', ->
+      httpBackend.verifyNoOutstandingExpectation()
+
+    # Loaded attribute set after the initial load
+    describe '_loaded', ->
+      it 'is initially false', ->
+        expect(instance._loaded).toBeFalsy()
+
+      describe 'after the server responds', ->
+        beforeEach -> httpBackend.flush()
+
+        it 'is true', ->
+          expect(instance._loaded).toBeTruthy()
 
     # Event listeners
     describe 'on model creation', ->
