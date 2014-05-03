@@ -62,11 +62,13 @@ angular.module('soil.model', [])
           .then => this
 
       $delete: ->
-        @_checkIfLoaded()
-        return $http.delete(@$url())
-          .success =>
-            $rootScope.$broadcast('modelDeleted', @_modelType, @id)
-            @$load(null)
+        if @id
+          return $http.delete(@$url())
+            .success =>
+              $rootScope.$broadcast('modelDeleted', @_modelType, @id)
+              @$load(null)
+        else
+          $rootScope.$broadcast('modelCreateFailed', this)
 
       $revert: ->
         savedData = @$saved

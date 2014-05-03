@@ -371,9 +371,16 @@ describe 'soil.model module', ->
 
     # Delete the model
     describe '#$delete', ->
+      createFailedSpy = null
+      beforeEach ->
+        createFailedSpy = jasmine.createSpy('rootScope createFailed watcher')
+        rootScope.$on('modelCreateFailed', createFailedSpy)
+
       describe 'without an id', ->
-        it 'throws an error', ->
-          expect(-> instance.$delete()).toThrow()
+        beforeEach -> instance.$delete()
+        it 'broadcasts a modelCreateFailed event', ->
+          expect(createFailedSpy).toHaveBeenCalled()
+          expect(createFailedSpy.mostRecentCall.args[1]).toBe(instance)
 
       describe 'with an id', ->
         request = promise = deleteSpy = null
@@ -411,6 +418,9 @@ describe 'soil.model module', ->
           it 'sends its id in the event', ->
             expect(deleteSpy.mostRecentCall.args[2]).toEqual(5)
 
+          it 'does not broadcast a modelCreateFailed event', ->
+            expect(createFailedSpy).not.toHaveBeenCalled()
+
         describe 'on failure', ->
           beforeEach ->
             request.respond 500
@@ -424,6 +434,9 @@ describe 'soil.model module', ->
 
           it 'does not broadcast an event', ->
             expect(deleteSpy).not.toHaveBeenCalled()
+
+          it 'does not broadcast a modelCreateFailed event', ->
+            expect(createFailedSpy).not.toHaveBeenCalled()
 
 
     # Load a single field from data

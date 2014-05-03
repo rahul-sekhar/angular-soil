@@ -1,4 +1,4 @@
-/* angular-soil 1.5.2 %> */
+/* angular-soil 1.5.3 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -412,13 +412,16 @@
         };
 
         SoilModel.prototype.$delete = function() {
-          this._checkIfLoaded();
-          return $http["delete"](this.$url()).success((function(_this) {
-            return function() {
-              $rootScope.$broadcast('modelDeleted', _this._modelType, _this.id);
-              return _this.$load(null);
-            };
-          })(this));
+          if (this.id) {
+            return $http["delete"](this.$url()).success((function(_this) {
+              return function() {
+                $rootScope.$broadcast('modelDeleted', _this._modelType, _this.id);
+                return _this.$load(null);
+              };
+            })(this));
+          } else {
+            return $rootScope.$broadcast('modelCreateFailed', this);
+          }
         };
 
         SoilModel.prototype.$revert = function() {
