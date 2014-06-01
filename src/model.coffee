@@ -162,10 +162,10 @@ angular.module('soil.model', [])
 
       _setupListeners: ->
         @_scope.$on 'modelSaved', (e, model, data) =>
-          if @id && model._modelType == @_modelType && model.id == @id
+          if @id && model != this && model._modelType == @_modelType && model.id == @id
             @$load(data)
 
         @_scope.$on 'modelFieldUpdated', (e, model, field, data) =>
-          if @id && model._modelType == @_modelType && model.id == @id
+          if @id && model != this && model._modelType == @_modelType && model.id == @id
             @_loadField(field, data)
   ])

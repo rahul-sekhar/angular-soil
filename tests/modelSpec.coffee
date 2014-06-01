@@ -617,6 +617,10 @@ describe 'soil.model module', ->
       describe 'on a modelSaved event', ->
         beforeEach -> spyOn(instance, '$load')
 
+        it 'does not effect the same model', ->
+          rootScope.$broadcast('modelSaved', instance, 'data')
+          expect(instance.$load).not.toHaveBeenCalled()
+
         describe 'if the event model has a different type', ->
           beforeEach ->
             other = new SoilModel(null, { id: 6 })
@@ -656,6 +660,10 @@ describe 'soil.model module', ->
 
       describe 'on a modelFieldUpdated event', ->
         beforeEach -> spyOn(instance, '_loadField')
+
+        it 'does not effect the same model', ->
+          rootScope.$broadcast('modelFieldUpdated', instance, 'field', 'data')
+          expect(instance._loadField).not.toHaveBeenCalled()
 
         describe 'if the event model has a different type', ->
           beforeEach ->

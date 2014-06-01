@@ -1,4 +1,4 @@
-/* angular-soil 1.5.3 %> */
+/* angular-soil 1.5.4 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -548,14 +548,14 @@
         SoilModel.prototype._setupListeners = function() {
           this._scope.$on('modelSaved', (function(_this) {
             return function(e, model, data) {
-              if (_this.id && model._modelType === _this._modelType && model.id === _this.id) {
+              if (_this.id && model !== _this && model._modelType === _this._modelType && model.id === _this.id) {
                 return _this.$load(data);
               }
             };
           })(this));
           return this._scope.$on('modelFieldUpdated', (function(_this) {
             return function(e, model, field, data) {
-              if (_this.id && model._modelType === _this._modelType && model.id === _this.id) {
+              if (_this.id && model !== _this && model._modelType === _this._modelType && model.id === _this.id) {
                 return _this._loadField(field, data);
               }
             };
