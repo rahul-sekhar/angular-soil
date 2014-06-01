@@ -48,9 +48,10 @@ angular.module('soil.model', [])
         return $http.get(@$url(id)).then (response) =>
           @$load(response.data)
 
-      $save: ->
+      $save: (url) ->
         sendRequest = if @id then $http.put else $http.post
-        return sendRequest(@$url(), @$dataToSave())
+        url ||= @$url()
+        return sendRequest(url, @$dataToSave())
           .success (responseData) =>
             @$load(responseData)
             $rootScope.$broadcast('modelSaved', this, responseData)

@@ -369,6 +369,15 @@ describe 'soil.model module', ->
           httpBackend.flush()
           expect(createFailedSpy).not.toHaveBeenCalled()
 
+      describe 'with a custom url passed', ->
+        beforeEach inject (promiseExpectation) ->
+          instance.id = 5
+          request = httpBackend.expectPUT('/custom_path', 'save data')
+          request.respond null
+          promise = promiseExpectation(instance.$save('/custom_path'))
+
+        runSaveTests()
+
     # Delete the model
     describe '#$delete', ->
       createFailedSpy = null

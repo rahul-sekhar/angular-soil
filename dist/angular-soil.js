@@ -1,4 +1,4 @@
-/* angular-soil 1.5.4 %> */
+/* angular-soil 1.5.5 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -390,10 +390,11 @@
           })(this));
         };
 
-        SoilModel.prototype.$save = function() {
+        SoilModel.prototype.$save = function(url) {
           var sendRequest;
           sendRequest = this.id ? $http.put : $http.post;
-          return sendRequest(this.$url(), this.$dataToSave()).success((function(_this) {
+          url || (url = this.$url());
+          return sendRequest(url, this.$dataToSave()).success((function(_this) {
             return function(responseData) {
               _this.$load(responseData);
               return $rootScope.$broadcast('modelSaved', _this, responseData);
