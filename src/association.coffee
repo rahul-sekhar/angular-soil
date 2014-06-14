@@ -55,7 +55,7 @@ angular.module('soil.association', ['soil.collection'])
 
       beforeLoad: (data, parent) ->
         return if !data
-        associationUrl = parent.$url(data.id || parent.id)  + '/' + @_field
+        associationUrl = parent.$url(data.slug || data.id || parent.slug || parent.id)  + '/' + @_field
 
         if (data[@_field])
           collection = @_createCollection(parent, @_modelClassFor(associationUrl), associationUrl)

@@ -90,7 +90,7 @@
           if (!data) {
             return;
           }
-          associationUrl = parent.$url(data.id || parent.id) + '/' + this._field;
+          associationUrl = parent.$url(data.slug || data.id || parent.slug || parent.id) + '/' + this._field;
           if (data[this._field]) {
             collection = this._createCollection(parent, this._modelClassFor(associationUrl), associationUrl);
             return data[this._field] = collection.$load(data[this._field]);

@@ -246,6 +246,14 @@ describe 'soil.association module', ->
         it 'leaves the other field intact', ->
           expect(data.other_field).toEqual('other val')
 
+      describe 'when association data is passed with a slug', ->
+        beforeEach ->
+          data = { associations: 'association data', other_field: 'other val', id: 6, slug: 'assoc-name' }
+          instance.beforeLoad(data, parent)
+
+        it 'sets the url for the collection to the slug', ->
+          expect(data.associations.sourceUrl).toEqual('/association_url/assoc-name/associations')
+
       describe 'with the nestedUpdate option set', ->
         beforeEach inject (HasManyAssociation) ->
           instance = new HasManyAssociation('associations', 'association_ids', 'SoilModel', { nestedUpdate: true })
@@ -267,6 +275,16 @@ describe 'soil.association module', ->
 
         it 'sets the url for the collection', ->
           expect(data.associations.sourceUrl).toEqual('/association_url/4/associations')
+
+      describe 'when the parent has a slug', ->
+        beforeEach ->
+          parent.id = 4
+          parent.slug = 'parent-name'
+          data = { associations: 'association data', other_field: 'other val' }
+          instance.beforeLoad(data, parent)
+
+        it 'sets the url for the collection', ->
+          expect(data.associations.sourceUrl).toEqual('/association_url/parent-name/associations')
 
 
     # Modify data before saving it
