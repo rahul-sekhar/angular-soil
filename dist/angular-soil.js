@@ -364,9 +364,7 @@
         };
 
         SoilModel.prototype.$url = function(id) {
-          if (id == null) {
-            id = this.id;
-          }
+          id || (id = this.slug || this.id);
           if (id) {
             return this._withSlash(this._baseUrl) + id;
           } else {

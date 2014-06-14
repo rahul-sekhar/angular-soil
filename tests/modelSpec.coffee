@@ -224,9 +224,26 @@ describe 'soil.model module', ->
         it 'returns the base url with the id', ->
           expect(instance.$url()).toBe('/model_path/56')
 
-      describe 'when passed an id as an integer', ->
+      describe 'when passed an id', ->
         it 'returns the model url for that id', ->
           expect(instance.$url(12)).toBe('/model_path/12')
+
+      describe 'with a slug', ->
+        beforeEach ->
+          instance.$setBaseUrl('/model_path')
+          instance.slug = 'model-name'
+
+        it 'returns a url with the slug', ->
+          expect(instance.$url()).toBe('/model_path/model-name')
+
+      describe 'with a slug and an id', ->
+        beforeEach ->
+          instance.$setBaseUrl('/model_path')
+          instance.id = 42
+          instance.slug = 'model-name'
+
+        it 'returns a url with the slug', ->
+          expect(instance.$url()).toBe('/model_path/model-name')
 
       describe 'with postUrl set', ->
         beforeEach -> instance.$setPostUrl('/model_source')

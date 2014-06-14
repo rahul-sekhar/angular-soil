@@ -31,7 +31,8 @@ angular.module('soil.model', [])
       $setPostUrl: (newUrl) ->
         @_postUrl = newUrl
 
-      $url: (id = @id) ->
+      $url: (id) ->
+        id ||= @slug || @id
         if id
           @_withSlash(@_baseUrl) + id
         else
