@@ -46,6 +46,34 @@ describe 'soil.collection module', ->
         it 'returns the instance', ->
           expect(result).toBe(instance)
 
+      describe 'with an object passed', ->
+        beforeEach ->
+          result = instance.$load({ 
+            items: [{ id: 1, name: 'first' }, { id: 4, name: 'second' }]
+            page: 4
+            totalPages: 10
+          })
+
+        it 'sets the page number', ->
+          expect(instance.page).toBe 4
+
+        it 'sets the total number of pages', ->
+          expect(instance.totalPages).toBe 10
+
+        it 'replaces members with a model for each member', ->
+          expect(instance.$members).toEqual([jasmine.any(SoilModel), jasmine.any(SoilModel)])
+
+        it 'loads each models data', ->
+          expect(instance.$members[0].$load).toHaveBeenCalledWith({ id: 1, name: 'first' })
+          expect(instance.$members[1].$load).toHaveBeenCalledWith({ id: 4, name: 'second' })
+
+        it 'sets the scope for each model', ->
+          expect(instance.$members[0]._scope).toBe(scope)
+          expect(instance.$members[1]._scope).toBe(scope)
+
+        it 'returns the instance', ->
+          expect(result).toBe(instance)
+
       describe 'with null passed', ->
         beforeEach -> result = instance.$load(null)
 

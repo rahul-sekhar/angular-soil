@@ -178,6 +178,11 @@
         }
 
         SoilCollection.prototype.$load = function(data) {
+          if (!angular.isArray(data) && angular.isObject(data)) {
+            this.page = data.page;
+            this.totalPages = data.totalPages;
+            data = data.items;
+          }
           data || (data = []);
           this.$members = _.map(data, (function(_this) {
             return function(modelData) {

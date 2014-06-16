@@ -12,6 +12,11 @@ angular.module('soil.collection', [])
           @_setupListeners()
 
       $load: (data) ->
+        if !angular.isArray(data) && angular.isObject(data)
+          @page = data.page
+          @totalPages = data.totalPages
+          data = data.items
+
         data ||= []
         @$members = _.map data, (modelData) =>
           @_createModel(modelData)
