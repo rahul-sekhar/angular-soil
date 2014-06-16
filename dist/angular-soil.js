@@ -1,4 +1,4 @@
-/* angular-soil 1.5.6 %> */
+/* angular-soil 1.5.7 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -179,8 +179,7 @@
 
         SoilCollection.prototype.$load = function(data) {
           if (!angular.isArray(data) && angular.isObject(data)) {
-            this.page = parseInt(data.page, 10) || 0;
-            this.totalPages = parseInt(data.totalPages, 10) || 0;
+            this.data = data.data;
             data = data.items;
           }
           data || (data = []);

@@ -50,15 +50,11 @@ describe 'soil.collection module', ->
         beforeEach ->
           result = instance.$load({ 
             items: [{ id: 1, name: 'first' }, { id: 4, name: 'second' }]
-            page: '4'
-            totalPages: '10'
+            data: 'some data'
           })
 
-        it 'sets the page number', ->
-          expect(instance.page).toBe 4
-
-        it 'sets the total number of pages', ->
-          expect(instance.totalPages).toBe 10
+        it 'sets data', ->
+          expect(instance.data).toBe 'some data'
 
         it 'replaces members with a model for each member', ->
           expect(instance.$members).toEqual([jasmine.any(SoilModel), jasmine.any(SoilModel)])

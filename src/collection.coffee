@@ -13,8 +13,7 @@ angular.module('soil.collection', [])
 
       $load: (data) ->
         if !angular.isArray(data) && angular.isObject(data)
-          @page = parseInt(data.page, 10) || 0
-          @totalPages = parseInt(data.totalPages, 10) || 0
+          @data = data.data
           data = data.items
 
         data ||= []
