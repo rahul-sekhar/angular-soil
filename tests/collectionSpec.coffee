@@ -50,8 +50,8 @@ describe 'soil.collection module', ->
         beforeEach ->
           result = instance.$load({ 
             items: [{ id: 1, name: 'first' }, { id: 4, name: 'second' }]
-            page: 4
-            totalPages: 10
+            page: '4'
+            totalPages: '10'
           })
 
         it 'sets the page number', ->
