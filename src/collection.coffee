@@ -11,14 +11,15 @@ angular.module('soil.collection', [])
         if @_scope
           @_setupListeners()
 
-      $load: (data) ->
+      $load: (data, append) ->
         if !angular.isArray(data) && angular.isObject(data)
           @data = data.data
           data = data.items
 
+        @$members = [] unless append?
         data ||= []
-        @$members = _.map data, (modelData) =>
-          @_createModel(modelData)
+        _.each data, (modelData) =>
+          @$add modelData
         return this
 
       $get: ->

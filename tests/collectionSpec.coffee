@@ -46,9 +46,16 @@ describe 'soil.collection module', ->
         it 'returns the instance', ->
           expect(result).toBe(instance)
 
+      describe 'with data passed and append set', ->
+        beforeEach ->
+          result = instance.$load([{ id: 1, name: 'first' }, { id: 4, name: 'second' }], true)
+
+        it 'appends a model for each member', ->
+          expect(instance.$members).toEqual(['member1', 'member2', 'member3', jasmine.any(SoilModel), jasmine.any(SoilModel)])
+
       describe 'with an object passed', ->
         beforeEach ->
-          result = instance.$load({ 
+          result = instance.$load({
             items: [{ id: 1, name: 'first' }, { id: 4, name: 'second' }]
             data: 'some data'
           })
@@ -70,6 +77,16 @@ describe 'soil.collection module', ->
         it 'returns the instance', ->
           expect(result).toBe(instance)
 
+      describe 'with an object passed and append set', ->
+        beforeEach ->
+          result = instance.$load({
+            items: [{ id: 1, name: 'first' }, { id: 4, name: 'second' }]
+            data: 'some data'
+          }, true)
+
+        it 'appends a model for each member', ->
+          expect(instance.$members).toEqual(['member1', 'member2', 'member3', jasmine.any(SoilModel), jasmine.any(SoilModel)])
+
       describe 'with null passed', ->
         beforeEach -> result = instance.$load(null)
 
@@ -78,6 +95,12 @@ describe 'soil.collection module', ->
 
         it 'returns the instance', ->
           expect(result).toBe(instance)
+
+      describe 'with null passed and append set', ->
+        beforeEach -> result = instance.$load(null, true)
+
+        it 'adds nothing', ->
+          expect(instance.$members).toEqual(['member1', 'member2', 'member3'])
 
     # Get data from a source
     describe '#$get', ->

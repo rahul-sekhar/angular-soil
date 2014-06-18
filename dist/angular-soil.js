@@ -1,4 +1,4 @@
-/* angular-soil 1.5.7 %> */
+/* angular-soil 1.5.8 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -177,15 +177,18 @@
           }
         }
 
-        SoilCollection.prototype.$load = function(data) {
+        SoilCollection.prototype.$load = function(data, append) {
           if (!angular.isArray(data) && angular.isObject(data)) {
             this.data = data.data;
             data = data.items;
           }
+          if (append == null) {
+            this.$members = [];
+          }
           data || (data = []);
-          this.$members = _.map(data, (function(_this) {
+          _.each(data, (function(_this) {
             return function(modelData) {
-              return _this._createModel(modelData);
+              return _this.$add(modelData);
             };
           })(this));
           return this;
