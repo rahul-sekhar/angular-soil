@@ -73,6 +73,50 @@ describe 'soil.association module', ->
         it 'leaves the other field intact', ->
           expect(data.other_field).toEqual('other val')
 
+      describe 'with the buildEmpty option set', ->
+        beforeEach inject (HasOneAssociation) ->
+          instance = new HasOneAssociation('association', 'SoilModel', { buildEmpty: true })
+
+        describe 'when the field is not present in the passed data', ->
+          beforeEach ->
+            data = { other_field: 'other val' }
+            instance.beforeLoad(data, parent)
+
+          it 'builds a model instance', ->
+            expect(data.association).toEqual(jasmine.any(SoilModel))
+
+          it 'leaves the other field intact', ->
+            expect(data.other_field).toEqual('other val')
+
+        describe 'when null is passed', ->
+          beforeEach ->
+            data = null
+            instance.beforeLoad(data, parent)
+
+          it 'does nothing to the data', ->
+            expect(data).toBeNull()
+
+        describe 'when association data is passed', ->
+          beforeEach ->
+            data = { association: { field: 'val' }, other_field: 'other val' }
+            instance.beforeLoad(data, parent)
+
+          it 'creates a model instance', ->
+            expect(data.association).toEqual(jasmine.any(SoilModel))
+
+          it 'loads data into that instance', ->
+            expect(data.association.$load).toHaveBeenCalledWith({ field: 'val' })
+
+        describe 'when an id is passed', ->
+          beforeEach ->
+            data = { association_id: 5, other_field: 'other val' }
+            instance.beforeLoad(data, parent)
+
+          it 'creates a model instance', ->
+            expect(data.association).toEqual(jasmine.any(SoilModel))
+
+          it 'gets the instance by id', ->
+            expect(data.association.$get).toHaveBeenCalledWith(5)
 
     # Modify data before saving it
     describe '#beforeSave', ->

@@ -5,6 +5,7 @@ angular.module('soil.association', ['soil.collection'])
       constructor: (@_field, modelClass, options = {}) ->
         @_options = _.defaults(options, {
           saveData: false
+          buildEmpty: false
         })
         @_modelClass = $injector.get(modelClass)
         @_idField = @_field + '_id'
@@ -17,6 +18,8 @@ angular.module('soil.association', ['soil.collection'])
         else if (data[@_idField])
           data[@_field] = @_createModelInstance(parent, data[@_idField])
           delete data[@_idField]
+        else if @_options.buildEmpty
+          data[@_field] = @_createModelInstance(parent)
 
       beforeSave: (data) ->
         if (data[@_field])

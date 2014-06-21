@@ -1,4 +1,4 @@
-/* angular-soil 1.5.8 %> */
+/* angular-soil 1.5.9 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -14,7 +14,8 @@
             options = {};
           }
           this._options = _.defaults(options, {
-            saveData: false
+            saveData: false,
+            buildEmpty: false
           });
           this._modelClass = $injector.get(modelClass);
           this._idField = this._field + '_id';
@@ -29,6 +30,8 @@
           } else if (data[this._idField]) {
             data[this._field] = this._createModelInstance(parent, data[this._idField]);
             return delete data[this._idField];
+          } else if (this._options.buildEmpty) {
+            return data[this._field] = this._createModelInstance(parent);
           }
         };
 
