@@ -395,6 +395,50 @@ describe 'soil.model module', ->
 
         runSaveTests()
 
+      describe 'with loadData set to false', ->
+        beforeEach inject (promiseExpectation) ->
+          instance.id = 5
+          request = httpBackend.expectPUT('/model_path/5', 'save data')
+          request.respond null
+          promise = promiseExpectation(instance.$save(null, false))
+
+        it 'sends a request', ->
+          httpBackend.verifyNoOutstandingExpectation()
+
+        describe 'on success', ->
+          beforeEach ->
+            request.respond { field: 'formatted new val', field4: 'side effect' }
+            httpBackend.flush()
+
+          it 'does not load the response data', ->
+            expect(instance.$load).not.toHaveBeenCalled()
+
+          it 'resolves the promise', ->
+            promise.expectToBeResolved()
+
+          it 'resolves the promise with the instance', ->
+            expect(promise.arg).toBe(instance)
+
+          it 'does not broadcast an event', ->
+            expect(saveSpy).not.toHaveBeenCalled()
+
+        describe 'on failure', ->
+          beforeEach ->
+            request.respond 500
+            httpBackend.flush()
+
+          it 'does not load the response data', ->
+            expect(instance.$load).not.toHaveBeenCalled()
+
+          it 'rejects the promise', ->
+            promise.expectToBeRejected()
+
+          it 'rejects the promise with the error', ->
+            expect(promise.arg.status).toEqual 500
+
+          it 'does not broadcast an event', ->
+            expect(saveSpy).not.toHaveBeenCalled()
+
     # Delete the model
     describe '#$delete', ->
       createFailedSpy = null
