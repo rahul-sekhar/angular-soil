@@ -1,4 +1,4 @@
-/* angular-soil 1.6.0 %> */
+/* angular-soil 1.6.1 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -409,8 +409,8 @@
             return function(responseData) {
               if (loadData) {
                 _this.$load(responseData);
-                return $rootScope.$broadcast('modelSaved', _this, responseData);
               }
+              return $rootScope.$broadcast('modelSaved', _this, responseData);
             };
           })(this)).error((function(_this) {
             return function() {

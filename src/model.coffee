@@ -56,7 +56,7 @@ angular.module('soil.model', [])
           .success (responseData) =>
             if loadData
               @$load(responseData)
-              $rootScope.$broadcast('modelSaved', this, responseData)
+            $rootScope.$broadcast('modelSaved', this, responseData)
 
           .error =>
             $rootScope.$broadcast('modelCreateFailed', this) unless @id

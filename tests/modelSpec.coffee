@@ -419,8 +419,17 @@ describe 'soil.model module', ->
           it 'resolves the promise with the instance', ->
             expect(promise.arg).toBe(instance)
 
-          it 'does not broadcast an event', ->
-            expect(saveSpy).not.toHaveBeenCalled()
+          it 'broadcasts an event', ->
+            expect(saveSpy).toHaveBeenCalled()
+
+          it 'sends itself in the event', ->
+            expect(saveSpy.mostRecentCall.args[1]).toBe(instance)
+
+          it 'sends the response data in the event', ->
+            expect(saveSpy.mostRecentCall.args[2]).toEqual({ field: 'formatted new val', field4: 'side effect' })
+
+          it 'does not broadcast a modelCreateFailed event', ->
+            expect(createFailedSpy).not.toHaveBeenCalled()
 
         describe 'on failure', ->
           beforeEach ->
