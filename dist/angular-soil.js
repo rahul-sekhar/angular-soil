@@ -1,4 +1,4 @@
-/* angular-soil 1.5.9 %> */
+/* angular-soil 1.6.0 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -398,14 +398,19 @@
           })(this));
         };
 
-        SoilModel.prototype.$save = function(url) {
+        SoilModel.prototype.$save = function(url, loadData) {
           var sendRequest;
+          if (loadData == null) {
+            loadData = true;
+          }
           sendRequest = this.id ? $http.put : $http.post;
           url || (url = this.$url());
           return sendRequest(url, this.$dataToSave()).success((function(_this) {
             return function(responseData) {
-              _this.$load(responseData);
-              return $rootScope.$broadcast('modelSaved', _this, responseData);
+              if (loadData) {
+                _this.$load(responseData);
+                return $rootScope.$broadcast('modelSaved', _this, responseData);
+              }
             };
           })(this)).error((function(_this) {
             return function() {
