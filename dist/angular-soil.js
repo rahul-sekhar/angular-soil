@@ -1,4 +1,4 @@
-/* angular-soil 1.6.1 %> */
+/* angular-soil 1.6.2 %> */
 
 (function() {
   var __hasProp = {}.hasOwnProperty,
@@ -46,7 +46,7 @@
               data[this._idField] = data[this._field].id;
               return delete data[this._field];
             }
-          } else if (data[this._field] !== void 0) {
+          } else {
             if (!this._options.saveData) {
               data[this._idField] = null;
               return delete data[this._field];

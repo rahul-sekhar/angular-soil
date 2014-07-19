@@ -31,7 +31,7 @@ angular.module('soil.association', ['soil.collection'])
             data[@_idField] = data[@_field].id
             delete data[@_field]
 
-        else if data[@_field] != undefined
+        else
           unless @_options.saveData
             data[@_idField] = null
             delete data[@_field]
