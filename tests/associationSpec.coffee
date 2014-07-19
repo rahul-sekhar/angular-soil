@@ -173,6 +173,18 @@ describe 'soil.association module', ->
         it 'leaves the other field intact', ->
           expect(data.other_field).toEqual('other val')
 
+      describe 'when the field is present and is a new model', ->
+        beforeEach ->
+          data = { association: { }, other_field: 'other val' }
+          instance.beforeSave(data, parent)
+
+        it 'sets the association id to null', ->
+          expect(data.association_id).toBeNull()
+          expect(data.association).toBeUndefined()
+
+        it 'leaves the other field intact', ->
+          expect(data.other_field).toEqual('other val')
+
       describe 'with the saveData option set', ->
         beforeEach inject (HasOneAssociation) ->
           instance = new HasOneAssociation('association', 'SoilModel', { saveData: true })

@@ -28,7 +28,7 @@ angular.module('soil.association', ['soil.collection'])
             data[@_field] = data[@_field].$dataToSave()
             data[@_field].id = id
           else
-            data[@_idField] = data[@_field].id
+            data[@_idField] = data[@_field].id || null
             delete data[@_field]
 
         else if(data[@_field] != undefined)
