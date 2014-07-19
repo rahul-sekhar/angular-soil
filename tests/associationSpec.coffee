@@ -22,6 +22,14 @@ describe 'soil.association module', ->
         it 'does nothing to the data', ->
           expect(data).toEqual { other_field: 'other val' }
 
+      describe 'when the field is present and null', ->
+        beforeEach ->
+          data = { other_field: 'other val', association: null }
+          instance.beforeLoad(data, parent)
+
+        it 'does nothing to the data', ->
+          expect(data).toEqual { other_field: 'other val', association: null }
+
       describe 'when null is passed', ->
         beforeEach ->
           data = null
@@ -88,6 +96,17 @@ describe 'soil.association module', ->
           it 'leaves the other field intact', ->
             expect(data.other_field).toEqual('other val')
 
+        describe 'when the field is present and null', ->
+          beforeEach ->
+            data = { other_field: 'other val', association: null }
+            instance.beforeLoad(data, parent)
+
+          it 'builds a model instance', ->
+            expect(data.association).toEqual(jasmine.any(SoilModel))
+
+          it 'leaves the other field intact', ->
+            expect(data.other_field).toEqual('other val')
+
         describe 'when null is passed', ->
           beforeEach ->
             data = null
@@ -127,12 +146,8 @@ describe 'soil.association module', ->
           data = { other_field: 'other val' }
           instance.beforeSave(data, parent)
 
-        it 'sets the association id to null', ->
-          expect(data.association_id).toBeNull()
-          expect(data.association).toBeUndefined()
-
-        it 'leaves the other field intact', ->
-          expect(data.other_field).toEqual('other val')
+        it 'does nothing to the data', ->
+          expect(data).toEqual { other_field: 'other val' }
 
       describe 'when the field is present', ->
         beforeEach ->
