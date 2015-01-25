@@ -3,20 +3,20 @@ angular.module('soil.model.mock', ['soil.model', 'angular-mock-promise'])
     $provide.decorator('SoilModel', ['$delegate', 'createMockPromise', ($delegate, createMockPromise) ->
       class SoilModelMock extends $delegate
         constructor: (arg) ->
-          spyOn(this, '$load').andCallThrough()
-          spyOn(this, '$revert').andCallThrough()
+          spyOn(this, '$load').and.callThrough()
+          spyOn(this, '$revert').and.callThrough()
 
           @_getPromise = createMockPromise()
-          spyOn(this, '$get').andReturn(@_getPromise)
+          spyOn(this, '$get').and.returnValue(@_getPromise)
 
           @_savePromise = createMockPromise()
-          spyOn(this, '$save').andReturn(@_savePromise)
+          spyOn(this, '$save').and.returnValue(@_savePromise)
 
           @_deletePromise = createMockPromise()
-          spyOn(this, '$delete').andReturn(@_deletePromise)
+          spyOn(this, '$delete').and.returnValue(@_deletePromise)
 
           @_updatePromise = createMockPromise()
-          spyOn(this, '$updateField').andReturn(@_updatePromise)
+          spyOn(this, '$updateField').and.returnValue(@_updatePromise)
           super
 
     ])

@@ -195,7 +195,7 @@ describe 'soil.association module', ->
             instance.beforeSave(data, parent)
 
           it 'replaces the association with its data', ->
-            expect(data.association).toEqual { modelData: 'val' }
+            expect(data.association).toEqual { id: undefined, modelData: 'val' }
 
           it 'leaves the other field intact', ->
             expect(data.other_field).toEqual('other val')
@@ -398,7 +398,7 @@ describe 'soil.association module', ->
 
         it 'replaces the association with its data, adding ids where present', ->
           expect(data.associations).toEqual([
-            { data1: 'val1' },
+            { id: undefined, data1: 'val1' },
             { id: 5, data2: 'val2' },
             { id: 6, data3: 'val3' }
           ])

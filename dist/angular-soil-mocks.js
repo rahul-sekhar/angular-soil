@@ -13,9 +13,9 @@
             __extends(SoilCollectionMock, _super);
 
             function SoilCollectionMock() {
-              spyOn(this, '$load').andCallThrough();
+              spyOn(this, '$load').and.callThrough();
               this._getPromise = createMockPromise();
-              spyOn(this, '$get').andReturn(this._getPromise);
+              spyOn(this, '$get').and.returnValue(this._getPromise);
               SoilCollectionMock.__super__.constructor.apply(this, arguments);
             }
 
@@ -42,16 +42,16 @@
             __extends(SoilModelMock, _super);
 
             function SoilModelMock(arg) {
-              spyOn(this, '$load').andCallThrough();
-              spyOn(this, '$revert').andCallThrough();
+              spyOn(this, '$load').and.callThrough();
+              spyOn(this, '$revert').and.callThrough();
               this._getPromise = createMockPromise();
-              spyOn(this, '$get').andReturn(this._getPromise);
+              spyOn(this, '$get').and.returnValue(this._getPromise);
               this._savePromise = createMockPromise();
-              spyOn(this, '$save').andReturn(this._savePromise);
+              spyOn(this, '$save').and.returnValue(this._savePromise);
               this._deletePromise = createMockPromise();
-              spyOn(this, '$delete').andReturn(this._deletePromise);
+              spyOn(this, '$delete').and.returnValue(this._deletePromise);
               this._updatePromise = createMockPromise();
-              spyOn(this, '$updateField').andReturn(this._updatePromise);
+              spyOn(this, '$updateField').and.returnValue(this._updatePromise);
               SoilModelMock.__super__.constructor.apply(this, arguments);
             }
 

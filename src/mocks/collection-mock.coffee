@@ -3,10 +3,10 @@ angular.module('soil.collection.mock', ['soil.collection', 'angular-mock-promise
     $provide.decorator('SoilCollection', ['$delegate', 'createMockPromise', ($delegate, createMockPromise) ->
       class SoilCollectionMock extends $delegate
         constructor: ->
-          spyOn(this, '$load').andCallThrough()
+          spyOn(this, '$load').and.callThrough()
 
           @_getPromise = createMockPromise()
-          spyOn(this, '$get').andReturn(@_getPromise)
+          spyOn(this, '$get').and.returnValue(@_getPromise)
 
           super
     ])

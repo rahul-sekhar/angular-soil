@@ -167,7 +167,7 @@ describe 'soil.model module', ->
       beforeEach inject (promiseExpectation) ->
         response = httpBackend.expectGET('/6')
         response.respond null
-        spyOn(instance, '$load').andReturn(instance)
+        spyOn(instance, '$load').and.returnValue(instance)
         promise = promiseExpectation(instance.$get(6))
 
       it 'sends a GET request', ->
@@ -302,7 +302,7 @@ describe 'soil.model module', ->
       request = promise = saveSpy = createFailedSpy = null
       beforeEach ->
         instance.$setBaseUrl('/model_path')
-        spyOn(instance, '$dataToSave').andReturn('save data')
+        spyOn(instance, '$dataToSave').and.returnValue('save data')
         spyOn(instance, '$load')
 
         saveSpy = jasmine.createSpy('rootScope save watcher')
@@ -333,10 +333,10 @@ describe 'soil.model module', ->
             expect(saveSpy).toHaveBeenCalled()
 
           it 'sends itself in the event', ->
-            expect(saveSpy.mostRecentCall.args[1]).toBe(instance)
+            expect(saveSpy.calls.mostRecent().args[1]).toBe(instance)
 
           it 'sends the response data in the event', ->
-            expect(saveSpy.mostRecentCall.args[2]).toEqual({ field: 'formatted new val', field4: 'side effect' })
+            expect(saveSpy.calls.mostRecent().args[2]).toEqual({ field: 'formatted new val', field4: 'side effect' })
 
           it 'does not broadcast a modelCreateFailed event', ->
             expect(createFailedSpy).not.toHaveBeenCalled()
@@ -370,7 +370,7 @@ describe 'soil.model module', ->
           request.respond 500
           httpBackend.flush()
           expect(createFailedSpy).toHaveBeenCalled()
-          expect(createFailedSpy.mostRecentCall.args[1]).toBe(instance)
+          expect(createFailedSpy.calls.mostRecent().args[1]).toBe(instance)
 
       describe 'with an id', ->
         beforeEach inject (promiseExpectation) ->
@@ -423,10 +423,10 @@ describe 'soil.model module', ->
             expect(saveSpy).toHaveBeenCalled()
 
           it 'sends itself in the event', ->
-            expect(saveSpy.mostRecentCall.args[1]).toBe(instance)
+            expect(saveSpy.calls.mostRecent().args[1]).toBe(instance)
 
           it 'sends the response data in the event', ->
-            expect(saveSpy.mostRecentCall.args[2]).toEqual({ field: 'formatted new val', field4: 'side effect' })
+            expect(saveSpy.calls.mostRecent().args[2]).toEqual({ field: 'formatted new val', field4: 'side effect' })
 
           it 'does not broadcast a modelCreateFailed event', ->
             expect(createFailedSpy).not.toHaveBeenCalled()
@@ -459,7 +459,7 @@ describe 'soil.model module', ->
         beforeEach -> instance.$delete()
         it 'broadcasts a modelCreateFailed event', ->
           expect(createFailedSpy).toHaveBeenCalled()
-          expect(createFailedSpy.mostRecentCall.args[1]).toBe(instance)
+          expect(createFailedSpy.calls.mostRecent().args[1]).toBe(instance)
 
       describe 'with an id', ->
         request = promise = deleteSpy = null
@@ -492,10 +492,10 @@ describe 'soil.model module', ->
             expect(deleteSpy).toHaveBeenCalled()
 
           it 'sends its type in the event', ->
-            expect(deleteSpy.mostRecentCall.args[1]).toEqual('a particular model')
+            expect(deleteSpy.calls.mostRecent().args[1]).toEqual('a particular model')
 
           it 'sends its id in the event', ->
-            expect(deleteSpy.mostRecentCall.args[2]).toEqual(5)
+            expect(deleteSpy.calls.mostRecent().args[2]).toEqual(5)
 
           it 'does not broadcast a modelCreateFailed event', ->
             expect(createFailedSpy).not.toHaveBeenCalled()
@@ -588,13 +588,13 @@ describe 'soil.model module', ->
             expect(updateSpy).toHaveBeenCalled()
 
           it 'sends itself in the event', ->
-            expect(updateSpy.mostRecentCall.args[1]).toBe(instance)
+            expect(updateSpy.calls.mostRecent().args[1]).toBe(instance)
 
           it 'sends the field in the event', ->
-            expect(updateSpy.mostRecentCall.args[2]).toEqual('field')
+            expect(updateSpy.calls.mostRecent().args[2]).toEqual('field')
 
           it 'sends the response data in the event', ->
-            expect(updateSpy.mostRecentCall.args[3]).toEqual('response data')
+            expect(updateSpy.calls.mostRecent().args[3]).toEqual('response data')
 
         describe 'on failure', ->
           beforeEach ->
